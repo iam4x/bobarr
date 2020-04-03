@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { LayoutComponent } from '../components/layout/layout.component';
-import { HomeComponent } from '../components/home/home.component';
+import { SearchComponent } from '../components/search/search.component';
 
-export default function IndexPage() {
+export default function SearchPage() {
   return (
     <LayoutComponent>
-      <HomeComponent />
+      <SearchComponent />
     </LayoutComponent>
   );
 }

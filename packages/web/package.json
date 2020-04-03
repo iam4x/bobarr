@@ -8,13 +8,26 @@
     "start": "next start"
   },
   "dependencies": {
+    "add": "^2.0.6",
+    "axios": "~0.18.1",
+    "classnames": "^2.2.6",
+    "dayjs": "^1.8.23",
     "next": "9.3.4",
+    "pure-react-carousel": "^1.27.0",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "react-icons": "^3.9.0",
+    "styled-components": "^5.0.1",
+    "styled-reset": "^4.1.2",
+    "use-async-effect": "^2.2.2",
+    "yarn": "^1.22.4"
   },
   "devDependencies": {
+    "@types/classnames": "^2.2.10",
     "@types/node": "^13.11.0",
     "@types/react": "^16.9.32",
+    "@types/styled-components": "^5.0.1",
+    "babel-plugin-styled-components": "^1.10.7",
     "typescript": "^3.8.3"
   }
 }
