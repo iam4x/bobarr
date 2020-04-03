@@ -1,0 +1,48 @@
+version: "3.4"
+
+volumes:
+  db_data:
+  api_node_modules:
+  web_node_modules:
+
+networks:
+  default:
+
+services:
+  api:
+    container_name: api
+    build:
+      context: ./packages/api
+    env_file: .env
+    volumes:
+      - ./packages/api:/usr/src/app
+      - api_node_modules:/usr/src/app/node_modules
+    ports:
+      - 4000:4000
+      - 9229:9229
+    depends_on:
+      - postgres
+    command: yarn start:dev
+
+  web:
+    container_name: web
+    build:
+      context: ./packages/web
+    env_file: .env
+    volumes:
+      - ./packages/web:/usr/src/app
+      - web_node_modules:/usr/src/app/node_modules
+    ports:
+      - 3000:3000
+    depends_on:
+      - api
+    command: yarn dev
+
+  postgres:
+    container_name: postgresql
+    image: postgres:12-alpine
+    env_file: .env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
