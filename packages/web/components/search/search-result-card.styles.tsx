@@ -11,6 +11,7 @@ export const SearchResultCardStyles = styled.div<Props>`
   width: 220px;
 
   .poster {
+    background-color: #fecea8;
     background-image: url(${(props) => props.posterPath});
     border-radius: 12px;
     margin-bottom: 24px;

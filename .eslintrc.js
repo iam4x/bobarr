@@ -8,6 +8,7 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
 
-    'new-cap': 'off'
+    'new-cap': 'off',
+    'no-console': 'warn'
   }
 };

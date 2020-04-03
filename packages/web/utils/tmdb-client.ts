@@ -16,6 +16,18 @@ class TMDBClient {
   public popularTVShows(region = 'fr') {
     return this.client.get('/tv/popular', { params: { region } });
   }
+
+  public async search(query: string) {
+    const [movies, tvShows] = await Promise.all([
+      this.client
+        .get('/search/movie', { params: { query } })
+        .then(({ data }) => data.results),
+      this.client
+        .get('/search/tv', { params: { query } })
+        .then(({ data }) => data.results),
+    ]);
+    return { movies, tvShows };
+  }
 }
 
 export const tmdb = new TMDBClient();

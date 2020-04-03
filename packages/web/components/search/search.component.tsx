@@ -5,6 +5,7 @@ import {
   FaSearch,
   FaChevronCircleLeft,
   FaChevronCircleRight,
+  FaCircleNotch,
 } from 'react-icons/fa';
 
 import {
@@ -21,12 +22,50 @@ import { SearchResultCardComponent } from './search-result-card.component';
 import { SearchStyles, Wrapper } from './search.styles';
 
 export function SearchComponent() {
-  const [searchQuery, setSearchQuery] = useState('fight club');
+  const [searchQuery, setSearchQuery] = useState('');
+
   const [popularMovies, setPopularMovies] = useState<any[]>([]);
   const [popularTVShows, setPopularTVShows] = useState<any[]>([]);
 
-  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
+  const [loading, setLoading] = useState(false);
+  const [lastSearchQuery, setLastSearchQuery] = useState<string | null>(null);
+  const [searchResults, setSearchResults] = useState<{
+    movies: any[];
+    tvShows: any[];
+  }>({ movies: [], tvShows: [] });
+
+  const displayMovieSearchResults =
+    searchQuery &&
+    lastSearchQuery === searchQuery &&
+    searchResults.movies.length > 0;
+
+  const displayTVSearchResults =
+    searchQuery &&
+    lastSearchQuery === searchQuery &&
+    searchResults.tvShows.length > 0;
+
+  const SearchIcon = loading ? FaCircleNotch : FaSearch;
+  const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (
+      !loading &&
+      searchQuery &&
+      searchQuery.trim() &&
+      lastSearchQuery !== searchQuery
+    ) {
+      setLoading(true);
+
+      try {
+        const results = await tmdb.search(searchQuery);
+        setSearchResults(results);
+        setLastSearchQuery(searchQuery);
+      } catch (error) {
+        console.error(error);
+      }
+
+      setLoading(false);
+    }
   };
 
   useAsyncEffect(async () => {
@@ -51,7 +90,7 @@ export function SearchComponent() {
                 onChange={({ target }) => setSearchQuery(target.value)}
               />
               <button type="submit" className="search-bar--input-submit">
-                <FaSearch style={{ marginRight: 8 }} /> Search
+                <SearchIcon style={{ marginRight: 8 }} /> Search
               </button>
             </div>
           </form>
@@ -60,13 +99,23 @@ export function SearchComponent() {
 
       <Wrapper>
         <div className="search-results--container">
-          <div className="search-results--category">Popular Movies</div>
-          <ResultsCarousel results={popularMovies} />
-
+          <div className="search-results--category">
+            {displayMovieSearchResults ? 'Found Movies' : 'Popular Movies'}
+          </div>
+          <ResultsCarousel
+            results={
+              displayMovieSearchResults ? searchResults.movies : popularMovies
+            }
+          />
           <div className="spacer" />
-
-          <div className="search-results--category">Popular TV Shows</div>
-          <ResultsCarousel results={popularTVShows} />
+          <div className="search-results--category">
+            {displayTVSearchResults ? 'Found TV Shows' : 'Popular TV Shows'}
+          </div>
+          <ResultsCarousel
+            results={
+              displayTVSearchResults ? searchResults.tvShows : popularTVShows
+            }
+          />
         </div>
       </Wrapper>
     </SearchStyles>
