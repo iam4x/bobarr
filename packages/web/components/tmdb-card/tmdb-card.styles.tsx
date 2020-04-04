@@ -35,7 +35,7 @@ export const TMDBCardStyles = styled.div<Props>`
 
     .overlay {
       display: flex;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.8);
       align-items: center;
       justify-content: center;
       flex-direction: column;

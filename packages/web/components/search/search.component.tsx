@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Skeleton } from 'antd';
+import { useTheme } from 'styled-components';
 
 import {
   FaSearch,
@@ -16,15 +17,15 @@ import {
   ButtonNext,
 } from 'pure-react-carousel';
 
-import { SearchStyles, Wrapper } from './search.styles';
-
 import {
   useGetPopularQuery,
   useSearchLazyQuery,
   TmdbSearchResult,
+  useGetLibraryMoviesQuery,
 } from '../../utils/graphql';
+
 import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
-import { useTheme } from 'styled-components';
+import { SearchStyles, Wrapper } from './search.styles';
 
 export function SearchComponent() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -104,6 +105,7 @@ function ResultsCarousel({
   type: 'movie' | 'tvshow';
 }) {
   const theme = useTheme();
+  const { data } = useGetLibraryMoviesQuery();
 
   return (
     <div className="carrousel--container">
@@ -117,11 +119,22 @@ function ResultsCarousel({
           <FaChevronCircleLeft size={16} />
         </ButtonBack>
         <Slider>
-          {results.map((result, index) => (
-            <Slide key={result.id} index={index}>
-              <TMDBCardComponent key={result.id} type={type} result={result} />
-            </Slide>
-          ))}
+          {results.map((result, index) => {
+            const inLibrary =
+              data?.movies?.some((movie) => movie.tmdbId === result.tmdbId) ||
+              false;
+
+            return (
+              <Slide key={result.id} index={index}>
+                <TMDBCardComponent
+                  key={result.id}
+                  type={type}
+                  result={result}
+                  inLibrary={inLibrary}
+                />
+              </Slide>
+            );
+          })}
         </Slider>
         <ButtonNext className="arrow-right">
           <FaChevronCircleRight size={16} />

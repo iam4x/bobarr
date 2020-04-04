@@ -29,7 +29,7 @@ export function useRemoveLibrary({
       cancelText: 'No',
       onOk: () => {
         if (type === 'movie') {
-          return removeMovie({ variables: { movieId: result.id } });
+          return removeMovie({ variables: { tmdbId: result.tmdbId } });
         }
         return Promise.resolve();
       },

@@ -12,39 +12,6 @@ export type Scalars = {
   DateTime: any;
 };
 
-export type Query = {
-   __typename?: 'Query';
-  getParams: ParamsHash;
-  search: TmdbSearchResults;
-  getPopular: TmdbSearchResults;
-  getMovies: Array<EnrichedMovie>;
-};
-
-
-export type QuerySearchArgs = {
-  query: Scalars['String'];
-};
-
-export type ParamsHash = {
-   __typename?: 'ParamsHash';
-  language: Scalars['String'];
-  region: Scalars['String'];
-};
-
-export type TmdbSearchResults = {
-   __typename?: 'TMDBSearchResults';
-  movies: Array<TmdbSearchResult>;
-  tvShows: Array<TmdbSearchResult>;
-};
-
-export type TmdbSearchResult = {
-   __typename?: 'TMDBSearchResult';
-  id: Scalars['Float'];
-  title: Scalars['String'];
-  voteAverage: Scalars['Float'];
-  posterPath?: Maybe<Scalars['String']>;
-  releaseDate?: Maybe<Scalars['String']>;
-};
 
 export type EnrichedMovie = {
    __typename?: 'EnrichedMovie';
@@ -59,6 +26,21 @@ export type EnrichedMovie = {
   releaseDate: Scalars['String'];
 };
 
+export type GraphQlCommonResponse = {
+   __typename?: 'GraphQLCommonResponse';
+  success: Scalars['Boolean'];
+  message?: Maybe<Scalars['String']>;
+};
+
+export type Movie = {
+   __typename?: 'Movie';
+  id: Scalars['Float'];
+  tmdbId: Scalars['Float'];
+  title: Scalars['String'];
+  state: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
 
 export type Mutation = {
    __typename?: 'Mutation';
@@ -74,27 +56,46 @@ export type MutationTrackMovieArgs = {
 
 
 export type MutationRemoveMovieArgs = {
-  movieId: Scalars['Int'];
+  tmdbId: Scalars['Int'];
 };
 
-export type Movie = {
-   __typename?: 'Movie';
+export type ParamsHash = {
+   __typename?: 'ParamsHash';
+  language: Scalars['String'];
+  region: Scalars['String'];
+};
+
+export type Query = {
+   __typename?: 'Query';
+  getParams: ParamsHash;
+  search: TmdbSearchResults;
+  getPopular: TmdbSearchResults;
+  getMovies: Array<EnrichedMovie>;
+};
+
+
+export type QuerySearchArgs = {
+  query: Scalars['String'];
+};
+
+export type TmdbSearchResult = {
+   __typename?: 'TMDBSearchResult';
   id: Scalars['Float'];
   tmdbId: Scalars['Float'];
   title: Scalars['String'];
-  state: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
+  voteAverage: Scalars['Float'];
+  posterPath?: Maybe<Scalars['String']>;
+  releaseDate?: Maybe<Scalars['String']>;
 };
 
-export type GraphQlCommonResponse = {
-   __typename?: 'GraphQLCommonResponse';
-  success: Scalars['Boolean'];
-  message?: Maybe<Scalars['String']>;
+export type TmdbSearchResults = {
+   __typename?: 'TMDBSearchResults';
+  movies: Array<TmdbSearchResult>;
+  tvShows: Array<TmdbSearchResult>;
 };
 
 export type RemoveMovieMutationVariables = {
-  movieId: Scalars['Int'];
+  tmdbId: Scalars['Int'];
 };
 
 
@@ -151,10 +152,10 @@ export type GetPopularQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
     )> }
   ) }
 );
@@ -170,18 +171,18 @@ export type SearchQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
     )> }
   ) }
 );
 
 
 export const RemoveMovieDocument = gql`
-    mutation removeMovie($movieId: Int!) {
-  result: removeMovie(movieId: $movieId) {
+    mutation removeMovie($tmdbId: Int!) {
+  result: removeMovie(tmdbId: $tmdbId) {
     success
     message
   }
@@ -202,7 +203,7 @@ export type RemoveMovieMutationFn = ApolloReactCommon.MutationFunction<RemoveMov
  * @example
  * const [removeMovieMutation, { data, loading, error }] = useRemoveMovieMutation({
  *   variables: {
- *      movieId: // value for 'movieId'
+ *      tmdbId: // value for 'tmdbId'
  *   },
  * });
  */
@@ -323,6 +324,7 @@ export const GetPopularDocument = gql`
   results: getPopular {
     movies {
       id
+      tmdbId
       title
       releaseDate
       posterPath
@@ -330,6 +332,7 @@ export const GetPopularDocument = gql`
     }
     tvShows {
       id
+      tmdbId
       title
       releaseDate
       posterPath
@@ -368,6 +371,7 @@ export const SearchDocument = gql`
   results: search(query: $query) {
     movies {
       id
+      tmdbId
       title
       releaseDate
       posterPath
@@ -375,6 +379,7 @@ export const SearchDocument = gql`
     }
     tvShows {
       id
+      tmdbId
       title
       releaseDate
       posterPath

@@ -30,7 +30,7 @@ export function useAddLibrary({
       onOk: () => {
         if (type === 'movie') {
           return trackMovie({
-            variables: { title: result.title, tmdbId: result.id },
+            variables: { title: result.title, tmdbId: result.tmdbId },
           });
         }
         return Promise.resolve();

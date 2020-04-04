@@ -1,5 +1,5 @@
-mutation removeMovie($movieId: Int!) {
-  result: removeMovie(movieId: $movieId) {
+mutation removeMovie($tmdbId: Int!) {
+  result: removeMovie(tmdbId: $tmdbId) {
     success
     message
   }

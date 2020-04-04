@@ -58,6 +58,7 @@ export class TMDBService {
   private mapMovie(result: TMDBMovie) {
     return {
       id: result.id,
+      tmdbId: result.id,
       title: result.title,
       releaseDate: result.release_date,
       posterPath: result.poster_path,
@@ -68,6 +69,7 @@ export class TMDBService {
   private mapTVShow(result: TMDBTVShow) {
     return {
       id: result.id,
+      tmdbId: result.id,
       title: result.name,
       releaseDate: result.first_air_date,
       posterPath: result.poster_path,

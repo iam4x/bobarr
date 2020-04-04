@@ -43,6 +43,7 @@ export interface TMDBTVShow {
 @ObjectType()
 export class TMDBSearchResult {
   @Field() public id!: number;
+  @Field() public tmdbId!: number;
   @Field() public title!: string;
   @Field() public voteAverage!: number;
   @Field({ nullable: true }) public posterPath?: string;

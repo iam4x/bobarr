@@ -35,7 +35,7 @@ type Movie {
 
 type Mutation {
   trackMovie(tmdbId: Int!, title: String!): Movie!
-  removeMovie(movieId: Int!): GraphQLCommonResponse!
+  removeMovie(tmdbId: Int!): GraphQLCommonResponse!
 }
 
 type ParamsHash {
@@ -52,6 +52,7 @@ type Query {
 
 type TMDBSearchResult {
   id: Float!
+  tmdbId: Float!
   title: String!
   voteAverage: Float!
   posterPath: String

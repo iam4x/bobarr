@@ -29,9 +29,9 @@ export class LibraryResolver {
 
   @Mutation((_returns) => GraphQLCommonResponse)
   public async removeMovie(
-    @Args('movieId', { type: () => Int }) movieId: number
+    @Args('tmdbId', { type: () => Int }) tmdbId: number
   ) {
-    await this.movieDAO.delete({ id: movieId });
+    await this.movieDAO.delete({ tmdbId });
     return { success: true, message: 'MOVIE_REMOVED_FROM_LIBRARY' };
   }
 }
