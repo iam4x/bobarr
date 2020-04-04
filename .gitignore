@@ -7,3 +7,8 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# jackett
+packages/jackett/config/*
+packages/jackett/downloads/*
+!packages/jackett/**/.gitkeep
