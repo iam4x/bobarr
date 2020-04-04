@@ -12,3 +12,14 @@ yarn-error.log*
 packages/jackett/config/*
 packages/jackett/downloads/*
 !packages/jackett/**/.gitkeep
+
+# transmission
+library/downloads/*
+!library/downloads/.gitkeep
+packages/transmission/config/*
+packages/transmission/watch/*
+!packages/transmission/**/.gitkeep
+
+# vpn
+packages/vpn/*
+!packages/vpn/.gitkeep

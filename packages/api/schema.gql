@@ -7,11 +7,17 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+enum DownloadableMediaState {
+  MISSING
+  DOWNLOADING
+  DOWNLOADED
+}
+
 type EnrichedMovie {
   id: Float!
   tmdbId: Float!
   title: String!
-  state: String!
+  state: DownloadableMediaState!
   createdAt: DateTime!
   updatedAt: DateTime!
   posterPath: String
@@ -28,7 +34,7 @@ type Movie {
   id: Float!
   tmdbId: Float!
   title: String!
-  state: String!
+  state: DownloadableMediaState!
   createdAt: DateTime!
   updatedAt: DateTime!
 }

@@ -8,3 +8,9 @@ export const DB_CONFIG = {
   entities: [`${__dirname}/entities/*.entity{.ts,.js}`],
   synchronize: true,
 };
+
+export const REDIS_CONFIG = {
+  host: 'redis',
+  port: 6379,
+  password: process.env.REDIS_PASSWORD,
+};

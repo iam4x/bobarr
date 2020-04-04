@@ -25,7 +25,7 @@ export class Movie {
   @Column('varchar')
   public title!: string;
 
-  @Field()
+  @Field((_type) => DownloadableMediaState)
   @Column('varchar', { default: DownloadableMediaState.MISSING })
   public state: DownloadableMediaState = DownloadableMediaState.MISSING;
 

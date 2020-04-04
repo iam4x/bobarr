@@ -24,7 +24,7 @@ export class LibraryResolver {
     @Args('title') title: string,
     @Args('tmdbId', { type: () => Int }) tmdbId: number
   ) {
-    return this.movieDAO.save({ title, tmdbId });
+    return this.libraryService.trackMovie({ title, tmdbId });
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)
