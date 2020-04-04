@@ -16,7 +16,6 @@ import {
   ButtonNext,
 } from 'pure-react-carousel';
 
-import { SearchResultCardComponent } from './search-result-card.component';
 import { SearchStyles, Wrapper } from './search.styles';
 
 import {
@@ -24,6 +23,8 @@ import {
   useSearchLazyQuery,
   TmdbSearchResult,
 } from '../../utils/graphql';
+import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
+import { useTheme } from 'styled-components';
 
 export function SearchComponent() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -102,10 +103,12 @@ function ResultsCarousel({
   results: TmdbSearchResult[];
   type: 'movie' | 'tvshow';
 }) {
+  const theme = useTheme();
+
   return (
     <div className="carrousel--container">
       <CarouselProvider
-        naturalSlideHeight={420}
+        naturalSlideHeight={theme.tmdbCardHeight}
         naturalSlideWidth={220}
         totalSlides={results.length}
         visibleSlides={5}
@@ -116,11 +119,7 @@ function ResultsCarousel({
         <Slider>
           {results.map((result, index) => (
             <Slide key={result.id} index={index}>
-              <SearchResultCardComponent
-                key={result.id}
-                type={type}
-                result={result}
-              />
+              <TMDBCardComponent key={result.id} type={type} result={result} />
             </Slide>
           ))}
         </Slider>

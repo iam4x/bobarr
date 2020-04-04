@@ -19,6 +19,11 @@ type EnrichedMovie {
   releaseDate: String!
 }
 
+type GraphQLCommonResponse {
+  success: Boolean!
+  message: String
+}
+
 type Movie {
   id: Float!
   tmdbId: Float!
@@ -30,6 +35,7 @@ type Movie {
 
 type Mutation {
   trackMovie(tmdbId: Int!, title: String!): Movie!
+  removeMovie(movieId: Int!): GraphQLCommonResponse!
 }
 
 type ParamsHash {

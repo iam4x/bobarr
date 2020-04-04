@@ -5,7 +5,7 @@ interface Props {
   vote: number;
 }
 
-export const SearchResultCardStyles = styled.div<Props>`
+export const TMDBCardStyles = styled.div<Props>`
   flex-shrink: 0;
   position: relative;
   width: 220px;

@@ -1,5 +1,5 @@
 query getLibraryMovies {
-  getMovies {
+  movies: getMovies {
     id
     tmdbId
     title

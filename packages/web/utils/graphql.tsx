@@ -41,9 +41,9 @@ export type TmdbSearchResult = {
    __typename?: 'TMDBSearchResult';
   id: Scalars['Float'];
   title: Scalars['String'];
-  releaseDate: Scalars['String'];
-  posterPath: Scalars['String'];
   voteAverage: Scalars['Float'];
+  posterPath?: Maybe<Scalars['String']>;
+  releaseDate?: Maybe<Scalars['String']>;
 };
 
 export type EnrichedMovie = {
@@ -63,12 +63,18 @@ export type EnrichedMovie = {
 export type Mutation = {
    __typename?: 'Mutation';
   trackMovie: Movie;
+  removeMovie: GraphQlCommonResponse;
 };
 
 
 export type MutationTrackMovieArgs = {
   tmdbId: Scalars['Int'];
   title: Scalars['String'];
+};
+
+
+export type MutationRemoveMovieArgs = {
+  movieId: Scalars['Int'];
 };
 
 export type Movie = {
@@ -80,6 +86,25 @@ export type Movie = {
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
 };
+
+export type GraphQlCommonResponse = {
+   __typename?: 'GraphQLCommonResponse';
+  success: Scalars['Boolean'];
+  message?: Maybe<Scalars['String']>;
+};
+
+export type RemoveMovieMutationVariables = {
+  movieId: Scalars['Int'];
+};
+
+
+export type RemoveMovieMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
 
 export type TrackMovieMutationVariables = {
   title: Scalars['String'];
@@ -100,7 +125,7 @@ export type GetLibraryMoviesQueryVariables = {};
 
 export type GetLibraryMoviesQuery = (
   { __typename?: 'Query' }
-  & { getMovies: Array<(
+  & { movies: Array<(
     { __typename?: 'EnrichedMovie' }
     & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'state' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
@@ -154,6 +179,39 @@ export type SearchQuery = (
 );
 
 
+export const RemoveMovieDocument = gql`
+    mutation removeMovie($movieId: Int!) {
+  result: removeMovie(movieId: $movieId) {
+    success
+    message
+  }
+}
+    `;
+export type RemoveMovieMutationFn = ApolloReactCommon.MutationFunction<RemoveMovieMutation, RemoveMovieMutationVariables>;
+
+/**
+ * __useRemoveMovieMutation__
+ *
+ * To run a mutation, you first call `useRemoveMovieMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveMovieMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeMovieMutation, { data, loading, error }] = useRemoveMovieMutation({
+ *   variables: {
+ *      movieId: // value for 'movieId'
+ *   },
+ * });
+ */
+export function useRemoveMovieMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RemoveMovieMutation, RemoveMovieMutationVariables>) {
+        return ApolloReactHooks.useMutation<RemoveMovieMutation, RemoveMovieMutationVariables>(RemoveMovieDocument, baseOptions);
+      }
+export type RemoveMovieMutationHookResult = ReturnType<typeof useRemoveMovieMutation>;
+export type RemoveMovieMutationResult = ApolloReactCommon.MutationResult<RemoveMovieMutation>;
+export type RemoveMovieMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveMovieMutation, RemoveMovieMutationVariables>;
 export const TrackMovieDocument = gql`
     mutation trackMovie($title: String!, $tmdbId: Int!) {
   trackMovie(title: $title, tmdbId: $tmdbId) {
@@ -189,7 +247,7 @@ export type TrackMovieMutationResult = ApolloReactCommon.MutationResult<TrackMov
 export type TrackMovieMutationOptions = ApolloReactCommon.BaseMutationOptions<TrackMovieMutation, TrackMovieMutationVariables>;
 export const GetLibraryMoviesDocument = gql`
     query getLibraryMovies {
-  getMovies {
+  movies: getMovies {
     id
     tmdbId
     title

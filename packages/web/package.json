@@ -19,7 +19,7 @@
     "apollo-link-http": "^1.5.16",
     "classnames": "^2.2.6",
     "dayjs": "^1.8.23",
-    "graphql": "^15.0.0",
+    "graphql": "^14.0.0",
     "graphql-tag": "^2.10.3",
     "isomorphic-unfetch": "^3.0.0",
     "next": "9.3.4",

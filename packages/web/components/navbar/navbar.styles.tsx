@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const NavbarStyles = styled.div`
   background: ${({ theme }) => theme.colors.navbarBackground};
   color: #fff;
-  height: ${({ theme }) => theme.navbarHeight};
+  height: ${({ theme }) => theme.navbarHeight}px;
   position: fixed;
   top: 0;
   left: 0;

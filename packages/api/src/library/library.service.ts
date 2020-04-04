@@ -17,6 +17,7 @@ export class LibraryService {
       const tmdbResult = await this.tmdbService.getMovie(movie.tmdbId);
       return {
         ...movie,
+        title: tmdbResult.title,
         posterPath: tmdbResult.poster_path,
         voteAverage: tmdbResult.vote_average,
         releaseDate: tmdbResult.release_date,
