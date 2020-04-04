@@ -1,3 +1,5 @@
+import { registerEnumType } from '@nestjs/graphql';
+
 export enum FileType {
   EPISODE = 'episode',
   SEASON = 'season',
@@ -15,3 +17,7 @@ export enum DownloadableMediaState {
   DOWNLOADING = 'downloading',
   DOWNLOADED = 'downloaded',
 }
+
+registerEnumType(FileType, { name: 'FileType' });
+registerEnumType(JobName, { name: 'JobName' });
+registerEnumType(DownloadableMediaState, { name: 'DownloadableMediaState' });

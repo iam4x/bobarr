@@ -1,5 +1,4 @@
-FROM node:12-alpine
-RUN apk add --no-cache libc6-compat
+FROM node:12-slim
 
 ENV PORT 3000
 EXPOSE 3000

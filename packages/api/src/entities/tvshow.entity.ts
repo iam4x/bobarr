@@ -19,10 +19,7 @@ export class TVShow {
   public tmdbId!: number;
 
   @Column('varchar')
-  public englishTitle!: string;
-
-  @Column('varchar')
-  public originalTitle!: string;
+  public title!: string;
 
   @OneToMany((_type) => TVSeason, (season) => season.tvshow)
   public seasons!: TVSeason[];

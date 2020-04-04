@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+**/build
+**/out
+**/.next
+
+packages/web/utils/graphql.tsx
+packages/web/utils/introspection-result.ts

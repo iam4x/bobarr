@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Skeleton } from 'antd';
 import useAsyncEffect from 'use-async-effect';
 
 import {
@@ -24,6 +25,7 @@ import { SearchStyles, Wrapper } from './search.styles';
 export function SearchComponent() {
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [popularLoading, setPopularLoading] = useState(true);
   const [popularMovies, setPopularMovies] = useState<any[]>([]);
   const [popularTVShows, setPopularTVShows] = useState<any[]>([]);
 
@@ -69,10 +71,12 @@ export function SearchComponent() {
   };
 
   useAsyncEffect(async () => {
+    setPopularLoading(true);
     await Promise.all([
       tmdb.popularMovies().then(({ data }) => setPopularMovies(data.results)),
       tmdb.popularTVShows().then(({ data }) => setPopularTVShows(data.results)),
     ]);
+    setPopularLoading(false);
   }, []);
 
   return (
@@ -99,23 +103,25 @@ export function SearchComponent() {
 
       <Wrapper>
         <div className="search-results--container">
-          <div className="search-results--category">
-            {displayMovieSearchResults ? 'Found Movies' : 'Popular Movies'}
-          </div>
-          <ResultsCarousel
-            results={
-              displayMovieSearchResults ? searchResults.movies : popularMovies
-            }
-          />
-          <div className="spacer" />
-          <div className="search-results--category">
-            {displayTVSearchResults ? 'Found TV Shows' : 'Popular TV Shows'}
-          </div>
-          <ResultsCarousel
-            results={
-              displayTVSearchResults ? searchResults.tvShows : popularTVShows
-            }
-          />
+          <Skeleton active={true} loading={popularLoading}>
+            <div className="search-results--category">
+              {displayMovieSearchResults ? 'Found Movies' : 'Popular Movies'}
+            </div>
+            <ResultsCarousel
+              results={
+                displayMovieSearchResults ? searchResults.movies : popularMovies
+              }
+            />
+            <div className="spacer" />
+            <div className="search-results--category">
+              {displayTVSearchResults ? 'Found TV Shows' : 'Popular TV Shows'}
+            </div>
+            <ResultsCarousel
+              results={
+                displayTVSearchResults ? searchResults.tvShows : popularTVShows
+              }
+            />
+          </Skeleton>
         </div>
       </Wrapper>
     </SearchStyles>
