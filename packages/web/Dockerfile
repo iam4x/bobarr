@@ -1,4 +1,4 @@
-FROM node:12-slim
+FROM node:12
 
 ENV PORT 3000
 EXPOSE 3000
