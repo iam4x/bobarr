@@ -13,7 +13,7 @@ export class Parameter {
   @PrimaryGeneratedColumn()
   public id!: number;
 
-  @Column('varchar')
+  @Column('varchar', { unique: true })
   public key!: ParameterKey;
 
   @Column('varchar')
