@@ -15,8 +15,9 @@ import {
 
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
-import { TransmissionService } from 'src/transmission/transmission.service';
-import { LibraryService } from 'src/library/library.service';
+
+import { TransmissionService } from 'src/modules/transmission/transmission.service';
+import { LibraryService } from 'src/modules/library/library.service';
 
 @Processor(JobsQueue.RENAME_AND_LINK)
 export class RenameAndLinkQueueProcessor {

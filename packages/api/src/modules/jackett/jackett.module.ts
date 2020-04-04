@@ -1,7 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 
-import { ParamsModule } from 'src/params/params.module';
-import { LibraryModule } from 'src/library/library.module';
+import { ParamsModule } from 'src/modules/params/params.module';
+import { LibraryModule } from 'src/modules/library/library.module';
 
 import { JackettService } from './jackett.service';
 

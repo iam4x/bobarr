@@ -4,7 +4,8 @@ import axios, { AxiosInstance } from 'axios';
 import { Injectable } from '@nestjs/common';
 
 import { ParameterKey } from 'src/app.dto';
-import { ParamsService } from 'src/params/params.service';
+import { ParamsService } from 'src/modules/params/params.service';
+
 import { TMDBMovie, TMDBTVShow } from './tmdb.dto';
 
 @Injectable()

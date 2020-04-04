@@ -4,9 +4,10 @@ import { orderBy } from 'lodash';
 import { mapSeries } from 'p-iteration';
 import { Injectable } from '@nestjs/common';
 
-import { ParamsService } from 'src/params/params.service';
 import { ParameterKey } from 'src/app.dto';
-import { LibraryService } from 'src/library/library.service';
+import { ParamsService } from 'src/modules/params/params.service';
+import { LibraryService } from 'src/modules/library/library.service';
+
 import { JackettResult } from './jackett.dto';
 
 @Injectable()

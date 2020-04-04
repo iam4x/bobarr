@@ -8,12 +8,14 @@ import {
 import { map } from 'p-iteration';
 
 import { FileType } from 'src/app.dto';
-import { TMDBService } from 'src/tmdb/tmdb.service';
+
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { Movie } from 'src/entities/movie.entity';
-import { JobsService } from 'src/jobs/jobs.service';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
-import { TransmissionService } from 'src/transmission/transmission.service';
+
+import { TMDBService } from 'src/modules/tmdb/tmdb.service';
+import { JobsService } from 'src/modules/jobs/jobs.service';
+import { TransmissionService } from 'src/modules/transmission/transmission.service';
 
 @Injectable()
 export class LibraryService {

@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ParameterDAO } from 'src/entities/dao/parameter.dao';
-import { ParameterKey } from 'src/app.dto';
 import { map } from 'p-iteration';
+
+import { ParameterKey } from 'src/app.dto';
+import { ParameterDAO } from 'src/entities/dao/parameter.dao';
 
 @Injectable()
 export class ParamsService {

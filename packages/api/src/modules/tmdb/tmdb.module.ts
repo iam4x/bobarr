@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { ParamsModule } from 'src/params/params.module';
+import { ParamsModule } from 'src/modules/params/params.module';
 
 import { TMDBResolver } from './tmdb.resolver';
 import { TMDBService } from './tmdb.service';

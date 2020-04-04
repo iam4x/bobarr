@@ -11,7 +11,8 @@ import {
 
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
-import { TransmissionService } from 'src/transmission/transmission.service';
+
+import { TransmissionService } from 'src/modules/transmission/transmission.service';
 
 @Processor(JobsQueue.REFRESH_TORRENT)
 export class RefreshTorrentProcessor {

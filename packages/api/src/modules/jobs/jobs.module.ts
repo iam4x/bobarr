@@ -5,11 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { REDIS_CONFIG } from 'src/config';
 import { JobsQueue } from 'src/app.dto';
 
-import { JackettModule } from 'src/jackett/jackett.module';
 import { MovieDAO } from 'src/entities/dao/movie.dao';
-import { LibraryModule } from 'src/library/library.module';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
-import { TransmissionModule } from 'src/transmission/transmission.module';
+
+import { JackettModule } from 'src/modules/jackett/jackett.module';
+import { LibraryModule } from 'src/modules/library/library.module';
+import { TransmissionModule } from 'src/modules/transmission/transmission.module';
 
 import { DownloadProcessor } from './processors/download.processor';
 import { RefreshTorrentProcessor } from './processors/refresh-torrent.processor';

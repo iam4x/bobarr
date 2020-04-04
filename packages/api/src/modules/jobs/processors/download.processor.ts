@@ -9,9 +9,10 @@ import {
 } from 'src/app.dto';
 
 import { MovieDAO } from 'src/entities/dao/movie.dao';
-import { JackettService } from 'src/jackett/jackett.service';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
-import { TransmissionService } from 'src/transmission/transmission.service';
+
+import { JackettService } from 'src/modules/jackett/jackett.service';
+import { TransmissionService } from 'src/modules/transmission/transmission.service';
 
 @Processor(JobsQueue.DOWNLOAD)
 export class DownloadProcessor {

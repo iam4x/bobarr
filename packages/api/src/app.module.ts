@@ -4,12 +4,12 @@ import { GraphQLModule } from '@nestjs/graphql';
 
 import { DB_CONFIG } from './config';
 
-import { LibraryModule } from './library/library.module';
-import { ParamsModule } from './params/params.module';
-import { TMDBModule } from './tmdb/tmdb.module';
-import { JackettModule } from './jackett/jackett.module';
-import { JobsModule } from './jobs/jobs.module';
-import { TransmissionModule } from './transmission/transmission.module';
+import { LibraryModule } from 'src/modules/library/library.module';
+import { ParamsModule } from 'src/modules/params/params.module';
+import { TMDBModule } from 'src/modules/tmdb/tmdb.module';
+import { JackettModule } from 'src/modules/jackett/jackett.module';
+import { JobsModule } from 'src/modules/jobs/jobs.module';
+import { TransmissionModule } from 'src/modules/transmission/transmission.module';
 
 @Module({
   imports: [
