@@ -1,6 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { Modal } from 'antd';
+import { PlusSquareOutlined } from '@ant-design/icons';
 
 import { useTrackMovieMutation } from '../../utils/graphql';
 import { SearchResultCardStyles } from './search-result-card.styles';
@@ -43,11 +44,19 @@ export function SearchResultCardComponent(props: SearchResultCardProps) {
       posterPath={`https://image.tmdb.org/t/p/w220_and_h330_face${props.poster_path}`}
       vote={props.vote_average * 10}
     >
-      <div className="poster" onClick={handleClick} />
+      <div className="poster--container" onClick={handleClick}>
+        <div className="poster" />
+        <div className="overlay">
+          <PlusSquareOutlined />
+          <div className="action-label">add to library</div>
+        </div>
+      </div>
+
       <div className="vote--container">
         <div className="vote" />
         <div className="percent">{props.vote_average * 10}%</div>
       </div>
+
       <div className="name">{title}</div>
       <div className="date">{dayjs(date).format('DD MMM YYYY')}</div>
     </SearchResultCardStyles>

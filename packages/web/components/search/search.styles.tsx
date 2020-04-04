@@ -18,6 +18,7 @@ export const SearchStyles = styled.div`
       font-size: 1.2em;
       outline: none;
       padding: 8px 18px;
+      height: 40px;
       width: 100%;
 
       &-container {
@@ -34,6 +35,7 @@ export const SearchStyles = styled.div`
         color: #fff;
         cursor: pointer;
         font-size: 1.2em;
+        height: 40px;
         padding: 8px 18px;
         position: absolute;
         right: 0;
