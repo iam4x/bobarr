@@ -1,7 +1,6 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 
 import { Movie } from 'src/entities/movie.entity';
-import { MovieDAO } from 'src/entities/dao/movie.dao';
 
 import { LibraryService } from './library.service';
 import { EnrichedMovie } from './library.dto';
@@ -9,10 +8,7 @@ import { GraphQLCommonResponse } from 'src/app.dto';
 
 @Resolver()
 export class LibraryResolver {
-  public constructor(
-    private readonly movieDAO: MovieDAO,
-    private readonly libraryService: LibraryService
-  ) {}
+  public constructor(private readonly libraryService: LibraryService) {}
 
   @Query((_returns) => [EnrichedMovie])
   public getMovies() {
@@ -31,7 +27,7 @@ export class LibraryResolver {
   public async removeMovie(
     @Args('tmdbId', { type: () => Int }) tmdbId: number
   ) {
-    await this.movieDAO.delete({ tmdbId });
+    await this.libraryService.removeMovie(tmdbId);
     return { success: true, message: 'MOVIE_REMOVED_FROM_LIBRARY' };
   }
 }

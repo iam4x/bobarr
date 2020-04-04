@@ -6,6 +6,10 @@ import { Transmission } from 'transmission-client';
 export class TransmissionService {
   private client = new Transmission({ host: 'transmission' });
 
+  public removeTorrentAndFiles(torrentHash: string) {
+    return this.client.remove(torrentHash, true);
+  }
+
   public getTorrent(torrentHash: string) {
     return this.client
       .get(torrentHash)
