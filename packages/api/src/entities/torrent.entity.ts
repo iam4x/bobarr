@@ -19,6 +19,12 @@ export class Torrent {
   @Column('varchar')
   public resourceType!: FileType;
 
+  @Column('varchar', { default: 'unknown' })
+  public quality!: string;
+
+  @Column('varchar', { default: 'unknown' })
+  public tag!: string;
+
   @Column('int')
   public resourceId!: number;
 

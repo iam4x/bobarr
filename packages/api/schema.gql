@@ -11,6 +11,7 @@ enum DownloadableMediaState {
   MISSING
   DOWNLOADING
   DOWNLOADED
+  PROCESSED
 }
 
 type EnrichedMovie {

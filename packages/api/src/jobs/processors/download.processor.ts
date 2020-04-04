@@ -1,10 +1,15 @@
 import { Processor, Process } from '@nestjs/bull';
 import { Job } from 'bull';
 
-import { JobsQueue, FileType, DownloadableMediaState } from 'src/app.dto';
+import {
+  JobsQueue,
+  FileType,
+  DownloadableMediaState,
+  DownloadQueueProcessors,
+} from 'src/app.dto';
+
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { JackettService } from 'src/jackett/jackett.service';
-import { LibraryService } from 'src/library/library.service';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
 import { TransmissionService } from 'src/transmission/transmission.service';
 
@@ -13,12 +18,11 @@ export class DownloadProcessor {
   public constructor(
     private readonly movieDAO: MovieDAO,
     private readonly torrentDAO: TorrentDAO,
-    private readonly libraryService: LibraryService,
     private readonly jackettService: JackettService,
     private readonly transmissionService: TransmissionService
   ) {}
 
-  @Process('movie')
+  @Process(DownloadQueueProcessors.DOWNLOAD_MOVIE)
   public async downloadMovie({ data: movieId }: Job<number>) {
     const [bestResult] = await this.jackettService.searchMovie(movieId);
 
@@ -34,6 +38,8 @@ export class DownloadProcessor {
       torrentHash: transmissionTorrent.hashString,
       resourceType: FileType.MOVIE,
       resourceId: movieId,
+      quality: bestResult.quality.label,
+      tag: bestResult.tag.label,
     });
 
     await this.movieDAO.save({

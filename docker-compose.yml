@@ -17,6 +17,7 @@ services:
     env_file: .env
     volumes:
       - ./packages/api:/usr/src/app
+      - ./library:/usr/library
       - api_node_modules:/usr/src/app/node_modules
     ports:
       - 4000:4000
@@ -30,6 +31,7 @@ services:
       - redis
       - jackett
       - transmission
+      - transmission-web
     command: yarn dev
     restart: unless-stopped
 

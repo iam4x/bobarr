@@ -48,28 +48,41 @@ export class JackettService {
       ParameterKey.PREFERRED_TAGS
     );
 
+    const normalizedQuery = query
+      .toLowerCase()
+      .replace(/,/g, ' ')
+      .replace(/\./g, ' ')
+      .replace(/-/g, ' ')
+      .replace(/\(|\)/g, '')
+      .replace(/\[|\]/g, '');
+
     const { data } = await this.client.get<{
       Results: JackettResult[];
     }>('/results', {
       params: {
-        Query: query,
+        Query: normalizedQuery,
         Category: [2000, 5000, 5070],
         _: Number(new Date()),
       },
     });
 
     const sizeLimitAndSeeded = data.Results.filter(
-      (result) => result.Size < maxSize && result.Seeders > 1
+      (result) => result.Size < maxSize && result.Seeders >= 5
     );
 
-    const withPreferredTags = sizeLimitAndSeeded
-      .map(this.formatSearchResult)
-      .filter((result) => preferredTags.includes(result.tag.label));
+    const withTags = sizeLimitAndSeeded.map(this.formatSearchResult);
+    const withPreferredTags = withTags.filter(
+      (result) =>
+        preferredTags.includes(result.tag.label) &&
+        !result.title.toLowerCase().includes('3d')
+    );
 
     return orderBy(
-      withPreferredTags,
-      ['tag.score', 'quality.score', 'seeders'],
-      ['desc', 'desc', 'desc']
+      withPreferredTags.length > 0 ? withPreferredTags : withTags,
+      withPreferredTags.length > 0
+        ? ['tag.score', 'quality.score', 'seeders']
+        : ['quality.score', 'seeders'],
+      withPreferredTags.length > 0 ? ['desc', 'desc', 'desc'] : ['desc', 'desc']
     );
   }
 

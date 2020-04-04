@@ -14,7 +14,7 @@ packages/jackett/downloads/*
 !packages/jackett/**/.gitkeep
 
 # transmission
-library/downloads/*
+library/*
 !library/downloads/.gitkeep
 packages/transmission/config/*
 packages/transmission/watch/*

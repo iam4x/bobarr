@@ -16,6 +16,7 @@ export enum DownloadableMediaState {
   MISSING = 'missing',
   DOWNLOADING = 'downloading',
   DOWNLOADED = 'downloaded',
+  PROCESSED = 'processed',
 }
 
 export enum ParameterKey {
@@ -30,6 +31,17 @@ export enum ParameterKey {
 
 export enum JobsQueue {
   DOWNLOAD = 'download',
+  REFRESH_TORRENT = 'refresh_torrent',
+  RENAME_AND_LINK = 'rename_and_link',
+}
+
+export enum DownloadQueueProcessors {
+  DOWNLOAD_MOVIE = 'download_movie',
+  REFRESH_TORRENTS = 'refresh_torrents',
+}
+
+export enum RenameAndLinkQueueProcessors {
+  HANDLE_MOVIE = 'handle_movie',
 }
 
 @ObjectType()
