@@ -1,0 +1,19 @@
+query getPopular {
+  results: getPopular {
+    movies {
+      id
+      title
+      releaseDate
+      posterPath
+      voteAverage
+    }
+
+    tvShows {
+      id
+      title
+      releaseDate
+      posterPath
+      voteAverage
+    }
+  }
+}

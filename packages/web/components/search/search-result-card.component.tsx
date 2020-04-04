@@ -3,37 +3,30 @@ import dayjs from 'dayjs';
 import { Modal } from 'antd';
 import { PlusSquareOutlined } from '@ant-design/icons';
 
-import { useTrackMovieMutation } from '../../utils/graphql';
+import { useTrackMovieMutation, TmdbSearchResult } from '../../utils/graphql';
 import { SearchResultCardStyles } from './search-result-card.styles';
 
-interface SearchResultCardProps {
-  id: number;
-  name?: string;
-  original_name?: string;
-  title?: string;
-  original_title?: string;
-  poster_path: string;
-  vote_average: number;
-  release_date?: string;
-  first_air_date?: string;
-}
-
-export function SearchResultCardComponent(props: SearchResultCardProps) {
+export function SearchResultCardComponent({
+  result,
+  type,
+}: {
+  result: TmdbSearchResult;
+  type: 'tvshow' | 'movie';
+}) {
   const [trackMovie] = useTrackMovieMutation();
-  const isMovie = typeof props.title !== undefined;
-
-  const title = props.title! || props.name!;
-  const date = props.release_date! || props.first_air_date!;
 
   const handleClick = () =>
     Modal.confirm({
-      title: <strong>{title}</strong>,
-      content: `Add and download to your library ?`,
+      title: <strong>{result.title}</strong>,
+      content: `Search torrent and start download ?`,
+      centered: true,
       okText: 'Yes',
       cancelText: 'No',
       onOk: () => {
-        if (isMovie) {
-          return trackMovie({ variables: { title, tmdbId: props.id } });
+        if (type === 'movie') {
+          return trackMovie({
+            variables: { title: result.title, tmdbId: result.id },
+          });
         }
         return Promise.resolve();
       },
@@ -41,8 +34,8 @@ export function SearchResultCardComponent(props: SearchResultCardProps) {
 
   return (
     <SearchResultCardStyles
-      posterPath={`https://image.tmdb.org/t/p/w220_and_h330_face${props.poster_path}`}
-      vote={props.vote_average * 10}
+      posterPath={`https://image.tmdb.org/t/p/w220_and_h330_face${result.posterPath}`}
+      vote={result.voteAverage * 10}
     >
       <div className="poster--container" onClick={handleClick}>
         <div className="poster" />
@@ -54,11 +47,13 @@ export function SearchResultCardComponent(props: SearchResultCardProps) {
 
       <div className="vote--container">
         <div className="vote" />
-        <div className="percent">{props.vote_average * 10}%</div>
+        <div className="percent">{result.voteAverage * 10}%</div>
       </div>
 
-      <div className="name">{title}</div>
-      <div className="date">{dayjs(date).format('DD MMM YYYY')}</div>
+      <div className="name">{result.title}</div>
+      <div className="date">
+        {dayjs(result.releaseDate).format('DD MMM YYYY')}
+      </div>
     </SearchResultCardStyles>
   );
 }

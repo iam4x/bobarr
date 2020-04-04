@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Skeleton } from 'antd';
-import useAsyncEffect from 'use-async-effect';
 
 import {
   FaSearch,
@@ -17,67 +16,29 @@ import {
   ButtonNext,
 } from 'pure-react-carousel';
 
-import { tmdb } from '../../utils/tmdb-client';
-
 import { SearchResultCardComponent } from './search-result-card.component';
 import { SearchStyles, Wrapper } from './search.styles';
+
+import {
+  useGetPopularQuery,
+  useSearchLazyQuery,
+  TmdbSearchResult,
+} from '../../utils/graphql';
 
 export function SearchComponent() {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [popularLoading, setPopularLoading] = useState(true);
-  const [popularMovies, setPopularMovies] = useState<any[]>([]);
-  const [popularTVShows, setPopularTVShows] = useState<any[]>([]);
+  const popularQuery = useGetPopularQuery();
+  const [search, { data, loading }] = useSearchLazyQuery();
 
-  const [loading, setLoading] = useState(false);
-  const [lastSearchQuery, setLastSearchQuery] = useState<string | null>(null);
-  const [searchResults, setSearchResults] = useState<{
-    movies: any[];
-    tvShows: any[];
-  }>({ movies: [], tvShows: [] });
-
-  const displayMovieSearchResults =
-    searchQuery &&
-    lastSearchQuery === searchQuery &&
-    searchResults.movies.length > 0;
-
-  const displayTVSearchResults =
-    searchQuery &&
-    lastSearchQuery === searchQuery &&
-    searchResults.tvShows.length > 0;
+  const displayTVResults = searchQuery && data?.results?.tvShows?.length;
+  const displayMovieResults = searchQuery && data?.results?.movies?.length;
 
   const SearchIcon = loading ? FaCircleNotch : FaSearch;
-  const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    if (
-      !loading &&
-      searchQuery &&
-      searchQuery.trim() &&
-      lastSearchQuery !== searchQuery
-    ) {
-      setLoading(true);
-
-      try {
-        const results = await tmdb.search(searchQuery);
-        setSearchResults(results);
-        setLastSearchQuery(searchQuery);
-      } catch (error) {
-        console.error(error);
-      }
-
-      setLoading(false);
-    }
+    search({ variables: { query: searchQuery } });
   };
-
-  useAsyncEffect(async () => {
-    setPopularLoading(true);
-    await Promise.all([
-      tmdb.popularMovies().then(({ data }) => setPopularMovies(data.results)),
-      tmdb.popularTVShows().then(({ data }) => setPopularTVShows(data.results)),
-    ]);
-    setPopularLoading(false);
-  }, []);
 
   return (
     <SearchStyles>
@@ -103,22 +64,28 @@ export function SearchComponent() {
 
       <Wrapper>
         <div className="search-results--container">
-          <Skeleton active={true} loading={popularLoading}>
+          <Skeleton active={true} loading={popularQuery.loading}>
             <div className="search-results--category">
-              {displayMovieSearchResults ? 'Found Movies' : 'Popular Movies'}
+              {displayMovieResults ? 'Found Movies' : 'Popular Movies'}
             </div>
             <ResultsCarousel
+              type="movie"
               results={
-                displayMovieSearchResults ? searchResults.movies : popularMovies
+                displayMovieResults
+                  ? data?.results?.movies || []
+                  : popularQuery.data?.results?.movies || []
               }
             />
             <div className="spacer" />
             <div className="search-results--category">
-              {displayTVSearchResults ? 'Found TV Shows' : 'Popular TV Shows'}
+              {displayTVResults ? 'Found TV Shows' : 'Popular TV Shows'}
             </div>
             <ResultsCarousel
+              type="tvshow"
               results={
-                displayTVSearchResults ? searchResults.tvShows : popularTVShows
+                displayTVResults
+                  ? data?.results?.tvShows || []
+                  : popularQuery.data?.results?.tvShows || []
               }
             />
           </Skeleton>
@@ -128,7 +95,13 @@ export function SearchComponent() {
   );
 }
 
-function ResultsCarousel({ results }: { results: any[] }) {
+function ResultsCarousel({
+  results,
+  type,
+}: {
+  results: TmdbSearchResult[];
+  type: 'movie' | 'tvshow';
+}) {
   return (
     <div className="carrousel--container">
       <CarouselProvider
@@ -143,7 +116,11 @@ function ResultsCarousel({ results }: { results: any[] }) {
         <Slider>
           {results.map((result, index) => (
             <Slide key={result.id} index={index}>
-              <SearchResultCardComponent key={result.id} {...result} />
+              <SearchResultCardComponent
+                key={result.id}
+                type={type}
+                result={result}
+              />
             </Slide>
           ))}
         </Slider>

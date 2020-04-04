@@ -23,6 +23,7 @@ services:
     depends_on:
       - postgres
     command: yarn dev
+    restart: unless-stopped
 
   web:
     container_name: web
@@ -37,6 +38,7 @@ services:
     depends_on:
       - api
     command: yarn dev
+    restart: unless-stopped
 
   postgres:
     container_name: postgresql

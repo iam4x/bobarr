@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { LayoutStyles } from './layout.styles';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { LayoutStyles } from './layout.styles';
 
 export function LayoutComponent({ children }: { children?: React.ReactNode }) {
   return (

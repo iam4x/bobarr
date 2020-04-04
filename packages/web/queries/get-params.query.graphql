@@ -1,0 +1,6 @@
+query getParams {
+  params: getParams {
+    language
+    region
+  }
+}

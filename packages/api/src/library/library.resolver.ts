@@ -3,13 +3,19 @@ import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { Movie } from 'src/entities/movie.entity';
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 
+import { LibraryService } from './library.service';
+import { EnrichedMovie } from './library.dto';
+
 @Resolver()
 export class LibraryResolver {
-  public constructor(private readonly movieDAO: MovieDAO) {}
+  public constructor(
+    private readonly movieDAO: MovieDAO,
+    private readonly libraryService: LibraryService
+  ) {}
 
-  @Query((_returns) => [Movie])
+  @Query((_returns) => [EnrichedMovie])
   public getMovies() {
-    return this.movieDAO.find({ order: { id: 'DESC' } });
+    return this.libraryService.getMovies();
   }
 
   @Mutation((_returns) => Movie, { name: 'trackMovie' })

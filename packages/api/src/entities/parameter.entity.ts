@@ -6,16 +6,18 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { ParameterKey } from 'src/app.dto';
+
 @Entity()
 export class Parameter {
   @PrimaryGeneratedColumn()
   public id!: number;
 
   @Column('varchar')
-  public key!: string;
+  public key!: ParameterKey;
 
-  @Column('jsonb')
-  public value!: Record<string, any>;
+  @Column('varchar')
+  public value!: string;
 
   @CreateDateColumn()
   public createdAt!: Date;

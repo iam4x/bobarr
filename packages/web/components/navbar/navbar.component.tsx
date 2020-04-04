@@ -3,6 +3,7 @@ import cx from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
+import { useGetParamsQuery } from '../../utils/graphql';
 import { NavbarStyles } from './navbar.styles';
 
 const links = [
@@ -13,6 +14,7 @@ const links = [
 
 export function NavbarComponent() {
   const router = useRouter();
+  const { data } = useGetParamsQuery();
 
   return (
     <NavbarStyles>
@@ -25,7 +27,7 @@ export function NavbarComponent() {
             </Link>
           ))}
         </div>
-        <div className="region-select">US</div>
+        <div className="region-select">{data?.params?.region || 'US'}</div>
       </div>
     </NavbarStyles>
   );

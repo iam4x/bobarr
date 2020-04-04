@@ -1,6 +1,6 @@
 overwrite: true
 schema: "http://api:4000/graphql"
-documents: "components/**/*.graphql"
+documents: "{queries,mutations}/**/*.graphql"
 generates:
   utils/introspection-result.ts:
     plugins:

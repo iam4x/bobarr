@@ -1,0 +1,19 @@
+query search($query: String!) {
+  results: search(query: $query) {
+    movies {
+      id
+      title
+      releaseDate
+      posterPath
+      voteAverage
+    }
+
+    tvShows {
+      id
+      title
+      releaseDate
+      posterPath
+      voteAverage
+    }
+  }
+}

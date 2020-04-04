@@ -18,6 +18,12 @@ export enum DownloadableMediaState {
   DOWNLOADED = 'downloaded',
 }
 
+export enum ParameterKey {
+  REGION = 'region',
+  LANGUAGE = 'language',
+  TMDB_API_KEY = 'tmdb_api_key',
+}
+
 registerEnumType(FileType, { name: 'FileType' });
 registerEnumType(JobName, { name: 'JobName' });
 registerEnumType(DownloadableMediaState, { name: 'DownloadableMediaState' });

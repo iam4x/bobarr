@@ -7,6 +7,18 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type EnrichedMovie {
+  id: Float!
+  tmdbId: Float!
+  title: String!
+  state: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  posterPath: String
+  voteAverage: Float!
+  releaseDate: String!
+}
+
 type Movie {
   id: Float!
   tmdbId: Float!
@@ -20,6 +32,27 @@ type Mutation {
   trackMovie(tmdbId: Int!, title: String!): Movie!
 }
 
+type ParamsHash {
+  language: String!
+  region: String!
+}
+
 type Query {
-  getMovies: [Movie!]!
+  getParams: ParamsHash!
+  search(query: String!): TMDBSearchResults!
+  getPopular: TMDBSearchResults!
+  getMovies: [EnrichedMovie!]!
+}
+
+type TMDBSearchResult {
+  id: Float!
+  title: String!
+  voteAverage: Float!
+  posterPath: String
+  releaseDate: String
+}
+
+type TMDBSearchResults {
+  movies: [TMDBSearchResult!]!
+  tvShows: [TMDBSearchResult!]!
 }
