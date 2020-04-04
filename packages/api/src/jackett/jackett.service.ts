@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import axios, { AxiosInstance } from 'axios';
 import { orderBy } from 'lodash';
+import { mapSeries } from 'p-iteration';
 import { Injectable } from '@nestjs/common';
 
 import { ParamsService } from 'src/params/params.service';
@@ -35,40 +36,46 @@ export class JackettService {
     );
 
     const movie = await this.libraryService.getMovie(movieId);
-    const results = await this.search(
+    const queries = [
       `${movie.title} ${dayjs(movie.releaseDate).format('YYYY')}`,
-      { maxSize }
-    );
+      `${movie.originalTitle} ${dayjs(movie.releaseDate).format('YYYY')}`,
+    ];
 
-    return results;
+    return this.search(queries, { maxSize });
   }
 
-  private async search(query: string, { maxSize }: { maxSize: number }) {
+  private async search(queries: string[], { maxSize }: { maxSize: number }) {
     const preferredTags = await this.paramsService.getList(
       ParameterKey.PREFERRED_TAGS
     );
 
-    const normalizedQuery = query
-      .toLowerCase()
-      .replace(/,/g, ' ')
-      .replace(/\./g, ' ')
-      .replace(/-/g, ' ')
-      .replace(/\(|\)/g, '')
-      .replace(/\[|\]/g, '');
+    const rawResults = await mapSeries(queries, async (query) => {
+      const normalizedQuery = query
+        .toLowerCase()
+        .replace(/,/g, ' ')
+        .replace(/\./g, ' ')
+        .replace(/-/g, ' ')
+        .replace(/\(|\)/g, '')
+        .replace(/\[|\]/g, '')
+        .replace(/[az]'/g, ' ')
+        .replace(/:/g, ' ');
 
-    const { data } = await this.client.get<{
-      Results: JackettResult[];
-    }>('/results', {
-      params: {
-        Query: normalizedQuery,
-        Category: [2000, 5000, 5070],
-        _: Number(new Date()),
-      },
+      const { data } = await this.client.get<{
+        Results: JackettResult[];
+      }>('/results', {
+        params: {
+          Query: normalizedQuery,
+          Category: [2000, 5000, 5070],
+          _: Number(new Date()),
+        },
+      });
+
+      return data.Results;
     });
 
-    const sizeLimitAndSeeded = data.Results.filter(
-      (result) => result.Size < maxSize && result.Seeders >= 5
-    );
+    const sizeLimitAndSeeded = rawResults
+      .flat()
+      .filter((result) => result.Size < maxSize && result.Seeders >= 5);
 
     const withTags = sizeLimitAndSeeded.map(this.formatSearchResult);
     const withPreferredTags = withTags.filter(

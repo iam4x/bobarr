@@ -68,6 +68,7 @@ export class LibraryService {
     return {
       ...movie,
       title: tmdbResult.title,
+      originalTitle: tmdbResult.original_title,
       posterPath: tmdbResult.poster_path,
       voteAverage: tmdbResult.vote_average,
       releaseDate: tmdbResult.release_date,
