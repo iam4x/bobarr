@@ -25,10 +25,14 @@ export class TVEpisode {
   @Column('varchar', { default: DownloadableMediaState.MISSING })
   public state: DownloadableMediaState = DownloadableMediaState.MISSING;
 
-  @ManyToOne((_type) => TVSeason, (season) => season.episodes)
+  @ManyToOne((_type) => TVSeason, (season) => season.episodes, {
+    onDelete: 'CASCADE',
+  })
   public season!: TVSeason;
 
-  @ManyToOne((_type) => TVShow, (tvshow) => tvshow.episodes)
+  @ManyToOne((_type) => TVShow, (tvshow) => tvshow.episodes, {
+    onDelete: 'CASCADE',
+  })
   public tvShow!: TVShow;
 
   @CreateDateColumn()

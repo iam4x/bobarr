@@ -9,7 +9,7 @@ import {
 } from 'src/app.dto';
 
 import { MovieDAO } from 'src/entities/dao/movie.dao';
-import { TorrentDAO } from 'src/entities/dao/torrent.dao';
+import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 
 import { JackettService } from 'src/modules/jackett/jackett.service';
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
@@ -18,7 +18,7 @@ import { TransmissionService } from 'src/modules/transmission/transmission.servi
 export class DownloadProcessor {
   public constructor(
     private readonly movieDAO: MovieDAO,
-    private readonly torrentDAO: TorrentDAO,
+    private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly jackettService: JackettService,
     private readonly transmissionService: TransmissionService
   ) {}
@@ -31,20 +31,44 @@ export class DownloadProcessor {
       throw new Error('CANT_FIND_TORRENT');
     }
 
-    const transmissionTorrent = await this.transmissionService.addTorrentURL(
-      bestResult.downloadLink
+    const torrent = await this.transmissionService.addTorrentURL(
+      bestResult.downloadLink,
+      {
+        resourceType: FileType.MOVIE,
+        resourceId: movieId,
+        quality: bestResult.quality.label,
+        tag: bestResult.tag.label,
+      }
     );
-
-    const torrent = await this.torrentDAO.save({
-      torrentHash: transmissionTorrent.hashString,
-      resourceType: FileType.MOVIE,
-      resourceId: movieId,
-      quality: bestResult.quality.label,
-      tag: bestResult.tag.label,
-    });
 
     await this.movieDAO.save({
       id: movieId,
+      state: DownloadableMediaState.DOWNLOADING,
+    });
+
+    return torrent;
+  }
+
+  @Process(DownloadQueueProcessors.DOWNLOAD_SEASON)
+  public async downloadSeason({ data: seasonId }: Job<number>) {
+    const [bestResult] = await this.jackettService.searchSeason(seasonId);
+
+    if (bestResult === undefined) {
+      throw new Error('CANT_FIND_TORRENT');
+    }
+
+    const torrent = await this.transmissionService.addTorrentURL(
+      bestResult.downloadLink,
+      {
+        resourceType: FileType.SEASON,
+        resourceId: seasonId,
+        quality: bestResult.quality.label,
+        tag: bestResult.tag.label,
+      }
+    );
+
+    await this.tvSeasonDAO.save({
+      id: seasonId,
       state: DownloadableMediaState.DOWNLOADING,
     });
 

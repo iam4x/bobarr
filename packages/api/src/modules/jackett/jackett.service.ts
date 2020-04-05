@@ -1,14 +1,16 @@
 import dayjs from 'dayjs';
 import axios, { AxiosInstance } from 'axios';
-import { orderBy } from 'lodash';
+import { orderBy, uniq } from 'lodash';
 import { mapSeries } from 'p-iteration';
 import { Injectable } from '@nestjs/common';
 
 import { ParameterKey } from 'src/app.dto';
 import { ParamsService } from 'src/modules/params/params.service';
 import { LibraryService } from 'src/modules/library/library.service';
+import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 
 import { JackettResult } from './jackett.dto';
+import { formatNumber } from 'src/utils/format-number';
 
 @Injectable()
 export class JackettService {
@@ -16,7 +18,8 @@ export class JackettService {
 
   public constructor(
     private readonly paramsService: ParamsService,
-    private readonly libraryService: LibraryService
+    private readonly libraryService: LibraryService,
+    private readonly tvSeasonDAO: TVSeasonDAO
   ) {
     this.initializeClient();
   }
@@ -45,12 +48,39 @@ export class JackettService {
     return this.search(queries, { maxSize });
   }
 
-  private async search(queries: string[], { maxSize }: { maxSize: number }) {
+  public async searchSeason(seasonId: number) {
+    const maxSize = await this.paramsService.getNumber(
+      ParameterKey.MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE
+    );
+
+    const tvSeason = await this.tvSeasonDAO.findOneOrFail({
+      where: { id: seasonId },
+      relations: ['tvShow', 'episodes'],
+    });
+
+    const queries = [
+      `${tvSeason.tvShow.title} S${formatNumber(tvSeason.seasonNumber)}`,
+      `${tvSeason.tvShow.title} Season ${formatNumber(tvSeason.seasonNumber)}`,
+      `${tvSeason.tvShow.title} Season ${tvSeason.seasonNumber}`,
+      `${tvSeason.tvShow.title} Saison ${formatNumber(tvSeason.seasonNumber)}`,
+      `${tvSeason.tvShow.title} Saison ${tvSeason.seasonNumber}`,
+    ];
+
+    return this.search(queries, {
+      maxSize: maxSize * tvSeason.episodes.length,
+      exclude: /e\d+|episode/,
+    });
+  }
+
+  private async search(
+    queries: string[],
+    { maxSize, exclude }: { maxSize: number; exclude?: RegExp }
+  ) {
     const preferredTags = await this.paramsService.getList(
       ParameterKey.PREFERRED_TAGS
     );
 
-    const rawResults = await mapSeries(queries, async (query) => {
+    const rawResults = await mapSeries(uniq(queries), async (query) => {
       const normalizedQuery = query
         .toLowerCase()
         .replace(/,/g, ' ')
@@ -74,9 +104,12 @@ export class JackettService {
       return data.Results;
     });
 
-    const sizeLimitAndSeeded = rawResults
-      .flat()
-      .filter((result) => result.Size < maxSize && result.Seeders >= 5);
+    const sizeLimitAndSeeded = rawResults.flat().filter(
+      (result) =>
+        result.Size < maxSize && // maxSize
+        result.Seeders >= 10 && // has seeders
+        (exclude ? !result.Title.toLowerCase().match(exclude) : true) // its not excluded
+    );
 
     const withTags = sizeLimitAndSeeded.map(this.formatSearchResult);
     const withPreferredTags = withTags.filter(

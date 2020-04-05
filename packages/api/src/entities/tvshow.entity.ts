@@ -27,14 +27,10 @@ export class TVShow {
   @Column('varchar')
   public title!: string;
 
-  @OneToMany((_type) => TVSeason, (season) => season.tvShow, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany((_type) => TVSeason, (season) => season.tvShow)
   public seasons!: TVSeason[];
 
-  @OneToMany((_type) => TVEpisode, (episode) => episode.tvShow, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany((_type) => TVEpisode, (episode) => episode.tvShow)
   public episodes!: TVEpisode[];
 
   @Field()

@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { map, forEachSeries } from 'p-iteration';
+import { map, forEachSeries, forEach } from 'p-iteration';
 import { times } from 'lodash';
 
 import {
@@ -84,9 +84,39 @@ export class LibraryService {
     @TransactionManager() manager?: EntityManager
   ) {
     const tvShowDAO = manager!.getCustomRepository(TVShowDAO);
+    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+
     const tvShow = await tvShowDAO.findOneOrFail({
       where: { tmdbId },
       relations: ['seasons', 'episodes'],
+    });
+
+    await forEach(tvShow.seasons, async (season) => {
+      const torrent = await torrentDAO.findOne({
+        resourceId: season.id,
+        resourceType: FileType.SEASON,
+      });
+
+      if (torrent) {
+        await torrentDAO.remove(torrent);
+        await this.transmissionService.removeTorrentAndFiles(
+          torrent.torrentHash
+        );
+      }
+    });
+
+    await forEach(tvShow.episodes, async (episode) => {
+      const torrent = await torrentDAO.findOne({
+        resourceId: episode.id,
+        resourceType: FileType.EPISODE,
+      });
+
+      if (torrent) {
+        await torrentDAO.remove(torrent);
+        await this.transmissionService.removeTorrentAndFiles(
+          torrent.torrentHash
+        );
+      }
     });
 
     await tvShowDAO.remove(tvShow);

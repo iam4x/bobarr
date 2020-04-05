@@ -8,6 +8,8 @@ import {
   OneToMany,
 } from 'typeorm';
 
+import { DownloadableMediaState } from 'src/app.dto';
+
 import { TVShow } from './tvshow.entity';
 import { TVEpisode } from './tvepisode.entity';
 
@@ -22,12 +24,15 @@ export class TVSeason {
   @Column('int')
   public seasonNumber!: number;
 
-  @ManyToOne((_type) => TVShow, (tvshow) => tvshow.seasons)
-  public tvShow!: TVShow;
+  @Column('varchar', { default: DownloadableMediaState.MISSING })
+  public state: DownloadableMediaState = DownloadableMediaState.MISSING;
 
-  @OneToMany((_type) => TVEpisode, (episode) => episode.season, {
+  @ManyToOne((_type) => TVShow, (tvshow) => tvshow.seasons, {
     onDelete: 'CASCADE',
   })
+  public tvShow!: TVShow;
+
+  @OneToMany((_type) => TVEpisode, (episode) => episode.season)
   public episodes!: TVEpisode[];
 
   @CreateDateColumn()
