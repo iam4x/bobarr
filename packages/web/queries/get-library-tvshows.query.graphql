@@ -1,0 +1,12 @@
+query getLibraryTVShows {
+  tvShows: getTVShows {
+    id
+    tmdbId
+    title
+    posterPath
+    voteAverage
+    releaseDate
+    createdAt
+    updatedAt
+  }
+}

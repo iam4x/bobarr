@@ -35,6 +35,18 @@ export type EnrichedMovie = {
   releaseDate: Scalars['String'];
 };
 
+export type EnrichedTvShow = {
+   __typename?: 'EnrichedTVShow';
+  id: Scalars['Float'];
+  tmdbId: Scalars['Float'];
+  title: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  posterPath?: Maybe<Scalars['String']>;
+  voteAverage: Scalars['Float'];
+  releaseDate: Scalars['String'];
+};
+
 export type GraphQlCommonResponse = {
    __typename?: 'GraphQLCommonResponse';
   success: Scalars['Boolean'];
@@ -89,6 +101,7 @@ export type Query = {
   getTVShowSeasons: Array<TmdbtvSeason>;
   getTorrentStatus: TorrentStatus;
   getMovies: Array<EnrichedMovie>;
+  getTVShows: Array<EnrichedTvShow>;
 };
 
 
@@ -218,6 +231,17 @@ export type GetLibraryMoviesQuery = (
   & { movies: Array<(
     { __typename?: 'EnrichedMovie' }
     & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'state' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
+  )> }
+);
+
+export type GetLibraryTvShowsQueryVariables = {};
+
+
+export type GetLibraryTvShowsQuery = (
+  { __typename?: 'Query' }
+  & { tvShows: Array<(
+    { __typename?: 'EnrichedTVShow' }
+    & Pick<EnrichedTvShow, 'id' | 'tmdbId' | 'title' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -435,6 +459,45 @@ export function useGetLibraryMoviesLazyQuery(baseOptions?: ApolloReactHooks.Lazy
 export type GetLibraryMoviesQueryHookResult = ReturnType<typeof useGetLibraryMoviesQuery>;
 export type GetLibraryMoviesLazyQueryHookResult = ReturnType<typeof useGetLibraryMoviesLazyQuery>;
 export type GetLibraryMoviesQueryResult = ApolloReactCommon.QueryResult<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>;
+export const GetLibraryTvShowsDocument = gql`
+    query getLibraryTVShows {
+  tvShows: getTVShows {
+    id
+    tmdbId
+    title
+    posterPath
+    voteAverage
+    releaseDate
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetLibraryTvShowsQuery__
+ *
+ * To run a query within a React component, call `useGetLibraryTvShowsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLibraryTvShowsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLibraryTvShowsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetLibraryTvShowsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>(GetLibraryTvShowsDocument, baseOptions);
+      }
+export function useGetLibraryTvShowsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>(GetLibraryTvShowsDocument, baseOptions);
+        }
+export type GetLibraryTvShowsQueryHookResult = ReturnType<typeof useGetLibraryTvShowsQuery>;
+export type GetLibraryTvShowsLazyQueryHookResult = ReturnType<typeof useGetLibraryTvShowsLazyQuery>;
+export type GetLibraryTvShowsQueryResult = ApolloReactCommon.QueryResult<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>;
 export const GetParamsDocument = gql`
     query getParams {
   params: getParams {

@@ -32,6 +32,17 @@ type EnrichedMovie {
   releaseDate: String!
 }
 
+type EnrichedTVShow {
+  id: Float!
+  tmdbId: Float!
+  title: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  posterPath: String
+  voteAverage: Float!
+  releaseDate: String!
+}
+
 type GraphQLCommonResponse {
   success: Boolean!
   message: String
@@ -64,6 +75,7 @@ type Query {
   getTVShowSeasons(tvShowTMDBId: Int!): [TMDBTVSeason!]!
   getTorrentStatus(resourceType: String!, resourceId: Int!): TorrentStatus!
   getMovies: [EnrichedMovie!]!
+  getTVShows: [EnrichedTVShow!]!
 }
 
 type TMDBSearchResult {

@@ -5,7 +5,7 @@ import { Movie } from 'src/entities/movie.entity';
 import { TVShow } from 'src/entities/tvshow.entity';
 
 import { LibraryService } from './library.service';
-import { EnrichedMovie } from './library.dto';
+import { EnrichedMovie, EnrichedTVShow } from './library.dto';
 
 @Resolver()
 export class LibraryResolver {
@@ -14,6 +14,11 @@ export class LibraryResolver {
   @Query((_returns) => [EnrichedMovie])
   public getMovies() {
     return this.libraryService.getMovies();
+  }
+
+  @Query((_returns) => [EnrichedTVShow])
+  public getTVShows() {
+    return this.libraryService.getTVShows();
   }
 
   @Mutation((_returns) => Movie, { name: 'trackMovie' })

@@ -21,11 +21,13 @@ import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 import { TMDBService } from 'src/modules/tmdb/tmdb.service';
 import { JobsService } from 'src/modules/jobs/jobs.service';
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
+import { TVShow } from 'src/entities/tvshow.entity';
 
 @Injectable()
 export class LibraryService {
   public constructor(
     private readonly movieDAO: MovieDAO,
+    private readonly tvShowDAO: TVShowDAO,
     private readonly tmdbService: TMDBService,
     private readonly jobsService: JobsService,
     private readonly transmissionService: TransmissionService
@@ -46,6 +48,12 @@ export class LibraryService {
   public async getMovie(movieId: number) {
     const movie = await this.movieDAO.findOneOrFail(movieId);
     return this.enrichMovie(movie);
+  }
+
+  public async getTVShows() {
+    const tvShows = await this.tvShowDAO.find({ order: { createdAt: 'ASC' } });
+    const enrichedTVShows = map(tvShows, this.enrichTVShow);
+    return enrichedTVShows;
   }
 
   @Transaction()
@@ -133,6 +141,18 @@ export class LibraryService {
       posterPath: tmdbResult.poster_path,
       voteAverage: tmdbResult.vote_average,
       releaseDate: tmdbResult.release_date,
+    };
+  };
+
+  private enrichTVShow = async (tvShow: TVShow) => {
+    const tmdbResult = await this.tmdbService.getTVShow(tvShow.tmdbId);
+    return {
+      ...tvShow,
+      title: tmdbResult.name,
+      originalTitle: tmdbResult.original_name,
+      posterPath: tmdbResult.poster_path,
+      voteAverage: tmdbResult.vote_average,
+      releaseDate: tmdbResult.first_air_date,
     };
   };
 }

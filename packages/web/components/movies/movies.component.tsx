@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import { Skeleton } from 'antd';
 
 import { useGetLibraryMoviesQuery } from '../../utils/graphql';
@@ -7,27 +6,7 @@ import { useGetLibraryMoviesQuery } from '../../utils/graphql';
 import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
 import { DownloadingComponent } from '../downloading/downloading.component';
 
-const MoviesComponentStyles = styled.div`
-  padding-top: 64px;
-
-  .wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .flex {
-    display: flex;
-    flex-wrap: wrap;
-    margin-left: -12px;
-    margin-right: -12px;
-  }
-
-  .movie-card {
-    margin-left: 12px;
-    margin-right: 12px;
-    height: ${({ theme }) => theme.tmdbCardHeight}px;
-  }
-`;
+import { MoviesComponentStyles } from './movies.styles';
 
 export function MoviesComponent() {
   const { data, loading } = useGetLibraryMoviesQuery();

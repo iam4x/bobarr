@@ -17,9 +17,7 @@ interface TMDBCardComponentProps {
 
 export function TMDBCardComponent(props: TMDBCardComponentProps) {
   const { result, type, inLibrary } = props;
-  const [tvSeasonModalActive, setTVSeasonModalActive] = useState(
-    result.tmdbId === 1399
-  );
+  const [tvSeasonModalActive, setTVSeasonModalActive] = useState(false);
 
   const handleMovieAddLibrary = useAddLibrary({ result, type });
   const handleMovieRemoveLibrary = useRemoveLibrary({ result, type });
