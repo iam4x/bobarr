@@ -31,11 +31,13 @@ export class DownloadProcessor {
   @Process(DownloadQueueProcessors.DOWNLOAD_MOVIE)
   public async downloadMovie({ data: movieId }: Job<number>) {
     const [bestResult] = await this.jackettService.searchMovie(movieId);
-    console.log({ bestResult });
 
     if (bestResult === undefined) {
-      // TODO: auto-retry job in a day
-      throw new Error('CANT_FIND_TORRENT');
+      return this.downloadQueue.add(
+        DownloadQueueProcessors.DOWNLOAD_MOVIE,
+        movieId,
+        { delay: 1000 * 60 * 60 } // retry in a hour
+      );
     }
 
     const torrent = await this.transmissionService.addTorrentURL(
@@ -58,15 +60,14 @@ export class DownloadProcessor {
 
   @Process(DownloadQueueProcessors.DOWNLOAD_SEASON)
   public async downloadSeason({ data: seasonId }: Job<number>) {
-    const season = await this.tvSeasonDAO.findOneOrFail({
-      where: { id: seasonId },
-      relations: ['episodes'],
-    });
-
-    const [bestResult] = await this.jackettService.searchSeason(season.id);
-    console.log({ bestResult });
+    const [bestResult] = await this.jackettService.searchSeason(seasonId);
 
     if (bestResult === undefined) {
+      const season = await this.tvSeasonDAO.findOneOrFail({
+        where: { id: seasonId },
+        relations: ['episodes'],
+      });
+
       return forEachSeries(season.episodes, (episode) =>
         this.downloadQueue.add(
           DownloadQueueProcessors.DOWNLOAD_EPISODE,
@@ -96,11 +97,13 @@ export class DownloadProcessor {
   @Process(DownloadQueueProcessors.DOWNLOAD_EPISODE)
   public async downloadEpisode({ data: episodeId }: Job<number>) {
     const [bestResult] = await this.jackettService.searchEpisode(episodeId);
-    console.log({ bestResult });
 
     if (bestResult === undefined) {
-      // TODO: auto-retry job in a day
-      throw new Error('TORRENT_NOT_FOUND');
+      return this.downloadQueue.add(
+        DownloadQueueProcessors.DOWNLOAD_EPISODE,
+        episodeId,
+        { delay: 1000 * 60 * 60 } // retry in a hour
+      );
     }
 
     const torrent = await this.transmissionService.addTorrentURL(
