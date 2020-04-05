@@ -12,6 +12,7 @@ import { DownloadableMediaState } from 'src/app.dto';
 
 import { TVShow } from './tvshow.entity';
 import { TVEpisode } from './tvepisode.entity';
+import { formatNumber } from 'src/utils/format-number';
 
 @Entity()
 export class TVSeason {
@@ -40,4 +41,11 @@ export class TVSeason {
 
   @UpdateDateColumn()
   public updatedAt!: Date;
+
+  public get title() {
+    const seasonNb = formatNumber(this.seasonNumber);
+    return this.tvShow?.title
+      ? `${this.tvShow.title} - Season ${seasonNb}`
+      : `Season ${seasonNb}`;
+  }
 }

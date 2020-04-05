@@ -16,3 +16,10 @@ export class EnrichedTVShow extends TVShow {
   @Field() public voteAverage!: number;
   @Field() public releaseDate!: string;
 }
+
+@ObjectType()
+export class DownloadingMedia {
+  @Field() public title!: string;
+  @Field() public resourceId!: number;
+  @Field() public resourceType!: string;
+}

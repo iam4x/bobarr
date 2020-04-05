@@ -11,14 +11,9 @@ import { MoviesComponentStyles } from './movies.styles';
 export function MoviesComponent() {
   const { data, loading } = useGetLibraryMoviesQuery();
 
-  const downloading =
-    data?.movies?.filter(
-      (movie) => movie.state === 'DOWNLOADING' || movie.state === 'MISSING'
-    ) || [];
-
   return (
     <>
-      <DownloadingComponent data={downloading} />
+      <DownloadingComponent types={['movie']} />
       <MoviesComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>

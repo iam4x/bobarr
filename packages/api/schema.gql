@@ -20,6 +20,12 @@ enum DownloadableMediaState {
   PROCESSED
 }
 
+type DownloadingMedia {
+  title: String!
+  resourceId: Float!
+  resourceType: String!
+}
+
 type EnrichedMovie {
   id: Float!
   tmdbId: Float!
@@ -75,6 +81,7 @@ type Query {
   getPopular: TMDBSearchResults!
   getTVShowSeasons(tvShowTMDBId: Int!): [TMDBTVSeason!]!
   getTorrentStatus(resourceType: String!, resourceId: Int!): TorrentStatus!
+  getDownloadingMedias: [DownloadingMedia!]!
   getMovies: [EnrichedMovie!]!
   getTVShows: [EnrichedTVShow!]!
 }

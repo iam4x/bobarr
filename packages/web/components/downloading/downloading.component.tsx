@@ -3,16 +3,24 @@ import prettySize from 'prettysize';
 import { Progress, Tag } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 
-import { EnrichedMovie, useGetTorrentStatusQuery } from '../../utils/graphql';
+import {
+  DownloadingMedia,
+  useGetTorrentStatusQuery,
+  useGetDownloadingQuery,
+} from '../../utils/graphql';
+
 import { DownloadingComponentStyles } from './downloading.styles';
 
-export function DownloadingComponent({ data }: { data: EnrichedMovie[] }) {
-  if (data.length > 0) {
+export function DownloadingComponent({ types }: { types: string[] }) {
+  const { data } = useGetDownloadingQuery({ pollInterval: 10000 });
+  const rows = data?.rows?.filter((row) => types.includes(row.resourceType));
+
+  if (rows && rows.length > 0) {
     return (
       <DownloadingComponentStyles>
         <div className="wrapper">
-          {data.map((row) => (
-            <DownloadRow key={row.id} {...row} />
+          {rows.map((row) => (
+            <DownloadRow key={row.resourceType + row.resourceId} {...row} />
           ))}
         </div>
       </DownloadingComponentStyles>
@@ -22,10 +30,13 @@ export function DownloadingComponent({ data }: { data: EnrichedMovie[] }) {
   return <noscript />;
 }
 
-function DownloadRow(props: EnrichedMovie) {
+function DownloadRow(props: DownloadingMedia) {
   const { data } = useGetTorrentStatusQuery({
-    pollInterval: 1000,
-    variables: { resourceId: props.id, resourceType: 'movie' },
+    pollInterval: 5000,
+    variables: {
+      resourceId: props.resourceId,
+      resourceType: props.resourceType,
+    },
   });
 
   const downloadSpeed = data?.torrent?.rateDownload || null;

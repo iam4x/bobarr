@@ -1,0 +1,7 @@
+query getDownloading {
+  rows: getDownloadingMedias {
+    title
+    resourceId
+    resourceType
+  }
+}

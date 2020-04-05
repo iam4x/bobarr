@@ -5,11 +5,16 @@ import { Movie } from 'src/entities/movie.entity';
 import { TVShow } from 'src/entities/tvshow.entity';
 
 import { LibraryService } from './library.service';
-import { EnrichedMovie, EnrichedTVShow } from './library.dto';
+import { EnrichedMovie, EnrichedTVShow, DownloadingMedia } from './library.dto';
 
 @Resolver()
 export class LibraryResolver {
   public constructor(private readonly libraryService: LibraryService) {}
+
+  @Query((_returns) => [DownloadingMedia])
+  public getDownloadingMedias() {
+    return this.libraryService.getDownloadingMedias();
+  }
 
   @Query((_returns) => [EnrichedMovie])
   public getMovies() {

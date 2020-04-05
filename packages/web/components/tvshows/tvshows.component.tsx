@@ -14,7 +14,7 @@ export function TVShowsComponent() {
 
   return (
     <>
-      <DownloadingComponent data={[]} />
+      <DownloadingComponent types={['season', 'episode']} />
       <TVShowsComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>

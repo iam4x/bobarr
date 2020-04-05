@@ -9,7 +9,7 @@ import {
   EntityManager,
 } from 'typeorm';
 
-import { FileType } from 'src/app.dto';
+import { FileType, DownloadableMediaState } from 'src/app.dto';
 
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { Movie } from 'src/entities/movie.entity';
@@ -25,13 +25,50 @@ import { TVShow } from 'src/entities/tvshow.entity';
 
 @Injectable()
 export class LibraryService {
+  // eslint-disable-next-line max-params
   public constructor(
     private readonly movieDAO: MovieDAO,
     private readonly tvShowDAO: TVShowDAO,
+    private readonly tvSeasonDAO: TVSeasonDAO,
+    private readonly tvEpisodeDAO: TVEpisodeDAO,
     private readonly tmdbService: TMDBService,
     private readonly jobsService: JobsService,
     private readonly transmissionService: TransmissionService
   ) {}
+
+  public async getDownloadingMedias() {
+    const movies = await this.movieDAO.find({
+      where: { state: DownloadableMediaState.DOWNLOADING },
+    });
+
+    const tvSeasons = await this.tvSeasonDAO.find({
+      where: { state: DownloadableMediaState.DOWNLOADING },
+      relations: ['tvShow'],
+    });
+
+    const tvEpisodes = await this.tvEpisodeDAO.find({
+      where: { state: DownloadableMediaState.DOWNLOADING },
+      relations: ['tvShow', 'season'],
+    });
+
+    return [
+      ...movies.map((movie) => ({
+        title: movie.title,
+        resourceId: movie.id,
+        resourceType: FileType.MOVIE,
+      })),
+      ...tvSeasons.map((season) => ({
+        title: season.title,
+        resourceId: season.id,
+        resourceType: FileType.SEASON,
+      })),
+      ...tvEpisodes.map((episode) => ({
+        title: episode.title,
+        resourceId: episode.id,
+        resourceType: FileType.EPISODE,
+      })),
+    ];
+  }
 
   public async trackMovie(movieAttributes: DeepPartial<Movie>) {
     const movie = await this.movieDAO.save(movieAttributes);

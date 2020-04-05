@@ -22,6 +22,13 @@ export enum DownloadableMediaState {
   Processed = 'PROCESSED'
 }
 
+export type DownloadingMedia = {
+   __typename?: 'DownloadingMedia';
+  title: Scalars['String'];
+  resourceId: Scalars['Float'];
+  resourceType: Scalars['String'];
+};
+
 export type EnrichedMovie = {
    __typename?: 'EnrichedMovie';
   id: Scalars['Float'];
@@ -106,6 +113,7 @@ export type Query = {
   getPopular: TmdbSearchResults;
   getTVShowSeasons: Array<TmdbtvSeason>;
   getTorrentStatus: TorrentStatus;
+  getDownloadingMedias: Array<DownloadingMedia>;
   getMovies: Array<EnrichedMovie>;
   getTVShows: Array<EnrichedTvShow>;
 };
@@ -241,6 +249,17 @@ export type TrackTvShowMutation = (
     { __typename?: 'TVShow' }
     & Pick<TvShow, 'id'>
   ) }
+);
+
+export type GetDownloadingQueryVariables = {};
+
+
+export type GetDownloadingQuery = (
+  { __typename?: 'Query' }
+  & { rows: Array<(
+    { __typename?: 'DownloadingMedia' }
+    & Pick<DownloadingMedia, 'title' | 'resourceId' | 'resourceType'>
+  )> }
 );
 
 export type GetLibraryMoviesQueryVariables = {};
@@ -472,6 +491,40 @@ export function useTrackTvShowMutation(baseOptions?: ApolloReactHooks.MutationHo
 export type TrackTvShowMutationHookResult = ReturnType<typeof useTrackTvShowMutation>;
 export type TrackTvShowMutationResult = ApolloReactCommon.MutationResult<TrackTvShowMutation>;
 export type TrackTvShowMutationOptions = ApolloReactCommon.BaseMutationOptions<TrackTvShowMutation, TrackTvShowMutationVariables>;
+export const GetDownloadingDocument = gql`
+    query getDownloading {
+  rows: getDownloadingMedias {
+    title
+    resourceId
+    resourceType
+  }
+}
+    `;
+
+/**
+ * __useGetDownloadingQuery__
+ *
+ * To run a query within a React component, call `useGetDownloadingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDownloadingQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDownloadingQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetDownloadingQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetDownloadingQuery, GetDownloadingQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetDownloadingQuery, GetDownloadingQueryVariables>(GetDownloadingDocument, baseOptions);
+      }
+export function useGetDownloadingLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetDownloadingQuery, GetDownloadingQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetDownloadingQuery, GetDownloadingQueryVariables>(GetDownloadingDocument, baseOptions);
+        }
+export type GetDownloadingQueryHookResult = ReturnType<typeof useGetDownloadingQuery>;
+export type GetDownloadingLazyQueryHookResult = ReturnType<typeof useGetDownloadingLazyQuery>;
+export type GetDownloadingQueryResult = ApolloReactCommon.QueryResult<GetDownloadingQuery, GetDownloadingQueryVariables>;
 export const GetLibraryMoviesDocument = gql`
     query getLibraryMovies {
   movies: getMovies {
