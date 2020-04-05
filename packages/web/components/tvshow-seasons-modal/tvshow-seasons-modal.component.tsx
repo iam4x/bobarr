@@ -51,13 +51,15 @@ export function TVShowSeasonsModalComponent(
     );
   };
 
-  const handleTrack = () =>
-    trackTVShow({
+  const handleTrack = async () => {
+    await trackTVShow({
       variables: {
         tmdbId: tvShow.tmdbId,
         seasonNumbers: selectedSeasons,
       },
     });
+    setSelectedSeasons([]);
+  };
 
   const footer = [
     <Button key="cancel" icon={<CloseOutlined />} onClick={onRequestClose}>
