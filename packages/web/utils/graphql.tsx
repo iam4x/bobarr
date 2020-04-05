@@ -55,6 +55,7 @@ export type Mutation = {
    __typename?: 'Mutation';
   trackMovie: Movie;
   removeMovie: GraphQlCommonResponse;
+  trackTVShow: TvShow;
 };
 
 
@@ -65,6 +66,12 @@ export type MutationTrackMovieArgs = {
 
 
 export type MutationRemoveMovieArgs = {
+  tmdbId: Scalars['Int'];
+};
+
+
+export type MutationTrackTvShowArgs = {
+  seasonNumbers: Array<Scalars['Int']>;
   tmdbId: Scalars['Int'];
 };
 
@@ -153,6 +160,15 @@ export type TvEpisode = {
   stillPath?: Maybe<Scalars['String']>;
 };
 
+export type TvShow = {
+   __typename?: 'TVShow';
+  id: Scalars['Float'];
+  tmdbId: Scalars['Float'];
+  title: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
 export type RemoveMovieMutationVariables = {
   tmdbId: Scalars['Int'];
 };
@@ -174,9 +190,23 @@ export type TrackMovieMutationVariables = {
 
 export type TrackMovieMutation = (
   { __typename?: 'Mutation' }
-  & { trackMovie: (
+  & { movie: (
     { __typename?: 'Movie' }
     & Pick<Movie, 'id'>
+  ) }
+);
+
+export type TrackTvShowMutationVariables = {
+  tmdbId: Scalars['Int'];
+  seasonNumbers: Array<Scalars['Int']>;
+};
+
+
+export type TrackTvShowMutation = (
+  { __typename?: 'Mutation' }
+  & { tvShow: (
+    { __typename?: 'TVShow' }
+    & Pick<TvShow, 'id'>
   ) }
 );
 
@@ -301,7 +331,7 @@ export type RemoveMovieMutationResult = ApolloReactCommon.MutationResult<RemoveM
 export type RemoveMovieMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveMovieMutation, RemoveMovieMutationVariables>;
 export const TrackMovieDocument = gql`
     mutation trackMovie($title: String!, $tmdbId: Int!) {
-  trackMovie(title: $title, tmdbId: $tmdbId) {
+  movie: trackMovie(title: $title, tmdbId: $tmdbId) {
     id
   }
 }
@@ -332,6 +362,39 @@ export function useTrackMovieMutation(baseOptions?: ApolloReactHooks.MutationHoo
 export type TrackMovieMutationHookResult = ReturnType<typeof useTrackMovieMutation>;
 export type TrackMovieMutationResult = ApolloReactCommon.MutationResult<TrackMovieMutation>;
 export type TrackMovieMutationOptions = ApolloReactCommon.BaseMutationOptions<TrackMovieMutation, TrackMovieMutationVariables>;
+export const TrackTvShowDocument = gql`
+    mutation trackTVShow($tmdbId: Int!, $seasonNumbers: [Int!]!) {
+  tvShow: trackTVShow(tmdbId: $tmdbId, seasonNumbers: $seasonNumbers) {
+    id
+  }
+}
+    `;
+export type TrackTvShowMutationFn = ApolloReactCommon.MutationFunction<TrackTvShowMutation, TrackTvShowMutationVariables>;
+
+/**
+ * __useTrackTvShowMutation__
+ *
+ * To run a mutation, you first call `useTrackTvShowMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTrackTvShowMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [trackTvShowMutation, { data, loading, error }] = useTrackTvShowMutation({
+ *   variables: {
+ *      tmdbId: // value for 'tmdbId'
+ *      seasonNumbers: // value for 'seasonNumbers'
+ *   },
+ * });
+ */
+export function useTrackTvShowMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<TrackTvShowMutation, TrackTvShowMutationVariables>) {
+        return ApolloReactHooks.useMutation<TrackTvShowMutation, TrackTvShowMutationVariables>(TrackTvShowDocument, baseOptions);
+      }
+export type TrackTvShowMutationHookResult = ReturnType<typeof useTrackTvShowMutation>;
+export type TrackTvShowMutationResult = ApolloReactCommon.MutationResult<TrackTvShowMutation>;
+export type TrackTvShowMutationOptions = ApolloReactCommon.BaseMutationOptions<TrackTvShowMutation, TrackTvShowMutationVariables>;
 export const GetLibraryMoviesDocument = gql`
     query getLibraryMovies {
   movies: getMovies {

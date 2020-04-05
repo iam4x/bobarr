@@ -37,7 +37,7 @@ export enum JobsQueue {
 
 export enum DownloadQueueProcessors {
   DOWNLOAD_MOVIE = 'download_movie',
-  REFRESH_TORRENTS = 'refresh_torrents',
+  DOWNLOAD_SEASON = 'download_season',
 }
 
 export enum RenameAndLinkQueueProcessors {

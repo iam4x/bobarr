@@ -23,9 +23,11 @@ export class TVSeason {
   public seasonNumber!: number;
 
   @ManyToOne((_type) => TVShow, (tvshow) => tvshow.seasons)
-  public tvshow!: TVShow;
+  public tvShow!: TVShow;
 
-  @OneToMany((_type) => TVEpisode, (episode) => episode.season)
+  @OneToMany((_type) => TVEpisode, (episode) => episode.season, {
+    onDelete: 'CASCADE',
+  })
   public episodes!: TVEpisode[];
 
   @CreateDateColumn()

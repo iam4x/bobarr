@@ -45,4 +45,11 @@ export class JobsService {
       movieId
     );
   }
+
+  public startDownloadSeason(seasonId: number) {
+    return this.downloadQueue.add(
+      DownloadQueueProcessors.DOWNLOAD_SEASON,
+      seasonId
+    );
+  }
 }

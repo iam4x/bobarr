@@ -1,17 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { map, forEachSeries } from 'p-iteration';
+import { times } from 'lodash';
+
 import {
   DeepPartial,
   TransactionManager,
   Transaction,
   EntityManager,
 } from 'typeorm';
-import { map } from 'p-iteration';
 
 import { FileType } from 'src/app.dto';
 
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { Movie } from 'src/entities/movie.entity';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
+import { TVShowDAO } from 'src/entities/dao/tvshow.dao';
+import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
+import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 
 import { TMDBService } from 'src/modules/tmdb/tmdb.service';
 import { JobsService } from 'src/modules/jobs/jobs.service';
@@ -63,6 +68,60 @@ export class LibraryService {
     }
 
     await movieDAO.remove(movie);
+  }
+
+  @Transaction()
+  public async trackTVShow(
+    { tmdbId, seasonNumbers }: { tmdbId: number; seasonNumbers: number[] },
+    @TransactionManager() manager?: EntityManager
+  ) {
+    const tvShowDAO = manager!.getCustomRepository(TVShowDAO);
+    const tvSeasonDAO = manager!.getCustomRepository(TVSeasonDAO);
+    const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
+
+    const tmdbTVShow = await this.tmdbService.getTVShow(tmdbId);
+    const tvShow = await tvShowDAO.findOrCreate({
+      tmdbId,
+      title: tmdbTVShow.name,
+    });
+
+    await forEachSeries(seasonNumbers, async (seasonNumber) => {
+      const tmdbSeason = tmdbTVShow.seasons.find(
+        (_) => _.season_number === seasonNumber
+      );
+
+      if (!tmdbSeason) {
+        throw new HttpException(
+          `Season number ${seasonNumber} not found on TMDB`,
+          HttpStatus.UNPROCESSABLE_ENTITY
+        );
+      }
+
+      const alreadExists = await tvSeasonDAO.findOne({
+        where: { tmdbId: tmdbSeason.id },
+      });
+
+      if (!alreadExists) {
+        const season = await tvSeasonDAO.save({
+          tvShow,
+          seasonNumber,
+          tmdbId: tmdbSeason.id,
+        });
+
+        await tvEpisodeDAO.save(
+          times(tmdbSeason.episode_count, (episodeNumber) => ({
+            tvShow,
+            season,
+            seasonNumber,
+            episodeNumber: episodeNumber + 1,
+          }))
+        );
+
+        await this.jobsService.startDownloadSeason(season.id);
+      }
+    });
+
+    return tvShow;
   }
 
   private enrichMovie = async (movie: Movie) => {

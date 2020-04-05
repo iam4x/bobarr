@@ -1,5 +1,5 @@
 mutation trackMovie($title: String!, $tmdbId: Int!) {
-  trackMovie(title: $title, tmdbId: $tmdbId) {
+  movie: trackMovie(title: $title, tmdbId: $tmdbId) {
     id
   }
 }

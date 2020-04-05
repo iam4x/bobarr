@@ -33,7 +33,9 @@ export class TMDBService {
   }
 
   public async getTVShow(tvShowTMDBId: number) {
-    const { data } = await this.client.get<TMDBTVShow>(`/tv/${tvShowTMDBId}`);
+    const { data } = await this.client.get<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
+      params: { language: 'en' }, // always get tvshows in english
+    });
     return data;
   }
 

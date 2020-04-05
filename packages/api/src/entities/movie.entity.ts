@@ -1,3 +1,5 @@
+import { ObjectType, Field } from '@nestjs/graphql';
+
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,8 +7,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-import { ObjectType, Field } from '@nestjs/graphql';
 
 import { DownloadableMediaState } from 'src/app.dto';
 

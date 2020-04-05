@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { Modal, Skeleton, Tag } from 'antd';
+import { Modal, Skeleton, Tag, notification } from 'antd';
 import { orderBy } from 'lodash';
+import dayjs from 'dayjs';
 import cx from 'classnames';
 
 import {
   TmdbSearchResult,
   useGetTvShowSeasonsQuery,
+  useTrackTvShowMutation,
 } from '../../utils/graphql';
 
 import { TVShowSeasonsModalComponentStyles } from './tvshow-seasons-modal.styles';
-import dayjs from 'dayjs';
 
 interface TVShowSeasonsModalComponentProps {
   visible: boolean;
@@ -21,8 +22,19 @@ export function TVShowSeasonsModalComponent(
   props: TVShowSeasonsModalComponentProps
 ) {
   const { tvShow, visible, onRequestClose } = props;
-
   const [selectedSeasons, setSelectedSeasons] = useState<number[]>([]);
+
+  const [trackTVShow] = useTrackTvShowMutation({
+    variables: { tmdbId: tvShow.tmdbId, seasonNumbers: selectedSeasons },
+    onError: ({ message }) => {
+      notification.error({ message: message.replace('GraphQL error: ', '') });
+    },
+    onCompleted: () => {
+      notification.success({ message: 'Episodes sent to download' });
+      props.onRequestClose();
+    },
+  });
+
   const { data, loading } = useGetTvShowSeasonsQuery({
     variables: { tvShowTMDBId: tvShow.tmdbId },
   });
@@ -45,6 +57,7 @@ export function TVShowSeasonsModalComponent(
       centered={true}
       onCancel={onRequestClose}
       destroyOnClose={true}
+      onOk={() => trackTVShow()}
       okText={
         selectedSeasons.length > 0
           ? `Download ${selectedSeasons.length} seasons`

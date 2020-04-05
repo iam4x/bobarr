@@ -16,9 +16,6 @@ export class TVEpisode {
   @PrimaryGeneratedColumn()
   public id!: number;
 
-  @Column('int', { unique: true })
-  public tmdbId!: number;
-
   @Column('int')
   public episodeNumber!: number;
 
@@ -32,7 +29,7 @@ export class TVEpisode {
   public season!: TVSeason;
 
   @ManyToOne((_type) => TVShow, (tvshow) => tvshow.episodes)
-  public tvshow!: TVShow;
+  public tvShow!: TVShow;
 
   @CreateDateColumn()
   public createdAt!: Date;

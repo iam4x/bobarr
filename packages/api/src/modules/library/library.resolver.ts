@@ -1,10 +1,11 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 
+import { GraphQLCommonResponse } from 'src/app.dto';
 import { Movie } from 'src/entities/movie.entity';
+import { TVShow } from 'src/entities/tvshow.entity';
 
 import { LibraryService } from './library.service';
 import { EnrichedMovie } from './library.dto';
-import { GraphQLCommonResponse } from 'src/app.dto';
 
 @Resolver()
 export class LibraryResolver {
@@ -29,5 +30,13 @@ export class LibraryResolver {
   ) {
     await this.libraryService.removeMovie(tmdbId);
     return { success: true, message: 'MOVIE_REMOVED_FROM_LIBRARY' };
+  }
+
+  @Mutation((_returns) => TVShow)
+  public trackTVShow(
+    @Args('tmdbId', { type: () => Int }) tmdbId: number,
+    @Args('seasonNumbers', { type: () => [Int] }) seasonNumbers: number[]
+  ) {
+    return this.libraryService.trackTVShow({ tmdbId, seasonNumbers });
   }
 }
