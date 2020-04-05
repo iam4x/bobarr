@@ -55,3 +55,4 @@ export class GraphQLCommonResponse {
 registerEnumType(FileType, { name: 'FileType' });
 registerEnumType(JobName, { name: 'JobName' });
 registerEnumType(DownloadableMediaState, { name: 'DownloadableMediaState' });
+registerEnumType(ParameterKey, { name: 'ParameterKey' });

@@ -10,6 +10,7 @@ const links = [
   ['Movies', '/library/movies'],
   ['TV Shows', '/library/tvshows'],
   ['Search', '/search'],
+  ['Settings', '/settings'],
 ];
 
 export function NavbarComponent() {

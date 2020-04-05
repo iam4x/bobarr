@@ -64,15 +64,31 @@ type Movie {
 }
 
 type Mutation {
+  updateParam(value: String!, key: ParameterKey!): GraphQLCommonResponse!
   trackMovie(tmdbId: Int!, title: String!): Movie!
   removeMovie(tmdbId: Int!): GraphQLCommonResponse!
   trackTVShow(seasonNumbers: [Int!]!, tmdbId: Int!): TVShow!
   removeTVShow(tmdbId: Int!): GraphQLCommonResponse!
 }
 
+enum ParameterKey {
+  REGION
+  LANGUAGE
+  TMDB_API_KEY
+  JACKETT_API_KEY
+  MAX_MOVIE_DOWNLOAD_SIZE
+  MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE
+  PREFERRED_TAGS
+}
+
 type ParamsHash {
-  language: String!
   region: String!
+  language: String!
+  tmdb_api_key: String!
+  jackett_api_key: String!
+  max_movie_download_size: String!
+  max_tvshow_episode_download_size: String!
+  preferred_tags: String!
 }
 
 type Query {

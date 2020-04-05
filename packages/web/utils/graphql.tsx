@@ -72,10 +72,17 @@ export type Movie = {
 
 export type Mutation = {
    __typename?: 'Mutation';
+  updateParam: GraphQlCommonResponse;
   trackMovie: Movie;
   removeMovie: GraphQlCommonResponse;
   trackTVShow: TvShow;
   removeTVShow: GraphQlCommonResponse;
+};
+
+
+export type MutationUpdateParamArgs = {
+  value: Scalars['String'];
+  key: ParameterKey;
 };
 
 
@@ -100,10 +107,25 @@ export type MutationRemoveTvShowArgs = {
   tmdbId: Scalars['Int'];
 };
 
+export enum ParameterKey {
+  Region = 'REGION',
+  Language = 'LANGUAGE',
+  TmdbApiKey = 'TMDB_API_KEY',
+  JackettApiKey = 'JACKETT_API_KEY',
+  MaxMovieDownloadSize = 'MAX_MOVIE_DOWNLOAD_SIZE',
+  MaxTvshowEpisodeDownloadSize = 'MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE',
+  PreferredTags = 'PREFERRED_TAGS'
+}
+
 export type ParamsHash = {
    __typename?: 'ParamsHash';
-  language: Scalars['String'];
   region: Scalars['String'];
+  language: Scalars['String'];
+  tmdb_api_key: Scalars['String'];
+  jackett_api_key: Scalars['String'];
+  max_movie_download_size: Scalars['String'];
+  max_tvshow_episode_download_size: Scalars['String'];
+  preferred_tags: Scalars['String'];
 };
 
 export type Query = {
@@ -251,6 +273,20 @@ export type TrackTvShowMutation = (
   ) }
 );
 
+export type UpdateParamMutationVariables = {
+  key: ParameterKey;
+  value: Scalars['String'];
+};
+
+
+export type UpdateParamMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
 export type GetDownloadingQueryVariables = {};
 
 
@@ -291,7 +327,7 @@ export type GetParamsQuery = (
   { __typename?: 'Query' }
   & { params: (
     { __typename?: 'ParamsHash' }
-    & Pick<ParamsHash, 'language' | 'region'>
+    & Pick<ParamsHash, 'region' | 'language' | 'tmdb_api_key' | 'jackett_api_key' | 'max_movie_download_size' | 'max_tvshow_episode_download_size' | 'preferred_tags'>
   ) }
 );
 
@@ -491,6 +527,40 @@ export function useTrackTvShowMutation(baseOptions?: ApolloReactHooks.MutationHo
 export type TrackTvShowMutationHookResult = ReturnType<typeof useTrackTvShowMutation>;
 export type TrackTvShowMutationResult = ApolloReactCommon.MutationResult<TrackTvShowMutation>;
 export type TrackTvShowMutationOptions = ApolloReactCommon.BaseMutationOptions<TrackTvShowMutation, TrackTvShowMutationVariables>;
+export const UpdateParamDocument = gql`
+    mutation updateParam($key: ParameterKey!, $value: String!) {
+  result: updateParam(key: $key, value: $value) {
+    success
+    message
+  }
+}
+    `;
+export type UpdateParamMutationFn = ApolloReactCommon.MutationFunction<UpdateParamMutation, UpdateParamMutationVariables>;
+
+/**
+ * __useUpdateParamMutation__
+ *
+ * To run a mutation, you first call `useUpdateParamMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateParamMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateParamMutation, { data, loading, error }] = useUpdateParamMutation({
+ *   variables: {
+ *      key: // value for 'key'
+ *      value: // value for 'value'
+ *   },
+ * });
+ */
+export function useUpdateParamMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateParamMutation, UpdateParamMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdateParamMutation, UpdateParamMutationVariables>(UpdateParamDocument, baseOptions);
+      }
+export type UpdateParamMutationHookResult = ReturnType<typeof useUpdateParamMutation>;
+export type UpdateParamMutationResult = ApolloReactCommon.MutationResult<UpdateParamMutation>;
+export type UpdateParamMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamMutation, UpdateParamMutationVariables>;
 export const GetDownloadingDocument = gql`
     query getDownloading {
   rows: getDownloadingMedias {
@@ -607,8 +677,13 @@ export type GetLibraryTvShowsQueryResult = ApolloReactCommon.QueryResult<GetLibr
 export const GetParamsDocument = gql`
     query getParams {
   params: getParams {
-    language
     region
+    language
+    tmdb_api_key
+    jackett_api_key
+    max_movie_download_size
+    max_tvshow_episode_download_size
+    preferred_tags
   }
 }
     `;
