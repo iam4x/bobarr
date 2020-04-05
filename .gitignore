@@ -17,6 +17,7 @@ packages/jackett/downloads/*
 packages/transmission/config/*
 packages/transmission/watch/*
 !packages/transmission/**/.gitkeep
+!packages/transmission/config/settings.json
 
 # vpn
 packages/vpn/*
