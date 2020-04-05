@@ -8,5 +8,6 @@ export const theme: DefaultTheme = {
   colors: {
     navbarBackground: '#2A363B',
     coral: '#ff847c',
+    blue: '#1890ff',
   },
 };

@@ -9,6 +9,7 @@ declare module 'styled-components' {
     colors: {
       navbarBackground: string;
       coral: string;
+      blue: string;
     };
   }
 }

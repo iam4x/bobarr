@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { PlusSquareOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
@@ -7,6 +7,7 @@ import { TmdbSearchResult, EnrichedMovie } from '../../utils/graphql';
 import { TMDBCardStyles } from './tmdb-card.styles';
 import { useAddLibrary } from './use-add-library.hook';
 import { useRemoveLibrary } from './use-remove-library.hook';
+import { TVShowSeasonsModalComponent } from '../tvshow-seasons-modal/tvshow-seasons-modal.component';
 
 interface TMDBCardComponentProps {
   type: 'tvshow' | 'movie';
@@ -16,19 +17,35 @@ interface TMDBCardComponentProps {
 
 export function TMDBCardComponent(props: TMDBCardComponentProps) {
   const { result, type, inLibrary } = props;
+  const [tvSeasonModalActive, setTVSeasonModalActive] = useState(
+    result.tmdbId === 1399
+  );
 
-  const handleAddLibrary = useAddLibrary({ result, type });
-  const handleRemoveLibrary = useRemoveLibrary({ result, type });
+  const handleMovieAddLibrary = useAddLibrary({ result, type });
+  const handleMovieRemoveLibrary = useRemoveLibrary({ result, type });
+
+  const movieHandler = inLibrary
+    ? handleMovieRemoveLibrary
+    : handleMovieAddLibrary;
+
+  const onPosterClickHandler =
+    type === 'movie' ? movieHandler : () => setTVSeasonModalActive(true);
 
   return (
     <TMDBCardStyles
       posterPath={`https://image.tmdb.org/t/p/w220_and_h330_face${result.posterPath}`}
       vote={result.voteAverage * 10}
     >
-      <div
-        className="poster--container"
-        onClick={inLibrary ? handleRemoveLibrary : handleAddLibrary}
-      >
+      {/* display season picker modal when it's tvshow */}
+      {type === 'tvshow' && (
+        <TVShowSeasonsModalComponent
+          tvShow={result as TmdbSearchResult}
+          visible={tvSeasonModalActive}
+          onRequestClose={() => setTVSeasonModalActive(false)}
+        />
+      )}
+
+      <div className="poster--container" onClick={onPosterClickHandler}>
         <div className="poster" />
         <div className="overlay">
           {inLibrary ? (

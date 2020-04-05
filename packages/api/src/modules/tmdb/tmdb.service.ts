@@ -6,7 +6,8 @@ import { Injectable } from '@nestjs/common';
 import { ParameterKey } from 'src/app.dto';
 import { ParamsService } from 'src/modules/params/params.service';
 
-import { TMDBMovie, TMDBTVShow } from './tmdb.dto';
+import { TMDBMovie, TMDBTVShow, TMDBTVSeason } from './tmdb.dto';
+import { recursiveCamelCase } from 'src/utils/recursive-camel-case';
 
 @Injectable()
 export class TMDBService {
@@ -26,9 +27,19 @@ export class TMDBService {
     });
   }
 
-  public async getMovie(id: number) {
-    const { data } = await this.client.get(`/movie/${id}`);
-    return data as TMDBMovie;
+  public async getMovie(movieTMDBId: number) {
+    const { data } = await this.client.get<TMDBMovie>(`/movie/${movieTMDBId}`);
+    return data;
+  }
+
+  public async getTVShow(tvShowTMDBId: number) {
+    const { data } = await this.client.get<TMDBTVShow>(`/tv/${tvShowTMDBId}`);
+    return data;
+  }
+
+  public async getTVShowSeasons(tvShowTMDBId: number) {
+    const tvShow = await this.getTVShow(tvShowTMDBId);
+    return recursiveCamelCase<TMDBTVSeason>(tvShow.seasons);
   }
 
   public async search(query: string) {

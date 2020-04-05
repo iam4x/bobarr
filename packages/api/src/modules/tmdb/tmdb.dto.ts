@@ -27,17 +27,81 @@ export interface TMDBMovie {
 export interface TMDBTVShow {
   id: number;
   backdrop_path: string;
+  episode_run_time: number[];
   first_air_date: string;
-  genre_ids: number[];
+  homepage: string;
+  in_production: true;
+  languages: string[];
+  last_air_date: string;
   name: string;
-  origin_country: string[];
+  number_of_episodes: number;
+  number_of_seasons: number;
+  origin_country: string;
   original_language: string;
   original_name: string;
   overview: string;
   popularity: number;
   poster_path: string;
+  status: string;
+  type: string;
   vote_average: number;
   vote_count: number;
+  genres: Array<{ id: number; name: string }>;
+  seasons: Array<{
+    id: number;
+    name: string;
+    air_date: string;
+    episode_count: number;
+    overview: string;
+    poster_path: string;
+    season_number: number;
+  }>;
+  last_episode_to_air: {
+    id: number;
+    name: string;
+    air_date: string;
+    episode_number: number;
+    overview: string;
+    production_code: string;
+    season_number: number;
+    show_id: number;
+    still_path: string;
+    vote_average: number;
+    vote_count: number;
+  };
+  created_by: Array<{
+    id: number;
+    credit_id: string;
+    gender: number;
+    name: string;
+    profile_path?: string;
+  }>;
+}
+
+@ObjectType()
+export class TVEpisode {
+  @Field() public id!: number;
+  @Field() public episodeNumber!: number;
+  @Field() public name!: string;
+  @Field() public overview!: string;
+  @Field() public seasonNumber!: number;
+  @Field({ nullable: true }) public voteCount!: number;
+  @Field({ nullable: true }) public voteAverage!: number;
+  @Field({ nullable: true }) public airDate!: string;
+  @Field({ nullable: true }) public stillPath!: string;
+}
+
+@ObjectType()
+export class TMDBTVSeason {
+  @Field() public id!: number;
+  @Field() public name!: string;
+  @Field() public seasonNumber!: number;
+  @Field({ nullable: true }) public overview!: string;
+  @Field({ nullable: true }) public airDate!: string;
+  @Field({ nullable: true }) public episodeCount!: number;
+  @Field({ nullable: true }) public posterPath!: string;
+  @Field((_type) => [TVEpisode], { nullable: true })
+  public episodes!: TVEpisode[];
 }
 
 @ObjectType()

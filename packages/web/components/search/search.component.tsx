@@ -113,7 +113,9 @@ function ResultsCarousel({
         naturalSlideHeight={theme.tmdbCardHeight}
         naturalSlideWidth={220}
         totalSlides={results.length}
+        dragEnabled={false}
         visibleSlides={5}
+        step={5}
       >
         <ButtonBack className="arrow-left">
           <FaChevronCircleLeft size={16} />
@@ -125,7 +127,11 @@ function ResultsCarousel({
               false;
 
             return (
-              <Slide key={result.id} index={index}>
+              <Slide
+                key={result.id}
+                index={index}
+                innerClassName="carrousel--slide"
+              >
                 <TMDBCardComponent
                   key={result.id}
                   type={type}

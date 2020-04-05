@@ -79,6 +79,7 @@ export type Query = {
   getParams: ParamsHash;
   search: TmdbSearchResults;
   getPopular: TmdbSearchResults;
+  getTVShowSeasons: Array<TmdbtvSeason>;
   getTorrentStatus: TorrentStatus;
   getMovies: Array<EnrichedMovie>;
 };
@@ -86,6 +87,11 @@ export type Query = {
 
 export type QuerySearchArgs = {
   query: Scalars['String'];
+};
+
+
+export type QueryGetTvShowSeasonsArgs = {
+  tvShowTMDBId: Scalars['Int'];
 };
 
 
@@ -110,6 +116,18 @@ export type TmdbSearchResults = {
   tvShows: Array<TmdbSearchResult>;
 };
 
+export type TmdbtvSeason = {
+   __typename?: 'TMDBTVSeason';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  seasonNumber: Scalars['Float'];
+  overview?: Maybe<Scalars['String']>;
+  airDate?: Maybe<Scalars['String']>;
+  episodeCount?: Maybe<Scalars['Float']>;
+  posterPath?: Maybe<Scalars['String']>;
+  episodes?: Maybe<Array<TvEpisode>>;
+};
+
 export type TorrentStatus = {
    __typename?: 'TorrentStatus';
   id: Scalars['Int'];
@@ -120,6 +138,19 @@ export type TorrentStatus = {
   uploadedEver: Scalars['BigInt'];
   totalSize: Scalars['BigInt'];
   status: Scalars['Int'];
+};
+
+export type TvEpisode = {
+   __typename?: 'TVEpisode';
+  id: Scalars['Float'];
+  episodeNumber: Scalars['Float'];
+  name: Scalars['String'];
+  overview: Scalars['String'];
+  seasonNumber: Scalars['Float'];
+  voteCount?: Maybe<Scalars['Float']>;
+  voteAverage?: Maybe<Scalars['Float']>;
+  airDate?: Maybe<Scalars['String']>;
+  stillPath?: Maybe<Scalars['String']>;
 };
 
 export type RemoveMovieMutationVariables = {
@@ -200,6 +231,19 @@ export type GetTorrentStatusQuery = (
     { __typename?: 'TorrentStatus' }
     & Pick<TorrentStatus, 'id' | 'percentDone' | 'rateDownload' | 'rateUpload' | 'uploadRatio' | 'uploadedEver' | 'totalSize' | 'status'>
   ) }
+);
+
+export type GetTvShowSeasonsQueryVariables = {
+  tvShowTMDBId: Scalars['Int'];
+};
+
+
+export type GetTvShowSeasonsQuery = (
+  { __typename?: 'Query' }
+  & { seasons: Array<(
+    { __typename?: 'TMDBTVSeason' }
+    & Pick<TmdbtvSeason, 'id' | 'name' | 'seasonNumber' | 'episodeCount' | 'overview' | 'posterPath' | 'airDate'>
+  )> }
 );
 
 export type SearchQueryVariables = {
@@ -449,6 +493,45 @@ export function useGetTorrentStatusLazyQuery(baseOptions?: ApolloReactHooks.Lazy
 export type GetTorrentStatusQueryHookResult = ReturnType<typeof useGetTorrentStatusQuery>;
 export type GetTorrentStatusLazyQueryHookResult = ReturnType<typeof useGetTorrentStatusLazyQuery>;
 export type GetTorrentStatusQueryResult = ApolloReactCommon.QueryResult<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>;
+export const GetTvShowSeasonsDocument = gql`
+    query getTVShowSeasons($tvShowTMDBId: Int!) {
+  seasons: getTVShowSeasons(tvShowTMDBId: $tvShowTMDBId) {
+    id
+    name
+    seasonNumber
+    episodeCount
+    overview
+    posterPath
+    airDate
+  }
+}
+    `;
+
+/**
+ * __useGetTvShowSeasonsQuery__
+ *
+ * To run a query within a React component, call `useGetTvShowSeasonsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTvShowSeasonsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTvShowSeasonsQuery({
+ *   variables: {
+ *      tvShowTMDBId: // value for 'tvShowTMDBId'
+ *   },
+ * });
+ */
+export function useGetTvShowSeasonsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>(GetTvShowSeasonsDocument, baseOptions);
+      }
+export function useGetTvShowSeasonsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>(GetTvShowSeasonsDocument, baseOptions);
+        }
+export type GetTvShowSeasonsQueryHookResult = ReturnType<typeof useGetTvShowSeasonsQuery>;
+export type GetTvShowSeasonsLazyQueryHookResult = ReturnType<typeof useGetTvShowSeasonsLazyQuery>;
+export type GetTvShowSeasonsQueryResult = ApolloReactCommon.QueryResult<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>;
 export const SearchDocument = gql`
     query search($query: String!) {
   results: search(query: $query) {

@@ -93,7 +93,7 @@ export const SearchStyles = styled.div`
         position: absolute;
         outline: none;
         border: none;
-        top: 44%;
+        top: 175px;
       }
 
       .arrow-left {
@@ -102,6 +102,12 @@ export const SearchStyles = styled.div`
 
       .arrow-right {
         right: 2px;
+      }
+    }
+
+    &--slide {
+      div {
+        outline-width: 0px;
       }
     }
   }

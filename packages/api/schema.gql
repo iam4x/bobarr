@@ -60,6 +60,7 @@ type Query {
   getParams: ParamsHash!
   search(query: String!): TMDBSearchResults!
   getPopular: TMDBSearchResults!
+  getTVShowSeasons(tvShowTMDBId: Int!): [TMDBTVSeason!]!
   getTorrentStatus(resourceType: String!, resourceId: Int!): TorrentStatus!
   getMovies: [EnrichedMovie!]!
 }
@@ -78,6 +79,17 @@ type TMDBSearchResults {
   tvShows: [TMDBSearchResult!]!
 }
 
+type TMDBTVSeason {
+  id: Float!
+  name: String!
+  seasonNumber: Float!
+  overview: String
+  airDate: String
+  episodeCount: Float
+  posterPath: String
+  episodes: [TVEpisode!]
+}
+
 type TorrentStatus {
   id: Int!
   percentDone: Float!
@@ -87,4 +99,16 @@ type TorrentStatus {
   uploadedEver: BigInt!
   totalSize: BigInt!
   status: Int!
+}
+
+type TVEpisode {
+  id: Float!
+  episodeNumber: Float!
+  name: String!
+  overview: String!
+  seasonNumber: Float!
+  voteCount: Float
+  voteAverage: Float
+  airDate: String
+  stillPath: String
 }
