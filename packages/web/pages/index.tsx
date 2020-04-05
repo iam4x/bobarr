@@ -1,15 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { NextPageContext } from 'next';
+import { useRouter } from 'next/router';
 
-import { withApollo } from '../components/with-apollo';
-import { LayoutComponent } from '../components/layout/layout.component';
-import { HomeComponent } from '../components/home/home.component';
+import { redirect } from '../utils/redirect';
+
+const redirectPath = '/search';
 
 function IndexPage() {
-  return (
-    <LayoutComponent>
-      <HomeComponent />
-    </LayoutComponent>
-  );
+  const router = useRouter();
+  useEffect(() => {
+    router.replace('/search');
+  }, []);
+  return <noscript />;
 }
 
-export default withApollo({ ssr: false })(IndexPage);
+IndexPage.getInitialProps = (ctx: NextPageContext) => {
+  redirect(ctx, redirectPath);
+  return {};
+};
+
+export default IndexPage;
