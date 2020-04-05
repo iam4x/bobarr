@@ -7,6 +7,7 @@ import {
   useRemoveTvShowMutation,
   GetLibraryTvShowsDocument,
   GetTvShowSeasonsDocument,
+  GetDownloadingDocument,
 } from '../../utils/graphql';
 
 export function useGetSeasons({ tmdbId }: { tmdbId: number }) {
@@ -17,6 +18,7 @@ export function useGetSeasons({ tmdbId }: { tmdbId: number }) {
   const [trackTVShow, { loading: mutationLoading }] = useTrackTvShowMutation({
     awaitRefetchQueries: true,
     refetchQueries: [
+      { query: GetDownloadingDocument },
       { query: GetLibraryTvShowsDocument },
       {
         query: GetTvShowSeasonsDocument,
@@ -32,6 +34,7 @@ export function useGetSeasons({ tmdbId }: { tmdbId: number }) {
   const [removeTVShow] = useRemoveTvShowMutation({
     awaitRefetchQueries: true,
     refetchQueries: [
+      { query: GetDownloadingDocument },
       { query: GetLibraryTvShowsDocument },
       {
         query: GetTvShowSeasonsDocument,

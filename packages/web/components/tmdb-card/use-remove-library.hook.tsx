@@ -6,6 +6,7 @@ import {
   EnrichedMovie,
   GetLibraryMoviesDocument,
   useRemoveMovieMutation,
+  GetDownloadingDocument,
 } from '../../utils/graphql';
 
 export function useRemoveLibrary({
@@ -17,7 +18,10 @@ export function useRemoveLibrary({
 }) {
   const [removeMovie] = useRemoveMovieMutation({
     awaitRefetchQueries: true,
-    refetchQueries: [{ query: GetLibraryMoviesDocument }],
+    refetchQueries: [
+      { query: GetLibraryMoviesDocument },
+      { query: GetDownloadingDocument },
+    ],
   });
 
   const handleClick = () =>

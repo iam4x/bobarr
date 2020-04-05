@@ -6,6 +6,7 @@ import {
   TmdbSearchResult,
   EnrichedMovie,
   GetLibraryMoviesDocument,
+  GetDownloadingDocument,
 } from '../../utils/graphql';
 
 export function useAddLibrary({
@@ -17,7 +18,10 @@ export function useAddLibrary({
 }) {
   const [trackMovie] = useTrackMovieMutation({
     awaitRefetchQueries: true,
-    refetchQueries: [{ query: GetLibraryMoviesDocument }],
+    refetchQueries: [
+      { query: GetLibraryMoviesDocument },
+      { query: GetDownloadingDocument },
+    ],
   });
 
   const handleClick = () =>
