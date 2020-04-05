@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal } from 'antd';
+import { Modal, notification } from 'antd';
 
 import {
   useTrackMovieMutation,
@@ -22,6 +22,16 @@ export function useAddLibrary({
       { query: GetLibraryMoviesDocument },
       { query: GetDownloadingDocument },
     ],
+    onError: ({ message }) =>
+      notification.error({
+        message: message.replace('GraphQL error: ', ''),
+        placement: 'bottomRight',
+      }),
+    onCompleted: () =>
+      notification.success({
+        message: 'Movie sent to download',
+        placement: 'bottomRight',
+      }),
   });
 
   const handleClick = () =>

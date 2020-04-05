@@ -26,9 +26,15 @@ export function useGetSeasons({ tmdbId }: { tmdbId: number }) {
       },
     ],
     onError: ({ message }) =>
-      notification.error({ message: message.replace('GraphQL error: ', '') }),
+      notification.error({
+        message: message.replace('GraphQL error: ', ''),
+        placement: 'bottomRight',
+      }),
     onCompleted: () =>
-      notification.success({ message: 'Episodes sent to download' }),
+      notification.success({
+        message: 'Episodes sent to download',
+        placement: 'bottomRight',
+      }),
   });
 
   const [removeTVShow] = useRemoveTvShowMutation({
@@ -42,9 +48,15 @@ export function useGetSeasons({ tmdbId }: { tmdbId: number }) {
       },
     ],
     onError: ({ message }) =>
-      notification.error({ message: message.replace('GraphQL error: ', '') }),
+      notification.error({
+        message: message.replace('GraphQL error: ', ''),
+        placement: 'bottomRight',
+      }),
     onCompleted: () =>
-      notification.success({ message: 'TVShow removed from library' }),
+      notification.success({
+        message: 'TVShow removed from library',
+        placement: 'bottomRight',
+      }),
   });
 
   const seasons = orderBy(data?.seasons, ['seasonNumber'], ['desc']).filter(
