@@ -5,19 +5,23 @@ import { mapSeries } from 'p-iteration';
 import { Injectable } from '@nestjs/common';
 
 import { ParameterKey } from 'src/app.dto';
+import { formatNumber } from 'src/utils/format-number';
+
 import { ParamsService } from 'src/modules/params/params.service';
 import { LibraryService } from 'src/modules/library/library.service';
+
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
+import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 
 import { JackettResult } from './jackett.dto';
-import { formatNumber } from 'src/utils/format-number';
 
 @Injectable()
 export class JackettService {
   public constructor(
     private readonly paramsService: ParamsService,
     private readonly libraryService: LibraryService,
-    private readonly tvSeasonDAO: TVSeasonDAO
+    private readonly tvSeasonDAO: TVSeasonDAO,
+    private readonly tvEpisodeDAO: TVEpisodeDAO
   ) {}
 
   private async request<TData>(path: string, params: Record<string, any>) {
@@ -58,23 +62,51 @@ export class JackettService {
     });
 
     const tvShow = await this.libraryService.getTVShow(tvSeason.tvShow.id);
+    const enTVShow = await this.libraryService.getTVShow(tvSeason.tvShow.id, {
+      language: 'en',
+    });
 
-    const queries = [
-      `${tvShow.title} S${formatNumber(tvSeason.seasonNumber)}`,
-      `${tvShow.originalTitle} S${formatNumber(tvSeason.seasonNumber)}`,
-      `${tvShow.title} Season ${formatNumber(tvSeason.seasonNumber)}`,
-      `${tvShow.originalTitle} Season ${formatNumber(tvSeason.seasonNumber)}`,
-      `${tvShow.title} Season ${tvSeason.seasonNumber}`,
-      `${tvShow.originalTitle} Season ${tvSeason.seasonNumber}`,
-      `${tvShow.title} Saison ${formatNumber(tvSeason.seasonNumber)}`,
-      `${tvShow.originalTitle} Saison ${formatNumber(tvSeason.seasonNumber)}`,
-      `${tvShow.title} Saison ${tvSeason.seasonNumber}`,
-    ];
+    const queries = uniq([tvShow.title, tvShow.originalTitle, enTVShow.title])
+      .map((title) => [
+        `${title} S${formatNumber(tvSeason.seasonNumber)}`,
+        `${title} Season ${formatNumber(tvSeason.seasonNumber)}`,
+        `${title} Saison ${formatNumber(tvSeason.seasonNumber)}`,
+      ])
+      .flat();
 
     return this.search(queries, {
       maxSize: maxSize * tvSeason.episodes.length,
       isSeason: true,
     });
+  }
+
+  public async searchEpisode(episodeId: number) {
+    const maxSize = await this.paramsService.getNumber(
+      ParameterKey.MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE
+    );
+
+    const tvEpisode = await this.tvEpisodeDAO.findOneOrFail({
+      where: { id: episodeId },
+      relations: ['tvShow'],
+    });
+
+    const tvShow = await this.libraryService.getTVShow(tvEpisode.tvShow.id);
+    const enTVShow = await this.libraryService.getTVShow(tvEpisode.tvShow.id, {
+      language: 'en',
+    });
+
+    const s = formatNumber(tvEpisode.seasonNumber);
+    const e = formatNumber(tvEpisode.episodeNumber);
+
+    const queries = uniq([tvShow.title, tvShow.originalTitle, enTVShow.title])
+      .map((title) => [
+        `${title} S${s}E${e}`,
+        `${title} Season ${s} Episode ${e}`,
+        `${title} Saison ${s} Episode ${e}`,
+      ])
+      .flat();
+
+    return this.search(queries, { maxSize });
   }
 
   private async search(

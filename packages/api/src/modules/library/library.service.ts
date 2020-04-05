@@ -48,7 +48,7 @@ export class LibraryService {
 
     const tvEpisodes = await this.tvEpisodeDAO.find({
       where: { state: DownloadableMediaState.DOWNLOADING },
-      relations: ['tvShow', 'season'],
+      relations: ['season', 'season.tvShow'],
     });
 
     return [
