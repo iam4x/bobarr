@@ -32,7 +32,8 @@ services:
       - jackett
       - transmission
       - transmission-web
-    command: yarn dev
+    command: yarn start
+    # command: yarn dev
     restart: unless-stopped
 
   web:
@@ -47,7 +48,8 @@ services:
       - 3000:3000
     depends_on:
       - api
-    command: yarn dev
+    command: yarn start
+    # command: yarn dev
     restart: unless-stopped
 
   postgres:

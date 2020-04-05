@@ -7,7 +7,7 @@
     "watch-next": "next dev",
     "watch-gql": "gql-gen --watch",
     "build": "next build",
-    "start": "yarn && next start",
+    "start": "yarn && yarn build && next start",
     "gql-gen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
