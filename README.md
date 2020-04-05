@@ -29,14 +29,14 @@ And to have something with a better ui, less configuration and faster 🚀
 * Then move your open vpn config file into the folder `packages/vpn`
 * Build the api and web ui packages `$ docker-compose build`
 * Start the bobarr stack `$ docker-compose up`
-* Go to http://localhost:9117/UI/Dashboard and copy the API Key in top right corner
+* Go to http://localhost:9117 and copy the API Key in top right corner
 * Go to http://localhost:3000/settings, paste the jackett API key and hit update
 
 ## Configuration
 
 ### Torrent account
 
-* Go to `http://localhost:9117/UI/Dashboard`
+* Go to `http://localhost:9117`
 * Hit `add indexer` and follow the steps
 
 ### Bobarr configuration
@@ -49,3 +49,11 @@ And to have something with a better ui, less configuration and faster 🚀
 * After configuration, go to http://localhost:3000 and just start searching!
 * The files will be downloaded into `library/downloads`
 * The files will be simlinked and organized into `library/tvshows` or `library/movies`
+
+## Services
+
+* Bobarr http://localhost:3000
+* Bobarr GraphQL API http://localhost:4000/graphql
+* Bobarr background jobs http://localhost:4000/jobs
+* Jackett http://localhost:9117
+* Transmission http://localhost:9091
