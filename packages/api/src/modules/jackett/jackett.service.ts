@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 import { orderBy, uniq, uniqBy } from 'lodash';
 import { mapSeries } from 'p-iteration';
 import { Injectable } from '@nestjs/common';
@@ -14,24 +14,23 @@ import { formatNumber } from 'src/utils/format-number';
 
 @Injectable()
 export class JackettService {
-  private client!: AxiosInstance;
-
   public constructor(
     private readonly paramsService: ParamsService,
     private readonly libraryService: LibraryService,
     private readonly tvSeasonDAO: TVSeasonDAO
-  ) {
-    this.initializeClient();
-  }
+  ) {}
 
-  private async initializeClient() {
+  private async request<TData>(path: string, params: Record<string, any>) {
     const jackettApiKey = await this.paramsService.get(
       ParameterKey.JACKETT_API_KEY
     );
-    this.client = axios.create({
+
+    const client = axios.create({
       baseURL: 'http://jackett:9117/api/v2.0/indexers/all',
       params: { apikey: jackettApiKey },
     });
+
+    return client.get<TData>(path, { params });
   }
 
   public async searchMovie(movieId: number) {
@@ -97,15 +96,14 @@ export class JackettService {
         .replace(/[az]'/g, ' ')
         .replace(/:/g, ' ');
 
-      const { data } = await this.client.get<{
-        Results: JackettResult[];
-      }>('/results', {
-        params: {
+      const { data } = await this.request<{ Results: JackettResult[] }>(
+        '/results',
+        {
           Query: normalizedQuery,
           Category: [2000, 5000, 5070],
           _: Number(new Date()),
-        },
-      });
+        }
+      );
 
       return data.Results;
     });

@@ -38,6 +38,11 @@ export function TVShowSeasonsModalComponent(
     tmdbId: tvShow.tmdbId,
   });
 
+  const handleClose = () => {
+    setSelectedSeasons([]);
+    onRequestClose();
+  };
+
   const handleSeasonClick = (seasonNumber: number) => {
     setSelectedSeasons(
       selectedSeasons.includes(seasonNumber)
@@ -46,15 +51,13 @@ export function TVShowSeasonsModalComponent(
     );
   };
 
-  const handleTrack = async () => {
-    await trackTVShow({
+  const handleTrack = () =>
+    trackTVShow({
       variables: {
         tmdbId: tvShow.tmdbId,
         seasonNumbers: selectedSeasons,
       },
-    });
-    onRequestClose();
-  };
+    }).then(handleClose);
 
   const footer = [
     <Button key="cancel" icon={<CloseOutlined />} onClick={onRequestClose}>

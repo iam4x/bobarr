@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/camelcase:off */
 
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 import { Injectable } from '@nestjs/common';
 import { map } from 'p-iteration';
 
@@ -13,39 +13,37 @@ import { TMDBMovie, TMDBTVShow, TMDBTVSeason } from './tmdb.dto';
 
 @Injectable()
 export class TMDBService {
-  private client!: AxiosInstance;
-
   public constructor(
     private readonly paramsService: ParamsService,
     private readonly tvSeasonDAO: TVSeasonDAO
-  ) {
-    this.initializeClient();
-  }
+  ) {}
 
-  private async initializeClient() {
+  private async request<TData>(path: string, params: Record<string, any> = {}) {
     const apiKey = await this.paramsService.get(ParameterKey.TMDB_API_KEY);
     const language = await this.paramsService.get(ParameterKey.LANGUAGE);
 
-    this.client = axios.create({
+    const client = axios.create({
       params: { api_key: apiKey, language },
       baseURL: 'https://api.themoviedb.org/3/',
     });
+
+    return client.get<TData>(path, { params });
   }
 
   public async getMovie(movieTMDBId: number) {
-    const { data } = await this.client.get<TMDBMovie>(`/movie/${movieTMDBId}`);
+    const { data } = await this.request<TMDBMovie>(`/movie/${movieTMDBId}`);
     return data;
   }
 
   public async getTVShow(tvShowTMDBId: number, params?: { language: string }) {
-    const { data } = await this.client.get<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
+    const { data } = await this.request<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
       params,
     });
     return data;
   }
 
   public async getEnglishTVShowName(tvShowTMDBId: number) {
-    const { data } = await this.client.get<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
+    const { data } = await this.request<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
       params: { language: 'en' },
     });
     return data.name;
@@ -66,12 +64,12 @@ export class TMDBService {
 
   public async search(query: string) {
     const [movies, tvShows] = await Promise.all([
-      this.client
-        .get<{ results: TMDBMovie[] }>('/search/movie', { params: { query } })
-        .then(({ data }) => data.results.map(this.mapMovie)),
-      this.client
-        .get<{ results: TMDBTVShow[] }>('/search/tv', { params: { query } })
-        .then(({ data }) => data.results.map(this.mapTVShow)),
+      this.request<{ results: TMDBMovie[] }>('/search/movie', {
+        query,
+      }).then(({ data }) => data.results.map(this.mapMovie)),
+      this.request<{ results: TMDBTVShow[] }>('/search/tv', {
+        query,
+      }).then(({ data }) => data.results.map(this.mapTVShow)),
     ]);
     return { movies, tvShows };
   }
@@ -79,12 +77,12 @@ export class TMDBService {
   public async getPopular() {
     const region = await this.paramsService.get(ParameterKey.REGION);
     const [movies, tvShows] = await Promise.all([
-      this.client
-        .get<{ results: TMDBMovie[] }>('/movie/popular', { params: { region } })
-        .then(({ data }) => data.results.map(this.mapMovie)),
-      this.client
-        .get<{ results: TMDBTVShow[] }>('/tv/popular', { params: { region } })
-        .then(({ data }) => data.results.map(this.mapTVShow)),
+      this.request<{ results: TMDBMovie[] }>('/movie/popular', {
+        region,
+      }).then(({ data }) => data.results.map(this.mapMovie)),
+      this.request<{ results: TMDBTVShow[] }>('/tv/popular', {
+        region,
+      }).then(({ data }) => data.results.map(this.mapTVShow)),
     ]);
     return { movies, tvShows };
   }

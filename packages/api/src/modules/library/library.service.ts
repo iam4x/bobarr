@@ -52,7 +52,7 @@ export class LibraryService {
 
   public async getTVShows() {
     const tvShows = await this.tvShowDAO.find({ order: { createdAt: 'ASC' } });
-    const enrichedTVShows = map(tvShows, this.enrichTVShow);
+    const enrichedTVShows = map(tvShows, (tvShow) => this.enrichTVShow(tvShow));
     return enrichedTVShows;
   }
 

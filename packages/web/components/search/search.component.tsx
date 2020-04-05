@@ -22,10 +22,12 @@ import {
   useSearchLazyQuery,
   TmdbSearchResult,
   useGetLibraryMoviesQuery,
+  useGetLibraryTvShowsQuery,
 } from '../../utils/graphql';
 
 import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
 import { SearchStyles, Wrapper } from './search.styles';
+import movies from '../../pages/library/movies';
 
 export function SearchComponent() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -105,7 +107,13 @@ function ResultsCarousel({
   type: 'movie' | 'tvshow';
 }) {
   const theme = useTheme();
-  const { data } = useGetLibraryMoviesQuery();
+  const { data: moviesLibrary } = useGetLibraryMoviesQuery();
+  const { data: tvShowsLibrary } = useGetLibraryTvShowsQuery();
+
+  const tmdbIds = [
+    ...(moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || []),
+    ...(tvShowsLibrary?.tvShows?.map(({ tmdbId }) => tmdbId) || []),
+  ];
 
   return (
     <div className="carrousel--container">
@@ -121,26 +129,20 @@ function ResultsCarousel({
           <FaChevronCircleLeft size={16} />
         </ButtonBack>
         <Slider>
-          {results.map((result, index) => {
-            const inLibrary =
-              data?.movies?.some((movie) => movie.tmdbId === result.tmdbId) ||
-              false;
-
-            return (
-              <Slide
+          {results.map((result, index) => (
+            <Slide
+              key={result.id}
+              index={index}
+              innerClassName="carrousel--slide"
+            >
+              <TMDBCardComponent
                 key={result.id}
-                index={index}
-                innerClassName="carrousel--slide"
-              >
-                <TMDBCardComponent
-                  key={result.id}
-                  type={type}
-                  result={result}
-                  inLibrary={inLibrary}
-                />
-              </Slide>
-            );
-          })}
+                type={type}
+                result={result}
+                inLibrary={tmdbIds.includes(result.tmdbId)}
+              />
+            </Slide>
+          ))}
         </Slider>
         <ButtonNext className="arrow-right">
           <FaChevronCircleRight size={16} />
