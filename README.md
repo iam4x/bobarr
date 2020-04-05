@@ -21,16 +21,17 @@ And to have something with a better ui, less configuration and faster 🚀
 
 * docker installed (https://get.docker.com/) with docker-compose
 * an open vpn configuration file (.ovpn)
-* an account in a torrent website
+* an account on a torrent website
 
 ## Installation
 
 * Clone the repo `$ git clone ssh://github.com/iam4x/bobarr.git && cd bobarr`
-* Then move your open vpn config file into the folder `packages/vpn`
+* Copy your open vpn config file (.ovpn) into the folder `packages/vpn`
+* Set `PUID` and `PGID` in `.env` (see .env for explanation)
 * Build the api and web ui packages `$ docker-compose build`
 * Start the bobarr stack `$ docker-compose up`
 * Go to http://localhost:9117 and copy the API Key in top right corner
-* Go to http://localhost:3000/settings, paste the jackett API key and hit update
+* Go to http://localhost:3000/settings and update the jackett API key
 
 ## Configuration
 
