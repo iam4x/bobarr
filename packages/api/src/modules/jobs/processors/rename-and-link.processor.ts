@@ -53,7 +53,7 @@ export class RenameAndLinkQueueProcessor {
 
     const newFolder = path.resolve(
       __dirname,
-      '../../../../../library/movies/',
+      '../../../../../../library/movies/',
       folderName
     );
 
