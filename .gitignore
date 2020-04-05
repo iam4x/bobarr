@@ -14,8 +14,6 @@ packages/jackett/downloads/*
 !packages/jackett/**/.gitkeep
 
 # transmission
-library/*
-!library/downloads/.gitkeep
 packages/transmission/config/*
 packages/transmission/watch/*
 !packages/transmission/**/.gitkeep
@@ -23,3 +21,11 @@ packages/transmission/watch/*
 # vpn
 packages/vpn/*
 !packages/vpn/.gitkeep
+
+# library
+library/downloads/*
+!library/downloads/.gitkeep
+library/movies/*
+!library/movies/.gitkeep
+library/tvshows/*
+!library/tvshows/.gitkeep
