@@ -96,6 +96,7 @@ export class TMDBTVSeason {
   @Field() public id!: number;
   @Field() public name!: string;
   @Field() public seasonNumber!: number;
+  @Field() public inLibrary!: boolean;
   @Field({ nullable: true }) public overview!: string;
   @Field({ nullable: true }) public airDate!: string;
   @Field({ nullable: true }) public episodeCount!: number;

@@ -79,6 +79,20 @@ export class LibraryService {
   }
 
   @Transaction()
+  public async removeTVShow(
+    tmdbId: number,
+    @TransactionManager() manager?: EntityManager
+  ) {
+    const tvShowDAO = manager!.getCustomRepository(TVShowDAO);
+    const tvShow = await tvShowDAO.findOneOrFail({
+      where: { tmdbId },
+      relations: ['seasons', 'episodes'],
+    });
+
+    await tvShowDAO.remove(tvShow);
+  }
+
+  @Transaction()
   public async trackTVShow(
     { tmdbId, seasonNumbers }: { tmdbId: number; seasonNumbers: number[] },
     @TransactionManager() manager?: EntityManager

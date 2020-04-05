@@ -61,6 +61,7 @@ type Mutation {
   trackMovie(tmdbId: Int!, title: String!): Movie!
   removeMovie(tmdbId: Int!): GraphQLCommonResponse!
   trackTVShow(seasonNumbers: [Int!]!, tmdbId: Int!): TVShow!
+  removeTVShow(tmdbId: Int!): GraphQLCommonResponse!
 }
 
 type ParamsHash {
@@ -96,6 +97,7 @@ type TMDBTVSeason {
   id: Float!
   name: String!
   seasonNumber: Float!
+  inLibrary: Boolean!
   overview: String
   airDate: String
   episodeCount: Float

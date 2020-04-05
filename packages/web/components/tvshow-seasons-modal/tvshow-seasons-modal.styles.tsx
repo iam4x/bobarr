@@ -18,6 +18,11 @@ export const TVShowSeasonsModalComponentStyles = styled.div`
     }
   }
 
+  .seasons {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
   .season-row {
     align-items: center;
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -25,12 +30,19 @@ export const TVShowSeasonsModalComponentStyles = styled.div`
     cursor: pointer;
     display: flex;
     margin-bottom: 8px;
+    margin-right: 4px;
+    margin-left: 4px;
     padding: 8px 10px;
     transition: 0.1s linear;
-    width: 100%;
+    width: calc(33% - 8px);
 
     &.selected {
       border: 1px solid ${({ theme }) => theme.colors.blue};
+    }
+
+    &.in-library {
+      cursor: not-allowed;
+      border: 1px solid #b7eb8f;
     }
   }
 

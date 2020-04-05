@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
-import { PlusSquareOutlined, CloseSquareOutlined } from '@ant-design/icons';
+import {
+  PlusSquareOutlined,
+  CloseSquareOutlined,
+  FolderOpenOutlined,
+} from '@ant-design/icons';
 
 import { TmdbSearchResult, EnrichedMovie } from '../../utils/graphql';
 
@@ -39,6 +43,7 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
         <TVShowSeasonsModalComponent
           tvShow={result as TmdbSearchResult}
           visible={tvSeasonModalActive}
+          inLibrary={inLibrary}
           onRequestClose={() => setTVSeasonModalActive(false)}
         />
       )}
@@ -46,15 +51,25 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
       <div className="poster--container" onClick={onPosterClickHandler}>
         <div className="poster" />
         <div className="overlay">
-          {inLibrary ? (
+          {type === 'tvshow' && (
             <>
-              <CloseSquareOutlined />
-              <div className="action-label">remove from library</div>
+              <FolderOpenOutlined />
+              <div className="action-label">manage TVShow</div>
             </>
-          ) : (
+          )}
+          {type === 'movie' && (
             <>
-              <PlusSquareOutlined />
-              <div className="action-label">add to library</div>
+              {inLibrary ? (
+                <>
+                  <CloseSquareOutlined />
+                  <div className="action-label">remove from library</div>
+                </>
+              ) : (
+                <>
+                  <PlusSquareOutlined />
+                  <div className="action-label">add to library</div>
+                </>
+              )}
             </>
           )}
         </div>

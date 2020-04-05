@@ -7,5 +7,6 @@ query getTVShowSeasons($tvShowTMDBId: Int!) {
     overview
     posterPath
     airDate
+    inLibrary
   }
 }

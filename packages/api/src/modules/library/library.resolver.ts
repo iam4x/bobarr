@@ -44,4 +44,12 @@ export class LibraryResolver {
   ) {
     return this.libraryService.trackTVShow({ tmdbId, seasonNumbers });
   }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
+  public async removeTVShow(
+    @Args('tmdbId', { type: () => Int }) tmdbId: number
+  ) {
+    await this.libraryService.removeTVShow(tmdbId);
+    return { success: true, message: 'TVSHOW_REMOVED_FROM_LIBRARY' };
+  }
 }

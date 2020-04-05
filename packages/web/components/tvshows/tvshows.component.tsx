@@ -21,7 +21,11 @@ export function TVShowsComponent() {
             <div className="flex">
               {data?.tvShows?.map((tvShow) => (
                 <div className="tvshow-card" key={tvShow.id}>
-                  <TMDBCardComponent type="tvshow" result={tvShow} />
+                  <TMDBCardComponent
+                    type="tvshow"
+                    result={tvShow}
+                    inLibrary={true}
+                  />
                 </div>
               ))}
             </div>

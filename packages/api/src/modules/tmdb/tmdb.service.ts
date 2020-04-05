@@ -2,18 +2,23 @@
 
 import axios, { AxiosInstance } from 'axios';
 import { Injectable } from '@nestjs/common';
+import { map } from 'p-iteration';
 
 import { ParameterKey } from 'src/app.dto';
+import { recursiveCamelCase } from 'src/utils/recursive-camel-case';
 import { ParamsService } from 'src/modules/params/params.service';
+import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 
 import { TMDBMovie, TMDBTVShow, TMDBTVSeason } from './tmdb.dto';
-import { recursiveCamelCase } from 'src/utils/recursive-camel-case';
 
 @Injectable()
 export class TMDBService {
   private client!: AxiosInstance;
 
-  public constructor(private readonly paramsService: ParamsService) {
+  public constructor(
+    private readonly paramsService: ParamsService,
+    private readonly tvSeasonDAO: TVSeasonDAO
+  ) {
     this.initializeClient();
   }
 
@@ -41,7 +46,15 @@ export class TMDBService {
 
   public async getTVShowSeasons(tvShowTMDBId: number) {
     const tvShow = await this.getTVShow(tvShowTMDBId);
-    return recursiveCamelCase<TMDBTVSeason>(tvShow.seasons);
+    return map(tvShow.seasons, async (season) =>
+      recursiveCamelCase<TMDBTVSeason>({
+        ...season,
+        inLibrary: await this.tvSeasonDAO.inLibrary(
+          tvShowTMDBId,
+          season.season_number
+        ),
+      })
+    );
   }
 
   public async search(query: string) {
