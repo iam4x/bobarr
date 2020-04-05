@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import axios, { AxiosInstance } from 'axios';
-import { orderBy, uniq } from 'lodash';
+import { orderBy, uniq, uniqBy } from 'lodash';
 import { mapSeries } from 'p-iteration';
 import { Injectable } from '@nestjs/common';
 
@@ -58,23 +58,29 @@ export class JackettService {
       relations: ['tvShow', 'episodes'],
     });
 
+    const tvShow = await this.libraryService.getTVShow(tvSeason.tvShow.id);
+
     const queries = [
-      `${tvSeason.tvShow.title} S${formatNumber(tvSeason.seasonNumber)}`,
-      `${tvSeason.tvShow.title} Season ${formatNumber(tvSeason.seasonNumber)}`,
-      `${tvSeason.tvShow.title} Season ${tvSeason.seasonNumber}`,
-      `${tvSeason.tvShow.title} Saison ${formatNumber(tvSeason.seasonNumber)}`,
-      `${tvSeason.tvShow.title} Saison ${tvSeason.seasonNumber}`,
+      `${tvShow.title} S${formatNumber(tvSeason.seasonNumber)}`,
+      `${tvShow.originalTitle} S${formatNumber(tvSeason.seasonNumber)}`,
+      `${tvShow.title} Season ${formatNumber(tvSeason.seasonNumber)}`,
+      `${tvShow.originalTitle} Season ${formatNumber(tvSeason.seasonNumber)}`,
+      `${tvShow.title} Season ${tvSeason.seasonNumber}`,
+      `${tvShow.originalTitle} Season ${tvSeason.seasonNumber}`,
+      `${tvShow.title} Saison ${formatNumber(tvSeason.seasonNumber)}`,
+      `${tvShow.originalTitle} Saison ${formatNumber(tvSeason.seasonNumber)}`,
+      `${tvShow.title} Saison ${tvSeason.seasonNumber}`,
     ];
 
     return this.search(queries, {
       maxSize: maxSize * tvSeason.episodes.length,
-      exclude: /e\d+|episode/,
+      isSeason: true,
     });
   }
 
   private async search(
     queries: string[],
-    { maxSize, exclude }: { maxSize: number; exclude?: RegExp }
+    { maxSize, isSeason }: { maxSize: number; isSeason?: boolean }
   ) {
     const preferredTags = await this.paramsService.getList(
       ParameterKey.PREFERRED_TAGS
@@ -104,27 +110,36 @@ export class JackettService {
       return data.Results;
     });
 
-    const sizeLimitAndSeeded = rawResults.flat().filter(
-      (result) =>
-        result.Size < maxSize && // maxSize
-        result.Seeders >= 10 && // has seeders
-        (exclude ? !result.Title.toLowerCase().match(exclude) : true) // its not excluded
-    );
+    const results = uniqBy(rawResults.flat(), 'Guid')
+      .map(this.formatSearchResult)
+      .filter(
+        (result) =>
+          // maxSize allowed
+          result.size < maxSize &&
+          // has at least 10 seeders
+          result.seeders >= 10 &&
+          // if tv season searched, filter out results with 'episode' in name
+          (!isSeason ||
+            !result.normalizedTitle.some((titlePart) =>
+              titlePart.match(/e\d+|episode|episode\d+|ep|ep\d+/)
+            ))
+      );
 
-    const withTags = sizeLimitAndSeeded.map(this.formatSearchResult);
-    const withPreferredTags = withTags.filter(
+    const withPreferredTags = results.filter(
       (result) =>
         preferredTags.includes(result.tag.label) &&
-        !result.title.toLowerCase().includes('3d')
+        !result.normalizedTitle.some((titlePart) => titlePart === '3d')
     );
 
-    return orderBy(
-      withPreferredTags.length > 0 ? withPreferredTags : withTags,
-      withPreferredTags.length > 0
-        ? ['tag.score', 'quality.score', 'seeders']
-        : ['quality.score', 'seeders'],
-      withPreferredTags.length > 0 ? ['desc', 'desc', 'desc'] : ['desc', 'desc']
-    );
+    if (withPreferredTags.length > 0) {
+      return orderBy(
+        withPreferredTags,
+        ['tag.score', 'quality.score', 'seeders'],
+        ['desc', 'desc', 'desc']
+      );
+    }
+
+    return orderBy(results, ['quality.score', 'seeders'], ['desc', 'desc']);
   }
 
   private formatSearchResult = (result: JackettResult) => {
@@ -137,6 +152,7 @@ export class JackettService {
       .split(' ');
 
     return {
+      normalizedTitle,
       title: result.Title,
       quality: this.parseQuality(normalizedTitle),
       size: result.Size,
@@ -155,7 +171,10 @@ export class JackettService {
       );
 
     if (match(['multi'])) return { label: 'multi', score: 2 };
-    if (match(['vost', 'subfrench'])) return { label: 'vost', score: 1 };
+    if (match(['vost', 'subfrench', 'vostfr'])) {
+      return { label: 'vost', score: 1 };
+    }
+
     return { label: 'unknown', score: 0 };
   }
 

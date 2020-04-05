@@ -56,6 +56,11 @@ export class LibraryService {
     return enrichedTVShows;
   }
 
+  public async getTVShow(tvShowId: number) {
+    const tvShow = await this.tvShowDAO.findOneOrFail(tvShowId);
+    return this.enrichTVShow(tvShow);
+  }
+
   @Transaction()
   public async removeMovie(
     tmdbId: number,

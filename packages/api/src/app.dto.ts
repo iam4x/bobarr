@@ -42,6 +42,7 @@ export enum DownloadQueueProcessors {
 
 export enum RenameAndLinkQueueProcessors {
   HANDLE_MOVIE = 'handle_movie',
+  HANDLE_SEASON = 'handle_season',
 }
 
 @ObjectType()
