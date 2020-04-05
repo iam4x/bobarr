@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Injectable } from '@nestjs/common';
 import { Transmission } from 'transmission-client';
 import { DeepPartial } from 'typeorm';
+
 import { Torrent } from 'src/entities/torrent.entity';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
 
@@ -13,6 +14,12 @@ export class TransmissionService {
 
   public removeTorrentAndFiles(torrentHash: string) {
     return this.client.remove(torrentHash, true);
+  }
+
+  public async getResourceTorrent(torrentAttributes: DeepPartial<Torrent>) {
+    const torrent = await this.torrentDAO.findOneOrFail(torrentAttributes);
+    const transmissionTorrent = await this.getTorrent(torrent.torrentHash);
+    return { ...torrent, transmissionTorrent };
   }
 
   public getTorrent(torrentHash: string) {

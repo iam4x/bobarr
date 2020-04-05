@@ -56,9 +56,9 @@ export class LibraryService {
     return enrichedTVShows;
   }
 
-  public async getTVShow(tvShowId: number) {
+  public async getTVShow(tvShowId: number, params?: { language: string }) {
     const tvShow = await this.tvShowDAO.findOneOrFail(tvShowId);
-    return this.enrichTVShow(tvShow);
+    return this.enrichTVShow(tvShow, params);
   }
 
   @Transaction()
@@ -193,8 +193,11 @@ export class LibraryService {
     };
   };
 
-  private enrichTVShow = async (tvShow: TVShow) => {
-    const tmdbResult = await this.tmdbService.getTVShow(tvShow.tmdbId);
+  private enrichTVShow = async (
+    tvShow: TVShow,
+    params?: { language: string }
+  ) => {
+    const tmdbResult = await this.tmdbService.getTVShow(tvShow.tmdbId, params);
     return {
       ...tvShow,
       title: tmdbResult.name,

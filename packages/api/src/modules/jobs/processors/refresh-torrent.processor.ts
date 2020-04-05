@@ -11,6 +11,7 @@ import {
 
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
+import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
 
@@ -21,7 +22,8 @@ export class RefreshTorrentProcessor {
     private readonly renameAndLinkQueue: Queue,
     private readonly movieDAO: MovieDAO,
     private readonly torrentDAO: TorrentDAO,
-    private readonly transmissionService: TransmissionService
+    private readonly transmissionService: TransmissionService,
+    private readonly tvSeasonDAO: TVSeasonDAO
   ) {}
 
   @Process()
@@ -30,25 +32,59 @@ export class RefreshTorrentProcessor {
       where: { state: DownloadableMediaState.DOWNLOADING },
     });
 
-    await forEachSeries(donwloadingMovies, async (movie) => {
-      const torrent = await this.torrentDAO.findOneOrFail({
-        where: { resourceId: movie.id, resourceType: FileType.MOVIE },
-      });
+    await forEachSeries(donwloadingMovies, (movie) =>
+      this.checkTorrent({ resourceId: movie.id, resourceType: FileType.MOVIE })
+    );
 
-      const transmissionTorrent = await this.transmissionService.getTorrent(
-        torrent.torrentHash
-      );
+    const downloadingSeasons = await this.tvSeasonDAO.find({
+      where: { state: DownloadableMediaState.DOWNLOADING },
+    });
 
-      if (transmissionTorrent.percentDone === 1) {
+    await forEachSeries(downloadingSeasons, (season) =>
+      this.checkTorrent({
+        resourceId: season.id,
+        resourceType: FileType.SEASON,
+      })
+    );
+  }
+
+  private async checkTorrent({
+    resourceId,
+    resourceType,
+  }: {
+    resourceId: number;
+    resourceType: FileType;
+  }) {
+    const torrent = await this.torrentDAO.findOneOrFail({
+      where: { resourceId, resourceType },
+    });
+
+    const transmissionTorrent = await this.transmissionService.getTorrent(
+      torrent.torrentHash
+    );
+
+    if (transmissionTorrent.percentDone === 1) {
+      if (resourceType === FileType.MOVIE) {
         await this.movieDAO.save({
-          id: movie.id,
+          id: resourceId,
           state: DownloadableMediaState.DOWNLOADED,
         });
         await this.renameAndLinkQueue.add(
           RenameAndLinkQueueProcessors.HANDLE_MOVIE,
-          { movieId: movie.id }
+          { movieId: resourceId }
         );
       }
-    });
+
+      if (resourceType === FileType.SEASON) {
+        await this.tvSeasonDAO.save({
+          id: resourceId,
+          state: DownloadableMediaState.DOWNLOADED,
+        });
+        await this.renameAndLinkQueue.add(
+          RenameAndLinkQueueProcessors.HANDLE_SEASON,
+          { seasonId: resourceId }
+        );
+      }
+    }
   }
 }

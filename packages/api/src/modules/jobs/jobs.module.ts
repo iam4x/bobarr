@@ -8,6 +8,7 @@ import { JobsQueue } from 'src/app.dto';
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
+import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 
 import { JackettModule } from 'src/modules/jackett/jackett.module';
 import { LibraryModule } from 'src/modules/library/library.module';
@@ -27,7 +28,7 @@ const queues = [
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([MovieDAO, TorrentDAO, TVSeasonDAO]),
+    TypeOrmModule.forFeature([MovieDAO, TorrentDAO, TVSeasonDAO, TVEpisodeDAO]),
     BullModule.registerQueue(...queues),
     JackettModule,
     TransmissionModule,

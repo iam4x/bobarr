@@ -13,8 +13,12 @@ import {
   RenameAndLinkQueueProcessors,
 } from 'src/app.dto';
 
+import allowedExtensions from 'src/utils/allowed-file-extensions.json';
+import { formatNumber } from 'src/utils/format-number';
+
 import { MovieDAO } from 'src/entities/dao/movie.dao';
-import { TorrentDAO } from 'src/entities/dao/torrent.dao';
+import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
+import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
 import { LibraryService } from 'src/modules/library/library.service';
@@ -23,27 +27,26 @@ import { LibraryService } from 'src/modules/library/library.service';
 export class RenameAndLinkQueueProcessor {
   public constructor(
     private readonly movieDAO: MovieDAO,
-    private readonly torrentDAO: TorrentDAO,
+    private readonly tvSeasonDAO: TVSeasonDAO,
+    private readonly tvEpisodeDAO: TVEpisodeDAO,
     private readonly transmissionService: TransmissionService,
     private readonly libraryService: LibraryService
   ) {}
 
   @Process(RenameAndLinkQueueProcessors.HANDLE_MOVIE)
-  public async renameAndLinkMovie({
-    data: { movieId },
-  }: Job<{ movieId: number }>) {
+  public async renameAndLinkMovie(job: Job<{ movieId: number }>) {
+    const { movieId } = job.data;
+
     const movie = await this.libraryService.getMovie(movieId);
-    const torrent = await this.torrentDAO.findOneOrFail({
-      where: { resourceId: movie.id, resourceType: FileType.MOVIE },
+    const torrent = await this.transmissionService.getResourceTorrent({
+      resourceId: movie.id,
+      resourceType: FileType.SEASON,
     });
-    const transmissionTorrent = await this.transmissionService.getTorrent(
-      torrent.torrentHash
-    );
 
     const year = dayjs(movie.releaseDate).format('YYYY');
     const folderName = `${movie.title} (${year})`;
 
-    const torrentFiles = transmissionTorrent.files.map((file) => {
+    const torrentFiles = torrent.transmissionTorrent.files.map((file) => {
       const ext = path.extname(file.name);
       const next = [folderName, torrent.quality, torrent.tag.toUpperCase()]
         .filter((str) => str.toLowerCase() !== 'unknown')
@@ -71,6 +74,79 @@ export class RenameAndLinkQueueProcessor {
 
     await this.movieDAO.save({
       id: movieId,
+      state: DownloadableMediaState.PROCESSED,
+    });
+  }
+
+  @Process(RenameAndLinkQueueProcessors.HANDLE_SEASON)
+  public async renameAndLinkSeason(job: Job<{ seasonId: number }>) {
+    const { seasonId } = job.data;
+
+    const season = await this.tvSeasonDAO.findOneOrFail({
+      where: { id: seasonId },
+      relations: ['tvShow', 'episodes'],
+    });
+
+    const tvShow = await this.libraryService.getTVShow(season.tvShow.id, {
+      language: 'en',
+    });
+
+    const torrent = await this.transmissionService.getResourceTorrent({
+      resourceId: season.id,
+      resourceType: FileType.SEASON,
+    });
+
+    const seasonNb = formatNumber(season.seasonNumber);
+    const seasonFolder = path.resolve(
+      __dirname,
+      '../../../../../../library/tvshows/',
+      tvShow.title,
+      `Season ${seasonNb}`
+    );
+
+    const torrentFiles = torrent.transmissionTorrent.files
+      .filter((file) => {
+        const ext = path.extname(file.name);
+        const [, episodeNb] = /S\d+E(\d+)/.exec(file.name.toUpperCase()) || [];
+        return episodeNb && allowedExtensions.includes(ext.replace(/^\./, ''));
+      })
+      .map((file) => {
+        const ext = path.extname(file.name);
+        const [, episodeNb] = /S\d+E(\d+)/.exec(file.name.toUpperCase()) || [];
+        return { original: file.name, ext, episodeNb: parseInt(episodeNb, 10) };
+      });
+
+    await childCommand(`mkdir -p "${seasonFolder}"`);
+    await mapSeries(torrentFiles, async (file) => {
+      const newName = [
+        tvShow.title,
+        `S${seasonNb}E${formatNumber(file.episodeNb)}`,
+        `${torrent.quality} [${torrent.tag.toUpperCase()}]`,
+      ].join(' - ');
+
+      await childCommand(
+        oneLine`
+          cd "${seasonFolder}" &&
+          ln -s
+          "../../downloads/complete/${file.original}"
+          "${newName}${file.ext}"
+        `
+      );
+    });
+
+    await this.tvEpisodeDAO.save(
+      season.episodes
+        .filter((episode) =>
+          torrentFiles.some((file) => file.episodeNb === episode.episodeNumber)
+        )
+        .map((episode) => ({
+          id: episode.id,
+          state: DownloadableMediaState.PROCESSED,
+        }))
+    );
+
+    await this.tvSeasonDAO.save({
+      id: season.id,
       state: DownloadableMediaState.PROCESSED,
     });
   }

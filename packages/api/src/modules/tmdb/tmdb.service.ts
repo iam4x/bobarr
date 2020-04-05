@@ -37,9 +37,18 @@ export class TMDBService {
     return data;
   }
 
-  public async getTVShow(tvShowTMDBId: number) {
-    const { data } = await this.client.get<TMDBTVShow>(`/tv/${tvShowTMDBId}`);
+  public async getTVShow(tvShowTMDBId: number, params?: { language: string }) {
+    const { data } = await this.client.get<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
+      params,
+    });
     return data;
+  }
+
+  public async getEnglishTVShowName(tvShowTMDBId: number) {
+    const { data } = await this.client.get<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
+      params: { language: 'en' },
+    });
+    return data.name;
   }
 
   public async getTVShowSeasons(tvShowTMDBId: number) {
