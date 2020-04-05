@@ -9,16 +9,25 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  BigInt: any;
   DateTime: any;
 };
 
+
+
+export enum DownloadableMediaState {
+  Missing = 'MISSING',
+  Downloading = 'DOWNLOADING',
+  Downloaded = 'DOWNLOADED',
+  Processed = 'PROCESSED'
+}
 
 export type EnrichedMovie = {
    __typename?: 'EnrichedMovie';
   id: Scalars['Float'];
   tmdbId: Scalars['Float'];
   title: Scalars['String'];
-  state: Scalars['String'];
+  state: DownloadableMediaState;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   posterPath?: Maybe<Scalars['String']>;
@@ -37,7 +46,7 @@ export type Movie = {
   id: Scalars['Float'];
   tmdbId: Scalars['Float'];
   title: Scalars['String'];
-  state: Scalars['String'];
+  state: DownloadableMediaState;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
 };
@@ -70,12 +79,19 @@ export type Query = {
   getParams: ParamsHash;
   search: TmdbSearchResults;
   getPopular: TmdbSearchResults;
+  getTorrentStatus: TorrentStatus;
   getMovies: Array<EnrichedMovie>;
 };
 
 
 export type QuerySearchArgs = {
   query: Scalars['String'];
+};
+
+
+export type QueryGetTorrentStatusArgs = {
+  resourceType: Scalars['String'];
+  resourceId: Scalars['Int'];
 };
 
 export type TmdbSearchResult = {
@@ -92,6 +108,18 @@ export type TmdbSearchResults = {
    __typename?: 'TMDBSearchResults';
   movies: Array<TmdbSearchResult>;
   tvShows: Array<TmdbSearchResult>;
+};
+
+export type TorrentStatus = {
+   __typename?: 'TorrentStatus';
+  id: Scalars['Int'];
+  percentDone: Scalars['Float'];
+  rateDownload: Scalars['Int'];
+  rateUpload: Scalars['Int'];
+  uploadRatio: Scalars['Float'];
+  uploadedEver: Scalars['BigInt'];
+  totalSize: Scalars['BigInt'];
+  status: Scalars['Int'];
 };
 
 export type RemoveMovieMutationVariables = {
@@ -157,6 +185,20 @@ export type GetPopularQuery = (
       { __typename?: 'TMDBSearchResult' }
       & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
     )> }
+  ) }
+);
+
+export type GetTorrentStatusQueryVariables = {
+  resourceId: Scalars['Int'];
+  resourceType: Scalars['String'];
+};
+
+
+export type GetTorrentStatusQuery = (
+  { __typename?: 'Query' }
+  & { torrent: (
+    { __typename?: 'TorrentStatus' }
+    & Pick<TorrentStatus, 'id' | 'percentDone' | 'rateDownload' | 'rateUpload' | 'uploadRatio' | 'uploadedEver' | 'totalSize' | 'status'>
   ) }
 );
 
@@ -366,6 +408,47 @@ export function useGetPopularLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryH
 export type GetPopularQueryHookResult = ReturnType<typeof useGetPopularQuery>;
 export type GetPopularLazyQueryHookResult = ReturnType<typeof useGetPopularLazyQuery>;
 export type GetPopularQueryResult = ApolloReactCommon.QueryResult<GetPopularQuery, GetPopularQueryVariables>;
+export const GetTorrentStatusDocument = gql`
+    query getTorrentStatus($resourceId: Int!, $resourceType: String!) {
+  torrent: getTorrentStatus(resourceId: $resourceId, resourceType: $resourceType) {
+    id
+    percentDone
+    rateDownload
+    rateUpload
+    uploadRatio
+    uploadedEver
+    totalSize
+    status
+  }
+}
+    `;
+
+/**
+ * __useGetTorrentStatusQuery__
+ *
+ * To run a query within a React component, call `useGetTorrentStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTorrentStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTorrentStatusQuery({
+ *   variables: {
+ *      resourceId: // value for 'resourceId'
+ *      resourceType: // value for 'resourceType'
+ *   },
+ * });
+ */
+export function useGetTorrentStatusQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>(GetTorrentStatusDocument, baseOptions);
+      }
+export function useGetTorrentStatusLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>(GetTorrentStatusDocument, baseOptions);
+        }
+export type GetTorrentStatusQueryHookResult = ReturnType<typeof useGetTorrentStatusQuery>;
+export type GetTorrentStatusLazyQueryHookResult = ReturnType<typeof useGetTorrentStatusLazyQuery>;
+export type GetTorrentStatusQueryResult = ApolloReactCommon.QueryResult<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>;
 export const SearchDocument = gql`
     query search($query: String!) {
   results: search(query: $query) {

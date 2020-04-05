@@ -3,6 +3,12 @@
 # ------------------------------------------------------
 
 """
+The `BigInt` scalar type represents non-fractional signed whole numeric values.
+BigInt can represent values between -(2^53) + 1 and 2^53 - 1. 
+"""
+scalar BigInt
+
+"""
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
@@ -54,6 +60,7 @@ type Query {
   getParams: ParamsHash!
   search(query: String!): TMDBSearchResults!
   getPopular: TMDBSearchResults!
+  getTorrentStatus(resourceType: String!, resourceId: Int!): TorrentStatus!
   getMovies: [EnrichedMovie!]!
 }
 
@@ -69,4 +76,15 @@ type TMDBSearchResult {
 type TMDBSearchResults {
   movies: [TMDBSearchResult!]!
   tvShows: [TMDBSearchResult!]!
+}
+
+type TorrentStatus {
+  id: Int!
+  percentDone: Float!
+  rateDownload: Int!
+  rateUpload: Int!
+  uploadRatio: Float!
+  uploadedEver: BigInt!
+  totalSize: BigInt!
+  status: Int!
 }

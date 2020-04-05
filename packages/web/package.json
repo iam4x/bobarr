@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "yarn && next dev",
+    "dev": "yarn && yarn concurrently yarn:watch-*",
+    "watch-next": "next dev",
+    "watch-gql": "gql-gen --watch",
     "build": "next build",
     "start": "yarn && next start",
     "gql-gen": "graphql-codegen --config codegen.yml"
@@ -23,6 +25,7 @@
     "graphql-tag": "^2.10.3",
     "isomorphic-unfetch": "^3.0.0",
     "next": "9.3.4",
+    "prettysize": "^2.0.0",
     "pure-react-carousel": "^1.27.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
@@ -44,6 +47,7 @@
     "@types/react": "^16.9.32",
     "@types/styled-components": "^5.0.1",
     "babel-plugin-styled-components": "^1.10.7",
+    "concurrently": "^5.1.0",
     "typescript": "^3.8.3"
   }
 }

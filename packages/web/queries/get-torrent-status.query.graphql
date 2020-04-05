@@ -1,0 +1,15 @@
+query getTorrentStatus($resourceId: Int!, $resourceType: String!) {
+  torrent: getTorrentStatus(
+    resourceId: $resourceId
+    resourceType: $resourceType
+  ) {
+    id
+    percentDone
+    rateDownload
+    rateUpload
+    uploadRatio
+    uploadedEver
+    totalSize
+    status
+  }
+}
