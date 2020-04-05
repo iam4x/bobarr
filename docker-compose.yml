@@ -5,6 +5,7 @@ volumes:
   redis_data:
   api_node_modules:
   web_node_modules:
+  web_build:
 
 networks:
   default:
@@ -44,6 +45,7 @@ services:
     volumes:
       - ./packages/web:/usr/src/app
       - web_node_modules:/usr/src/app/node_modules
+      - web_build:/usr/src/app/.next
     ports:
       - 3000:3000
     depends_on:

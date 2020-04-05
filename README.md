@@ -5,7 +5,7 @@ Bobarr is a movies and tv shows collection manager for BitTorrent users. It uses
 
 ![Screenshot](./screenshot.png)
 
-**This is an beta release!**
+**This is an early release!**
 
 ## Why ?
 
@@ -36,8 +36,8 @@ And to have something with a better ui, less configuration and faster 🚀
 
 ### Torrent account
 
-* Go to `http://localhost:9117`
-* Hit `add indexer` and follow the steps
+* Go to http://localhost:9117
+* Add indexer and follow the steps
 
 ### Bobarr configuration
 

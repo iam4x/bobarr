@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "author": "iam4x <iam4x@me.com>",
   "license": "MIT",
+  "scripts": {
+    "postinstall": "(cd packages/web && yarn) && (cd packages/api && yarn)"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.12.0",
     "@typescript-eslint/parser": "^2.12.0",
