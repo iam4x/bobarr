@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Skeleton } from 'antd';
+import { Skeleton, Empty } from 'antd';
 import { useTheme } from 'styled-components';
 
 import {
@@ -27,16 +27,12 @@ import {
 
 import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
 import { SearchStyles, Wrapper } from './search.styles';
-import movies from '../../pages/library/movies';
 
 export function SearchComponent() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const popularQuery = useGetPopularQuery();
   const [search, { data, loading }] = useSearchLazyQuery();
-
-  const displayTVResults = searchQuery && data?.results?.tvShows?.length;
-  const displayMovieResults = searchQuery && data?.results?.movies?.length;
 
   const SearchIcon = loading ? FaCircleNotch : FaSearch;
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
@@ -69,29 +65,37 @@ export function SearchComponent() {
       <Wrapper>
         <div className="search-results--container">
           <Skeleton active={true} loading={popularQuery.loading}>
-            <div className="search-results--category">
-              {displayMovieResults ? 'Found Movies' : 'Popular Movies'}
-            </div>
-            <ResultsCarousel
-              type="movie"
-              results={
-                displayMovieResults
-                  ? data?.results?.movies || []
-                  : popularQuery.data?.results?.movies || []
-              }
-            />
-            <div className="spacer" />
-            <div className="search-results--category">
-              {displayTVResults ? 'Found TV Shows' : 'Popular TV Shows'}
-            </div>
-            <ResultsCarousel
-              type="tvshow"
-              results={
-                displayTVResults
-                  ? data?.results?.tvShows || []
-                  : popularQuery.data?.results?.tvShows || []
-              }
-            />
+            {searchQuery &&
+            data?.results.tvShows?.length === 0 &&
+            data?.results.movies?.length === 0 ? (
+              <Empty description="No results... 😔" />
+            ) : (
+              <>
+                <div className="search-results--category">
+                  {searchQuery && data ? 'Found Movies' : 'Popular Movies'}
+                </div>
+                <ResultsCarousel
+                  type="movie"
+                  results={
+                    searchQuery && data
+                      ? data?.results?.movies || []
+                      : popularQuery.data?.results?.movies || []
+                  }
+                />
+                <div className="spacer" />
+                <div className="search-results--category">
+                  {searchQuery && data ? 'Found TV Shows' : 'Popular TV Shows'}
+                </div>
+                <ResultsCarousel
+                  type="tvshow"
+                  results={
+                    searchQuery && data
+                      ? data?.results?.tvShows || []
+                      : popularQuery.data?.results?.tvShows || []
+                  }
+                />
+              </>
+            )}
           </Skeleton>
         </div>
       </Wrapper>

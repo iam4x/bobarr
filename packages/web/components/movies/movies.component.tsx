@@ -1,5 +1,5 @@
 import React from 'react';
-import { Skeleton } from 'antd';
+import { Skeleton, Empty } from 'antd';
 
 import { useGetLibraryMoviesQuery } from '../../utils/graphql';
 
@@ -17,8 +17,9 @@ export function MoviesComponent() {
       <MoviesComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>
+            {data?.movies?.length === 0 && <Empty />}
             <div className="flex">
-              {data?.movies?.map((movie) => (
+              {data?.movies.map((movie) => (
                 <div className="movie-card" key={movie.id}>
                   <TMDBCardComponent
                     type="movie"

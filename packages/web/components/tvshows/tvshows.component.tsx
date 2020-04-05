@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Skeleton } from 'antd';
+import { Skeleton, Empty } from 'antd';
+
+import { useGetLibraryTvShowsQuery } from '../../utils/graphql';
 
 import { MoviesComponentStyles } from '../movies/movies.styles';
 import { DownloadingComponent } from '../downloading/downloading.component';
-import { useGetLibraryTvShowsQuery } from '../../utils/graphql';
 import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
 
 const TVShowsComponentStyles = styled(MoviesComponentStyles)``;
@@ -18,6 +19,7 @@ export function TVShowsComponent() {
       <TVShowsComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>
+            {data?.tvShows?.length === 0 && <Empty />}
             <div className="flex">
               {data?.tvShows?.map((tvShow) => (
                 <div className="tvshow-card" key={tvShow.id}>
