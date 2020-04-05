@@ -18,6 +18,7 @@ export class ParamsService {
       [ParameterKey.MAX_MOVIE_DOWNLOAD_SIZE, (20e9).toString()], // max file size 20gb
       [ParameterKey.MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE, (5e9).toString()], // max file size 5gb
       [ParameterKey.PREFERRED_TAGS, 'multi,vost'],
+      [ParameterKey.JACKETT_API_KEY, ''],
     ];
 
     await map(defaultParams, ([key, value]) =>
