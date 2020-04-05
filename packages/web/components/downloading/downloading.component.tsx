@@ -12,7 +12,11 @@ import {
 import { DownloadingComponentStyles } from './downloading.styles';
 
 export function DownloadingComponent({ types }: { types: string[] }) {
-  const { data } = useGetDownloadingQuery({ pollInterval: 10000 });
+  const { data } = useGetDownloadingQuery({
+    fetchPolicy: 'cache-and-network',
+    pollInterval: 2500,
+  });
+
   const rows = data?.rows?.filter((row) => types.includes(row.resourceType));
 
   if (rows && rows.length > 0) {

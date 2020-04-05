@@ -37,11 +37,15 @@ export const TVShowSeasonsModalComponentStyles = styled.div`
     width: calc(33% - 8px);
 
     &.selected {
-      border: 1px solid ${({ theme }) => theme.colors.blue};
+      color: #1890ff;
+      background: #e6f7ff;
+      border-color: #91d5ff;
     }
 
     &.in-library {
       cursor: not-allowed;
+      color: #52c41a;
+      background-color: #f6ffed;
       border: 1px solid #b7eb8f;
     }
   }

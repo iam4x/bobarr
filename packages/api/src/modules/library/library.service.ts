@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { map, forEachSeries, forEach } from 'p-iteration';
+import { map, forEachSeries, forEach, reduce } from 'p-iteration';
 import { times } from 'lodash';
 
 import {
@@ -22,6 +22,7 @@ import { TMDBService } from 'src/modules/tmdb/tmdb.service';
 import { JobsService } from 'src/modules/jobs/jobs.service';
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
 import { TVShow } from 'src/entities/tvshow.entity';
+import { TVSeason } from 'src/entities/tvseason.entity';
 
 @Injectable()
 export class LibraryService {
@@ -33,6 +34,7 @@ export class LibraryService {
     private readonly tvEpisodeDAO: TVEpisodeDAO,
     private readonly tmdbService: TMDBService,
     private readonly jobsService: JobsService,
+    private readonly torrentDAO: TorrentDAO,
     private readonly transmissionService: TransmissionService
   ) {}
 
@@ -51,7 +53,7 @@ export class LibraryService {
       relations: ['season', 'season.tvShow'],
     });
 
-    return [
+    const mixed = [
       ...movies.map((movie) => ({
         title: movie.title,
         resourceId: movie.id,
@@ -68,6 +70,19 @@ export class LibraryService {
         resourceType: FileType.EPISODE,
       })),
     ];
+
+    const withTorrentQuality = await map(mixed, async (resource) => {
+      const { tag, quality } = await this.torrentDAO.findOneOrFail({
+        where: {
+          resourceId: resource.resourceId,
+          resourceType: resource.resourceType,
+        },
+      });
+      const newTitle = `${resource.title} - ${tag.toUpperCase()} ${quality}`;
+      return { ...resource, title: newTitle };
+    });
+
+    return withTorrentQuality;
   }
 
   public async trackMovie(movieAttributes: DeepPartial<Movie>) {
@@ -164,8 +179,28 @@ export class LibraryService {
     await tvShowDAO.remove(tvShow);
   }
 
+  public async trackTVShow({
+    tmdbId,
+    seasonNumbers,
+  }: {
+    tmdbId: number;
+    seasonNumbers: number[];
+  }) {
+    const { tvShow, missingSeasons } = await this.trackMissingSeasons({
+      tmdbId,
+      seasonNumbers,
+    });
+
+    // start jobs outside of transaction
+    await forEachSeries(missingSeasons, (season) =>
+      this.jobsService.startDownloadSeason(season.id)
+    );
+
+    return tvShow;
+  }
+
   @Transaction()
-  public async trackTVShow(
+  private async trackMissingSeasons(
     { tmdbId, seasonNumbers }: { tmdbId: number; seasonNumbers: number[] },
     @TransactionManager() manager?: EntityManager
   ) {
@@ -179,43 +214,52 @@ export class LibraryService {
       title: tmdbTVShow.name,
     });
 
-    await forEachSeries(seasonNumbers, async (seasonNumber) => {
-      const tmdbSeason = tmdbTVShow.seasons.find(
-        (_) => _.season_number === seasonNumber
-      );
-
-      if (!tmdbSeason) {
-        throw new HttpException(
-          `Season number ${seasonNumber} not found on TMDB`,
-          HttpStatus.UNPROCESSABLE_ENTITY
+    const missingSeasons = await reduce(
+      seasonNumbers,
+      async (result, seasonNumber) => {
+        const tmdbSeason = tmdbTVShow.seasons.find(
+          (_) => _.season_number === seasonNumber
         );
-      }
 
-      const alreadExists = await tvSeasonDAO.findOne({
-        where: { tmdbId: tmdbSeason.id },
-      });
+        if (!tmdbSeason) {
+          throw new HttpException(
+            `Season number ${seasonNumber} not found on TMDB`,
+            HttpStatus.UNPROCESSABLE_ENTITY
+          );
+        }
 
-      if (!alreadExists) {
-        const season = await tvSeasonDAO.save({
-          tvShow,
-          seasonNumber,
-          tmdbId: tmdbSeason.id,
+        const alreadExists = await tvSeasonDAO.findOne({
+          where: { tmdbId: tmdbSeason.id },
         });
 
-        await tvEpisodeDAO.save(
-          times(tmdbSeason.episode_count, (episodeNumber) => ({
+        if (!alreadExists) {
+          const season = await tvSeasonDAO.save({
             tvShow,
-            season,
             seasonNumber,
-            episodeNumber: episodeNumber + 1,
-          }))
-        );
+            tmdbId: tmdbSeason.id,
+          });
 
-        await this.jobsService.startDownloadSeason(season.id);
-      }
-    });
+          await tvEpisodeDAO.save(
+            times(tmdbSeason.episode_count, (episodeNumber) => ({
+              tvShow,
+              season,
+              seasonNumber,
+              episodeNumber: episodeNumber + 1,
+            }))
+          );
 
-    return tvShow;
+          return [...result, season];
+        }
+
+        return result;
+      },
+      [] as TVSeason[]
+    );
+
+    return {
+      tvShow,
+      missingSeasons,
+    };
   }
 
   private enrichMovie = async (movie: Movie) => {

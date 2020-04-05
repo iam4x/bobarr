@@ -57,7 +57,7 @@ export function TVShowSeasonsModalComponent(
         tmdbId: tvShow.tmdbId,
         seasonNumbers: selectedSeasons,
       },
-    }).then(handleClose);
+    });
 
   const footer = [
     <Button key="cancel" icon={<CloseOutlined />} onClick={onRequestClose}>
@@ -103,7 +103,7 @@ export function TVShowSeasonsModalComponent(
     <Modal
       visible={visible}
       centered={true}
-      onCancel={onRequestClose}
+      onCancel={handleClose}
       closable={false}
       destroyOnClose={true}
       footer={footer}
@@ -117,7 +117,7 @@ export function TVShowSeasonsModalComponent(
               {inLibrary ? (
                 <Tag color="green">in library</Tag>
               ) : (
-                <Tag>not in library</Tag>
+                <Tag color="blue">not in library</Tag>
               )}
             </div>
           </div>

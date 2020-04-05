@@ -5,6 +5,7 @@ import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { TVShowDAO } from 'src/entities/dao/tvshow.dao';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
+import { TorrentDAO } from 'src/entities/dao/torrent.dao';
 
 import { TMDBModule } from 'src/modules/tmdb/tmdb.module';
 import { JobsModule } from 'src/modules/jobs/jobs.module';
@@ -15,7 +16,13 @@ import { LibraryService } from './library.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([MovieDAO, TVShowDAO, TVSeasonDAO, TVEpisodeDAO]),
+    TypeOrmModule.forFeature([
+      MovieDAO,
+      TVShowDAO,
+      TVSeasonDAO,
+      TVEpisodeDAO,
+      TorrentDAO,
+    ]),
     TMDBModule,
     TransmissionModule,
     forwardRef(() => JobsModule),
