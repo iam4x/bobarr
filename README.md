@@ -1,4 +1,4 @@
-# 🍿 Bobbarr
+# 🍿 Bobarr
 > The all-in-one replacement for Sonarr, Radarr, Jackett... with a VPN and running in docker
 
 Bobarr is a movies and tv shows collection manager for BitTorrent users. It uses [themoviedb.org](https://www.themoviedb.org/) to search movies and tv shows to add to your library. Then it searchs into your favorites torrent trackers the best match and downloads it for you through a VPN.
