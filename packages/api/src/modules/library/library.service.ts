@@ -1,6 +1,8 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { map, forEachSeries, forEach, reduce } from 'p-iteration';
 import { times } from 'lodash';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 import childCommand from 'child-command';
 import dayjs from 'dayjs';
 import path from 'path';
@@ -31,6 +33,7 @@ import { TVSeason } from 'src/entities/tvseason.entity';
 export class LibraryService {
   // eslint-disable-next-line max-params
   public constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private readonly movieDAO: MovieDAO,
     private readonly tvShowDAO: TVShowDAO,
     private readonly tvSeasonDAO: TVSeasonDAO,
@@ -39,7 +42,9 @@ export class LibraryService {
     private readonly jobsService: JobsService,
     private readonly torrentDAO: TorrentDAO,
     private readonly transmissionService: TransmissionService
-  ) {}
+  ) {
+    this.logger = logger.child({ context: 'LibraryService' });
+  }
 
   public async getDownloadingMedias() {
     const movies = await this.movieDAO.find({
@@ -89,6 +94,7 @@ export class LibraryService {
   }
 
   public async trackMovie(movieAttributes: DeepPartial<Movie>) {
+    this.logger.info('track movie', { tmdbId: movieAttributes.tmdbId });
     const movie = await this.movieDAO.save(movieAttributes);
     await this.jobsService.startDownloadMovie(movie.id);
     return movie;
@@ -121,6 +127,7 @@ export class LibraryService {
     tmdbId: number,
     @TransactionManager() manager?: EntityManager
   ) {
+    this.logger.info('start remove movie', { tmdbId });
     const movieDAO = manager!.getCustomRepository(MovieDAO);
     const torrentDAO = manager!.getCustomRepository(TorrentDAO);
 
@@ -133,6 +140,7 @@ export class LibraryService {
     if (torrent) {
       await this.transmissionService.removeTorrentAndFiles(torrent.torrentHash);
       await torrentDAO.remove(torrent);
+      this.logger.info('movie torrent removed', { torrent: torrent.id });
     }
 
     const enrichedMovie = await this.getMovie(movie.id);
@@ -145,7 +153,10 @@ export class LibraryService {
     );
 
     await childCommand(`rm -rf "${folderPath}"`);
+    this.logger.info('movie files and folder deleted from file system');
+
     await movieDAO.remove(movie);
+    this.logger.info('finish remove movie', { tmdbId });
   }
 
   @Transaction()
@@ -153,6 +164,8 @@ export class LibraryService {
     tmdbId: number,
     @TransactionManager() manager?: EntityManager
   ) {
+    this.logger.info('start remove tv show', { tmdbId });
+
     const tvShowDAO = manager!.getCustomRepository(TVShowDAO);
     const torrentDAO = manager!.getCustomRepository(TorrentDAO);
 
@@ -172,6 +185,7 @@ export class LibraryService {
         await this.transmissionService.removeTorrentAndFiles(
           torrent.torrentHash
         );
+        this.logger.info('season torrent removed', { torrent: torrent.id });
       }
     });
 
@@ -186,6 +200,7 @@ export class LibraryService {
         await this.transmissionService.removeTorrentAndFiles(
           torrent.torrentHash
         );
+        this.logger.info('episode torrent removed', { torrent: torrent.id });
       }
     });
 
@@ -197,7 +212,10 @@ export class LibraryService {
     );
 
     await childCommand(`rm -rf "${tvShowFolder}"`);
+    this.logger.info('tv show files and folder deleted from file system');
+
     await tvShowDAO.remove(tvShow);
+    this.logger.info('finish remove tv show', { tmdbId });
   }
 
   public async trackTVShow({
@@ -207,6 +225,8 @@ export class LibraryService {
     tmdbId: number;
     seasonNumbers: number[];
   }) {
+    this.logger.info('track tv show', { tmdbId });
+
     const { tvShow, missingSeasons } = await this.trackMissingSeasons({
       tmdbId,
       seasonNumbers,
@@ -225,6 +245,8 @@ export class LibraryService {
     { tmdbId, seasonNumbers }: { tmdbId: number; seasonNumbers: number[] },
     @TransactionManager() manager?: EntityManager
   ) {
+    this.logger.info('track missing seasons', { seasonNumbers });
+
     const tvShowDAO = manager!.getCustomRepository(TVShowDAO);
     const tvSeasonDAO = manager!.getCustomRepository(TVSeasonDAO);
     const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
@@ -260,6 +282,10 @@ export class LibraryService {
             tmdbId: tmdbSeason.id,
           });
 
+          this.logger.info('new season added to library', {
+            seasonId: season.id,
+          });
+
           await tvEpisodeDAO.save(
             times(tmdbSeason.episode_count, (episodeNumber) => ({
               tvShow,
@@ -268,6 +294,10 @@ export class LibraryService {
               episodeNumber: episodeNumber + 1,
             }))
           );
+
+          this.logger.info('new season episodes added to library', {
+            seasonId: season.id,
+          });
 
           return [...result, season];
         }

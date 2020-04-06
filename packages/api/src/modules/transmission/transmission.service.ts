@@ -1,5 +1,7 @@
 import axios from 'axios';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 import { Transmission } from 'transmission-client';
 import { DeepPartial } from 'typeorm';
 
@@ -10,7 +12,12 @@ import { TorrentDAO } from 'src/entities/dao/torrent.dao';
 export class TransmissionService {
   private client = new Transmission({ host: 'transmission' });
 
-  public constructor(private readonly torrentDAO: TorrentDAO) {}
+  public constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
+    private readonly torrentDAO: TorrentDAO
+  ) {
+    this.logger = logger.child({ context: 'TransmissionService' });
+  }
 
   public removeTorrentAndFiles(torrentHash: string) {
     return this.client.remove(torrentHash, true);
@@ -32,10 +39,13 @@ export class TransmissionService {
     url: string,
     torrentAttributes: DeepPartial<Torrent>
   ) {
+    this.logger.info('start download torrent from url', torrentAttributes);
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     const base64 = Buffer.from(response.data, 'binary').toString('base64');
 
     const transmissionTorrent = await this.client.addBase64(base64);
+    this.logger.info('torrent download started', torrentAttributes);
+
     const torrent = await this.torrentDAO.save({
       ...torrentAttributes,
       torrentHash: transmissionTorrent.hashString,

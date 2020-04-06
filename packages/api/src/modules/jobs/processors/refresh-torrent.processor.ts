@@ -1,6 +1,9 @@
 import { forEachSeries } from 'p-iteration';
 import { Processor, Process, InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { Inject } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 import {
   JobsQueue,
@@ -20,6 +23,7 @@ import { TransmissionService } from 'src/modules/transmission/transmission.servi
 export class RefreshTorrentProcessor {
   // eslint-disable-next-line max-params
   public constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     @InjectQueue(JobsQueue.RENAME_AND_LINK)
     private readonly renameAndLinkQueue: Queue,
     private readonly movieDAO: MovieDAO,
@@ -27,10 +31,14 @@ export class RefreshTorrentProcessor {
     private readonly transmissionService: TransmissionService,
     private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tvEpisodeDAO: TVEpisodeDAO
-  ) {}
+  ) {
+    this.logger = logger.child({ context: 'RefreshTorrentProcessor' });
+  }
 
   @Process()
   public async refreshTorrents() {
+    this.logger.info('start refresh torrent status');
+
     const donwloadingMovies = await this.movieDAO.find({
       where: { state: DownloadableMediaState.DOWNLOADING },
     });
@@ -60,6 +68,8 @@ export class RefreshTorrentProcessor {
         resourceType: FileType.EPISODE,
       })
     );
+
+    this.logger.info('finish refresh torrent status');
   }
 
   private async checkTorrent({
@@ -69,6 +79,8 @@ export class RefreshTorrentProcessor {
     resourceId: number;
     resourceType: FileType;
   }) {
+    this.logger.info('refresh torrent status', { resourceId, resourceType });
+
     const torrent = await this.torrentDAO.findOneOrFail({
       where: { resourceId, resourceType },
     });
@@ -77,7 +89,14 @@ export class RefreshTorrentProcessor {
       torrent.torrentHash
     );
 
-    if (transmissionTorrent.percentDone === 1) {
+    const isComplete = transmissionTorrent.percentDone === 1;
+
+    this.logger.info(
+      isComplete ? 'torrent download finish' : 'torrent download in progress',
+      { resourceId, resourceType }
+    );
+
+    if (isComplete) {
       if (resourceType === FileType.MOVIE) {
         await this.movieDAO.save({
           id: resourceId,

@@ -7,6 +7,10 @@ import {
   Args,
 } from '@nestjs/graphql';
 
+import { Inject } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+
 import { ParameterDAO } from 'src/entities/dao/parameter.dao';
 import { GraphQLCommonResponse, ParameterKey } from 'src/app.dto';
 
@@ -23,7 +27,12 @@ class ParamsHash {
 
 @Resolver()
 export class ParamsResolver {
-  public constructor(private readonly parameterDAO: ParameterDAO) {}
+  public constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
+    private readonly parameterDAO: ParameterDAO
+  ) {
+    this.logger = logger.child({ context: 'ParamsResolver' });
+  }
 
   @Query((_returns) => ParamsHash)
   public async getParams() {
@@ -38,6 +47,7 @@ export class ParamsResolver {
   ) {
     const param = await this.parameterDAO.findOrCreate({ key, value });
     await this.parameterDAO.save({ id: param.id, value });
+    this.logger.info('param updated', { key, value });
     return { success: true, message: `PARAM_${key}_CORRECTLY_UPDATED` };
   }
 }
