@@ -45,6 +45,17 @@ And to have something with a better ui, less configuration and faster 🚀
 * Go to http://localhost:3000/settings
 * Set your region and language according to your torrent tracker
 
+### Run without VPN
+
+This is not recommended, but you can start downloading torrents without a VPN with the `docker-compose.without-vpn.yml`
+
+* `mv docker-compose.yml docker-compose.with-vpn.yml`
+* `mv docker-compose.without-vpn.yml docker-compose.yml`
+
+And makes sure to restart the all stack with
+
+* `$ docker-compose up --force-recreate`
+
 ## Usage
 
 * After configuration, go to http://localhost:3000 and just start searching!
