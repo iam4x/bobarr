@@ -38,6 +38,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4",
+    "scandirectory": "^5.3.0",
     "transmission-client": "^1.0.0",
     "typeorm": "^0.2.24",
     "winston": "^3.2.1"

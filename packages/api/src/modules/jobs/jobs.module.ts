@@ -17,13 +17,16 @@ import { TransmissionModule } from 'src/modules/transmission/transmission.module
 import { DownloadProcessor } from './processors/download.processor';
 import { RefreshTorrentProcessor } from './processors/refresh-torrent.processor';
 import { RenameAndLinkProcessor } from './processors/rename-and-link.processor';
+import { ScanLibraryProcessor } from './processors/scan-library.processor';
 
 import { JobsService } from './jobs.service';
+import { TMDBModule } from '../tmdb/tmdb.module';
 
 const queues = [
   { name: JobsQueue.REFRESH_TORRENT, redis: REDIS_CONFIG },
   { name: JobsQueue.DOWNLOAD, redis: REDIS_CONFIG },
   { name: JobsQueue.RENAME_AND_LINK, redis: REDIS_CONFIG },
+  { name: JobsQueue.SCAN_LIBRARY, redis: REDIS_CONFIG },
 ];
 
 @Module({
@@ -32,12 +35,14 @@ const queues = [
     BullModule.registerQueue(...queues),
     JackettModule,
     TransmissionModule,
+    TMDBModule,
     forwardRef(() => LibraryModule),
   ],
   providers: [
     DownloadProcessor,
     RefreshTorrentProcessor,
     RenameAndLinkProcessor,
+    ScanLibraryProcessor,
     JobsService,
   ],
   exports: [JobsService],
