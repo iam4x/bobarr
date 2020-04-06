@@ -11,7 +11,7 @@
     "start": "nest start",
     "dev": "yarn && yarn ts-node-dev --respawn --transpileOnly -r tsconfig-paths/register --ignore-watch node_modules src/main.ts",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main"
+    "start:prod": "ENV=production node dist/main"
   },
   "dependencies": {
     "@nestjs/bull": "^0.1.0",
