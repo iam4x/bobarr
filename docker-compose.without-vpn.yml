@@ -90,3 +90,24 @@ services:
       - ./library/downloads:/downloads
       - ./packages/transmission/config:/config
       - ./packages/transmission/watch:/watch
+
+
+  plex:
+    image: plexinc/pms-docker:${PMSTAG}
+    restart: unless-stopped
+    ports:
+      - 32400:32400 # for access to the Plex Media Server - required
+    #      - 1900:1900/udp # for access to the Plex DLNA Server
+    #      - 3005:3005 # for controlling Plex Home Theater via Plex Companion
+    #      - 5353:5353/udp # for older Bonjour/Avahi network discovery
+    #      - 8324:8324 # for controlling Plex for Roku via Plex Companion
+    #      - 32410:32410/udp # for current GDM network discovery
+    #      - 32412:32412/udp # for current GDM network discovery
+    #      - 32413:32413/udp # for current GDM network discovery
+    #      - 32414:32414/udp # for current GDM network discovery
+    #      - 32469:32469 # for access to the Plex DLNA Server
+    env_file: .env
+    volumes:
+      - ./packages/plex/config:/config
+      - ./library/tvshows:/data/tv
+      - ./library/movies:/
