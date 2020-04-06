@@ -8,14 +8,36 @@ function formatLog(log: Record<string, any>) {
     : baseLine;
 }
 
-export const winstonOptions = {
-  transports: [
-    new winston.transports.Console({
+const transports: any[] = [
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
+      winston.format.colorize(),
+      winston.format.printf(formatLog)
+    ),
+  }),
+];
+
+if (process.env.ENV === 'production') {
+  transports.push(
+    new winston.transports.File({
+      filename: 'out.log',
       format: winston.format.combine(
-        winston.format.timestamp({ format: 'YYY-MM-DD HH:mm:ss.SSS' }),
-        winston.format.colorize(),
-        winston.format.printf(formatLog)
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
+        winston.format.json()
       ),
-    }),
-  ],
-};
+    })
+  );
+  transports.push(
+    new winston.transports.File({
+      level: 'error',
+      filename: 'error.log',
+      format: winston.format.combine(
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
+        winston.format.json()
+      ),
+    })
+  );
+}
+
+export const winstonOptions = { transports };
