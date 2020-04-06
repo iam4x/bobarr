@@ -33,7 +33,7 @@ services:
       - jackett
       - transmission
       - transmission-web
-    command: yarn start
+    command: yarn start:prod
     # command: yarn dev
     restart: unless-stopped
 
