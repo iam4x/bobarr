@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
+import { WinstonModule } from 'nest-winston';
 
 import { DB_CONFIG } from './config';
+import { winstonOptions } from './utils/winston-options';
 
 import { LibraryModule } from 'src/modules/library/library.module';
 import { ParamsModule } from 'src/modules/params/params.module';
@@ -13,6 +15,7 @@ import { TransmissionModule } from 'src/modules/transmission/transmission.module
 
 @Module({
   imports: [
+    WinstonModule.forRoot(winstonOptions),
     TypeOrmModule.forRoot(DB_CONFIG),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',

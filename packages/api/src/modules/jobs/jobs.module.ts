@@ -16,7 +16,7 @@ import { TransmissionModule } from 'src/modules/transmission/transmission.module
 
 import { DownloadProcessor } from './processors/download.processor';
 import { RefreshTorrentProcessor } from './processors/refresh-torrent.processor';
-import { RenameAndLinkQueueProcessor } from './processors/rename-and-link.processor';
+import { RenameAndLinkProcessor } from './processors/rename-and-link.processor';
 
 import { JobsService } from './jobs.service';
 
@@ -37,7 +37,7 @@ const queues = [
   providers: [
     DownloadProcessor,
     RefreshTorrentProcessor,
-    RenameAndLinkQueueProcessor,
+    RenameAndLinkProcessor,
     JobsService,
   ],
   exports: [JobsService],

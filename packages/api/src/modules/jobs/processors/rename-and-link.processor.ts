@@ -5,6 +5,9 @@ import { oneLine } from 'common-tags';
 import { Processor, Process } from '@nestjs/bull';
 import { mapSeries } from 'p-iteration';
 import { Job } from 'bull';
+import { Inject } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 import {
   JobsQueue,
@@ -24,18 +27,23 @@ import { TransmissionService } from 'src/modules/transmission/transmission.servi
 import { LibraryService } from 'src/modules/library/library.service';
 
 @Processor(JobsQueue.RENAME_AND_LINK)
-export class RenameAndLinkQueueProcessor {
+export class RenameAndLinkProcessor {
+  // eslint-disable-next-line max-params
   public constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private readonly movieDAO: MovieDAO,
     private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tvEpisodeDAO: TVEpisodeDAO,
     private readonly transmissionService: TransmissionService,
     private readonly libraryService: LibraryService
-  ) {}
+  ) {
+    this.logger = this.logger.child({ context: 'RenameAndLinkProcessor' });
+  }
 
   @Process(RenameAndLinkQueueProcessors.HANDLE_MOVIE)
   public async renameAndLinkMovie(job: Job<{ movieId: number }>) {
     const { movieId } = job.data;
+    this.logger.info('start rename and link movie', { movieId });
 
     const movie = await this.libraryService.getMovie(movieId);
     const torrent = await this.transmissionService.getResourceTorrent({
@@ -76,11 +84,14 @@ export class RenameAndLinkQueueProcessor {
       id: movieId,
       state: DownloadableMediaState.PROCESSED,
     });
+
+    this.logger.info('finish rename and link movie', { movieId });
   }
 
   @Process(RenameAndLinkQueueProcessors.HANDLE_EPISODE)
   public async renameAndLinkEpisode(job: Job<{ episodeId: number }>) {
     const { episodeId } = job.data;
+    this.logger.info('start rename and link episode', { episodeId });
 
     const episode = await this.tvEpisodeDAO.findOneOrFail({
       where: { id: episodeId },
@@ -136,11 +147,14 @@ export class RenameAndLinkQueueProcessor {
       id: episode.id,
       state: DownloadableMediaState.PROCESSED,
     });
+
+    this.logger.info('finish rename and link episode', { episodeId });
   }
 
   @Process(RenameAndLinkQueueProcessors.HANDLE_SEASON)
   public async renameAndLinkSeason(job: Job<{ seasonId: number }>) {
     const { seasonId } = job.data;
+    this.logger.info('start rename and link season', { seasonId });
 
     const season = await this.tvSeasonDAO.findOneOrFail({
       where: { id: seasonId },
@@ -209,5 +223,7 @@ export class RenameAndLinkQueueProcessor {
       id: season.id,
       state: DownloadableMediaState.PROCESSED,
     });
+
+    this.logger.info('finsh rename and link season', { seasonId });
   }
 }

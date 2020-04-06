@@ -2,7 +2,9 @@ import dayjs from 'dayjs';
 import axios from 'axios';
 import { orderBy, uniq, uniqBy } from 'lodash';
 import { mapSeries } from 'p-iteration';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 import { ParameterKey } from 'src/app.dto';
 import { formatNumber } from 'src/utils/format-number';
@@ -18,11 +20,14 @@ import { JackettResult } from './jackett.dto';
 @Injectable()
 export class JackettService {
   public constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private readonly paramsService: ParamsService,
     private readonly libraryService: LibraryService,
     private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tvEpisodeDAO: TVEpisodeDAO
-  ) {}
+  ) {
+    this.logger = logger.child({ context: 'JackettService' });
+  }
 
   private async request<TData>(path: string, params: Record<string, any>) {
     const jackettApiKey = await this.paramsService.get(
@@ -38,6 +43,8 @@ export class JackettService {
   }
 
   public async searchMovie(movieId: number) {
+    this.logger.info('search movie', { movieId });
+
     const maxSize = await this.paramsService.getNumber(
       ParameterKey.MAX_MOVIE_DOWNLOAD_SIZE
     );
@@ -52,6 +59,8 @@ export class JackettService {
   }
 
   public async searchSeason(seasonId: number) {
+    this.logger.info('search tv season', { seasonId });
+
     const maxSize = await this.paramsService.getNumber(
       ParameterKey.MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE
     );
@@ -81,6 +90,8 @@ export class JackettService {
   }
 
   public async searchEpisode(episodeId: number) {
+    this.logger.info('search tv episode', { episodeId });
+
     const maxSize = await this.paramsService.getNumber(
       ParameterKey.MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE
     );
@@ -128,6 +139,10 @@ export class JackettService {
         .replace(/[az]'/g, ' ')
         .replace(/:/g, ' ');
 
+      this.logger.info('search torrents with query', {
+        query: normalizedQuery,
+      });
+
       const { data } = await this.request<{ Results: JackettResult[] }>(
         '/results',
         {
@@ -140,6 +155,7 @@ export class JackettService {
       return data.Results;
     });
 
+    this.logger.info(`found ${rawResults.flat().length} potential results`);
     const results = uniqBy(rawResults.flat(), 'Guid')
       .map(this.formatSearchResult)
       .filter(
@@ -155,6 +171,7 @@ export class JackettService {
             ))
       );
 
+    this.logger.info(`found ${results.length} downloadable results`);
     const withPreferredTags = results.filter(
       (result) =>
         preferredTags.includes(result.tag.label) &&

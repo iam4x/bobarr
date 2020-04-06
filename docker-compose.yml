@@ -6,6 +6,7 @@ volumes:
   api_node_modules:
   web_node_modules:
   web_build:
+  api_build:
 
 networks:
   default:
@@ -20,6 +21,7 @@ services:
       - ./packages/api:/usr/src/app
       - ./library:/usr/library
       - api_node_modules:/usr/src/app/node_modules
+      - api_build:/usr/src/app/dist
     ports:
       - 4000:4000
       - 9229:9229
