@@ -3317,6 +3317,18 @@ ignore@^5.1.4:
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.1.4.tgz#84b7b3dbe64552b6ef0eca99f6743dbec6d97adf"
   integrity sha512-MzbUSahkTW1u7JpKKjY7LCARd1fU5W2rLdxlM4kdkayuCwZImjkpluF9CM1aLewYJguPDqewLam18Y6AU69A8A==
 
+ignorefs@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/ignorefs/-/ignorefs-2.3.0.tgz#2a70a80a55b1ccecf14b65d7fb78dc1b3b454c80"
+  integrity sha512-ptPMw12KUmf46YwP/vy5BYlHLmTwlBg7CYOI+CvOif5TxZYmwXccVEPwNqB/Um7U6r1gWU99CryP/hvxfxlMsQ==
+  dependencies:
+    ignorepatterns "^2.2.0"
+
+ignorepatterns@^2.2.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/ignorepatterns/-/ignorepatterns-2.3.0.tgz#2d88c15062141ce019a7c12b25204dfbbab38c77"
+  integrity sha512-x+t4C8E3hHJ1L1TsGFyAnt2+PLWndL/esgeQaxDKTOZJTaBx1bMu3PVfZA3UdyLa7FJXTVlc1YyJlh5Y4L+pXw==
+
 imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
@@ -5143,6 +5155,11 @@ readable-stream@^3.1.1:
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
 
+readdir-cluster@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/readdir-cluster/-/readdir-cluster-2.3.0.tgz#54d9b539406c01329ed1b9015e35dddca6a8c6db"
+  integrity sha512-8xT0yWJ5WHHN5BfZ0d+P5y6A8p24sEfD8JTDdxida+oPKBvDYWoXwkDZ79nzGpDsxwEf7L4cGJQEhw9sUb21Bw==
+
 readdirp@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/readdirp/-/readdirp-2.2.1.tgz#0e87622a3325aa33e892285caf8b4e846529a525"
@@ -5364,6 +5381,14 @@ sax@>=0.6.0:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
+
+scandirectory@^5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/scandirectory/-/scandirectory-5.3.0.tgz#4ed904e1516e969ff5549ff7f22b4658bca15f83"
+  integrity sha512-hfb4aTGE1c1jtp3vVYO3pcWndaO31XwmGNdX2T8WHbSLZvXMKiOon7CF49LDlqTQIm367RHuJJPay+2Hd6vNTA==
+  dependencies:
+    ignorefs "^2.3.0"
+    readdir-cluster "^2.3.0"
 
 scheduler@^0.16.2:
   version "0.16.2"
