@@ -40,7 +40,7 @@ export class RenameAndLinkQueueProcessor {
     const movie = await this.libraryService.getMovie(movieId);
     const torrent = await this.transmissionService.getResourceTorrent({
       resourceId: movie.id,
-      resourceType: FileType.SEASON,
+      resourceType: FileType.MOVIE,
     });
 
     const year = dayjs(movie.releaseDate).format('YYYY');
@@ -74,6 +74,66 @@ export class RenameAndLinkQueueProcessor {
 
     await this.movieDAO.save({
       id: movieId,
+      state: DownloadableMediaState.PROCESSED,
+    });
+  }
+
+  @Process(RenameAndLinkQueueProcessors.HANDLE_EPISODE)
+  public async renameAndLinkEpisode(job: Job<{ episodeId: number }>) {
+    const { episodeId } = job.data;
+
+    const episode = await this.tvEpisodeDAO.findOneOrFail({
+      where: { id: episodeId },
+      relations: ['season', 'season.tvShow'],
+    });
+
+    const tvShow = await this.libraryService.getTVShow(
+      episode.season.tvShow.id,
+      { language: 'en' }
+    );
+
+    const torrent = await this.transmissionService.getResourceTorrent({
+      resourceId: episode.id,
+      resourceType: FileType.EPISODE,
+    });
+
+    const seasonNb = formatNumber(episode.season.seasonNumber);
+    const seasonFolder = path.resolve(
+      __dirname,
+      '../../../../../../library/tvshows/',
+      tvShow.title,
+      `Season ${seasonNb}`
+    );
+
+    const torrentFiles = torrent.transmissionTorrent.files
+      .filter((file) => {
+        const ext = path.extname(file.name);
+        return allowedExtensions.includes(ext.replace(/^\./, ''));
+      })
+      .map((file) => {
+        const ext = path.extname(file.name);
+        const next = [
+          tvShow.title,
+          `S${seasonNb}E${formatNumber(episode.episodeNumber)}`,
+          `${torrent.quality} [${torrent.tag.toUpperCase()}]`,
+        ].join(' - ');
+        return { original: file.name, next: `${next}${ext}` };
+      });
+
+    await childCommand(`mkdir -p "${seasonFolder}"`);
+    await mapSeries(torrentFiles, async (torrentFile) => {
+      await childCommand(
+        oneLine`
+          cd "${seasonFolder}" &&
+          ln -s
+            "../../../downloads/complete/${torrentFile.original}"
+            "${torrentFile.next}"
+        `
+      );
+    });
+
+    await this.tvEpisodeDAO.save({
+      id: episode.id,
       state: DownloadableMediaState.PROCESSED,
     });
   }
@@ -128,7 +188,7 @@ export class RenameAndLinkQueueProcessor {
         oneLine`
           cd "${seasonFolder}" &&
           ln -s
-          "../../downloads/complete/${file.original}"
+          "../../../downloads/complete/${file.original}"
           "${newName}${file.ext}"
         `
       );

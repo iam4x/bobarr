@@ -1,6 +1,9 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { map, forEachSeries, forEach, reduce } from 'p-iteration';
 import { times } from 'lodash';
+import childCommand from 'child-command';
+import dayjs from 'dayjs';
+import path from 'path';
 
 import {
   DeepPartial,
@@ -132,6 +135,16 @@ export class LibraryService {
       await torrentDAO.remove(torrent);
     }
 
+    const enrichedMovie = await this.getMovie(movie.id);
+    const year = dayjs(enrichedMovie.releaseDate).format('YYYY');
+    const folderName = `${enrichedMovie.title} (${year})`;
+    const folderPath = path.resolve(
+      __dirname,
+      '../../../../../library/movies',
+      folderName
+    );
+
+    await childCommand(`rm -rf "${folderPath}"`);
     await movieDAO.remove(movie);
   }
 
@@ -176,6 +189,14 @@ export class LibraryService {
       }
     });
 
+    const enTVShow = await this.getTVShow(tvShow.id, { language: 'en' });
+    const tvShowFolder = path.resolve(
+      __dirname,
+      '../../../../../library/tvshows/',
+      enTVShow.title
+    );
+
+    await childCommand(`rm -rf "${tvShowFolder}"`);
     await tvShowDAO.remove(tvShow);
   }
 

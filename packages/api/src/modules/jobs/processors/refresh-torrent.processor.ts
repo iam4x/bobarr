@@ -12,18 +12,21 @@ import {
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
+import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
 
 @Processor(JobsQueue.REFRESH_TORRENT)
 export class RefreshTorrentProcessor {
+  // eslint-disable-next-line max-params
   public constructor(
     @InjectQueue(JobsQueue.RENAME_AND_LINK)
     private readonly renameAndLinkQueue: Queue,
     private readonly movieDAO: MovieDAO,
     private readonly torrentDAO: TorrentDAO,
     private readonly transmissionService: TransmissionService,
-    private readonly tvSeasonDAO: TVSeasonDAO
+    private readonly tvSeasonDAO: TVSeasonDAO,
+    private readonly tvEpisodeDAO: TVEpisodeDAO
   ) {}
 
   @Process()
@@ -44,6 +47,17 @@ export class RefreshTorrentProcessor {
       this.checkTorrent({
         resourceId: season.id,
         resourceType: FileType.SEASON,
+      })
+    );
+
+    const downloadEpisodes = await this.tvEpisodeDAO.find({
+      where: { state: DownloadableMediaState.DOWNLOADING },
+    });
+
+    await forEachSeries(downloadEpisodes, (episode) =>
+      this.checkTorrent({
+        resourceId: episode.id,
+        resourceType: FileType.EPISODE,
       })
     );
   }
@@ -83,6 +97,17 @@ export class RefreshTorrentProcessor {
         await this.renameAndLinkQueue.add(
           RenameAndLinkQueueProcessors.HANDLE_SEASON,
           { seasonId: resourceId }
+        );
+      }
+
+      if (resourceType === FileType.EPISODE) {
+        await this.tvEpisodeDAO.save({
+          id: resourceId,
+          state: DownloadableMediaState.DOWNLOADED,
+        });
+        await this.renameAndLinkQueue.add(
+          RenameAndLinkQueueProcessors.HANDLE_EPISODE,
+          { episodeId: resourceId }
         );
       }
     }

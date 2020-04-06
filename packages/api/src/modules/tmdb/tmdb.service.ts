@@ -27,7 +27,7 @@ export class TMDBService {
       baseURL: 'https://api.themoviedb.org/3/',
     });
 
-    return client.get<TData>(path, { params });
+    return client.get<TData>(path, params);
   }
 
   public async getMovie(movieTMDBId: number) {
