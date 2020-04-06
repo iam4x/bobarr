@@ -18,7 +18,14 @@ export class TMDBService {
     private readonly tvSeasonDAO: TVSeasonDAO
   ) {}
 
-  private async request<TData>(path: string, params: Record<string, any> = {}) {
+  private async request<TData>(
+    path: string,
+    params: {
+      query?: string;
+      language?: string;
+      region?: string;
+    } = {}
+  ) {
     const apiKey = await this.paramsService.get(ParameterKey.TMDB_API_KEY);
     const language = await this.paramsService.get(ParameterKey.LANGUAGE);
 
@@ -27,7 +34,7 @@ export class TMDBService {
       baseURL: 'https://api.themoviedb.org/3/',
     });
 
-    return client.get<TData>(path, params);
+    return client.get<TData>(path, { params });
   }
 
   public async getMovie(movieTMDBId: number) {
@@ -36,15 +43,16 @@ export class TMDBService {
   }
 
   public async getTVShow(tvShowTMDBId: number, params?: { language: string }) {
-    const { data } = await this.request<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
-      params,
-    });
+    const { data } = await this.request<TMDBTVShow>(
+      `/tv/${tvShowTMDBId}`,
+      params
+    );
     return data;
   }
 
   public async getEnglishTVShowName(tvShowTMDBId: number) {
     const { data } = await this.request<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
-      params: { language: 'en' },
+      language: 'en',
     });
     return data.name;
   }
