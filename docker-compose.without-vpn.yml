@@ -73,7 +73,6 @@ services:
   redis:
     container_name: bobarr-redis
     image: bitnami/redis:5.0.6
-    restart: always
     ports:
       - 6379:6379
     env_file: .env
