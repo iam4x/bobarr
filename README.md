@@ -26,10 +26,9 @@ And to have something with a better ui, less configuration and faster 🚀
 ## Installation
 
 * Clone the repo `$ git clone ssh://github.com/iam4x/bobarr.git && cd bobarr`
-* Copy your open vpn config file (.ovpn) into the folder `packages/vpn`
+
 * Set `PUID` and `PGID` in `.env` (see .env for explanation)
-* Build the api and web ui packages `$ docker-compose build`
-* Start the bobarr stack `$ docker-compose up`
+* Start the bobarr minimal stack `$ docker-compose up --build -d` (see below to add vpn)
 * Go to http://localhost:9117 and copy the API Key in top right corner
 * Go to http://localhost:3000/settings and update the jackett API key
 
@@ -45,16 +44,13 @@ And to have something with a better ui, less configuration and faster 🚀
 * Go to http://localhost:3000/settings
 * Set your region and language according to your torrent tracker
 
-### Run without VPN
+### Run with VPN
 
-This is not recommended, but you can start downloading torrents without a VPN with the `docker-compose.without-vpn.yml`
-
-* `mv docker-compose.yml docker-compose.with-vpn.yml`
-* `mv docker-compose.without-vpn.yml docker-compose.yml`
-
-And makes sure to restart the all stack with
-
-* `$ docker-compose up --force-recreate`
+You can easily enforce all downloads through your VPN
+* Copy your open vpn config file (.ovpn) into the folder `packages/vpn`
+* Run the docker-compose.with-vpn.yml file
+  * if you have npm -> `$ npm run start:vpn`
+  * otherwise -> `$ docker-compose up -f docker-compose.yml -f docker-compose.with-vpn.yml up -d`
 
 ## Usage
 
@@ -80,3 +76,13 @@ You can now head to http://localhost:3000 and hit that "Scan library folder" but
 * Bobarr background jobs http://localhost:4000/jobs
 * Jackett http://localhost:9117
 * Transmission http://localhost:9091
+
+## Development
+
+You can run bobarr API and Web UI in dev watch mode and display logs with:
+
+* With npm
+  * `$ yarn dev`
+* Without npm
+  * `$ docker-compose up -f docker-compose.yml -f docker-compose.dev.yml up --force-recreate -d`
+  * `$ docker-compose logs --tail 20 -f api web`

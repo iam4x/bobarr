@@ -1,12 +1,8 @@
-version: "3.4"
+version: "3.6"
 
 volumes:
   db_data:
   redis_data:
-  api_node_modules:
-  web_node_modules:
-  web_build:
-  api_build:
 
 networks:
   default:
@@ -18,25 +14,10 @@ services:
       context: ./packages/api
     env_file: .env
     volumes:
-      - ./packages/api:/usr/src/app
       - ./library:/usr/library
-      - api_node_modules:/usr/src/app/node_modules
-      - api_build:/usr/src/app/dist
     ports:
       - 4000:4000
-      - 9229:9229
-    links:
-      - vpn:transmission
-    networks:
-      - default
-    depends_on:
-      - postgres
-      - redis
-      - jackett
-      - transmission
-      - transmission-web
     command: yarn start:prod
-    # command: yarn dev
     restart: unless-stopped
 
   web:
@@ -44,16 +25,9 @@ services:
     build:
       context: ./packages/web
     env_file: .env
-    volumes:
-      - ./packages/web:/usr/src/app
-      - web_node_modules:/usr/src/app/node_modules
-      - web_build:/usr/src/app/.next
     ports:
       - 3000:3000
-    depends_on:
-      - api
     command: yarn start
-    # command: yarn dev
     restart: unless-stopped
 
   postgres:
@@ -66,6 +40,16 @@ services:
       - 5432:5432
     restart: unless-stopped
 
+  redis:
+    container_name: bobarr-redis
+    image: bitnami/redis:5.0.6
+    ports:
+      - 6379:6379
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - redis_data:/bitnami/redis/data
+
   jackett:
     image: linuxserver/jackett
     container_name: bobarr-jacket
@@ -77,40 +61,9 @@ services:
       - 9117:9117
     restart: unless-stopped
 
-  redis:
-    container_name: bobarr-redis
-    image: bitnami/redis:5.0.6
-    ports:
-      - 6379:6379
-    env_file: .env
-    restart: unless-stopped
-    volumes:
-      - redis_data:/bitnami/redis/data
-
-  vpn:
-    image: dperson/openvpn-client
-    container_name: bobarr-vpn
-    cap_add:
-      - net_admin
-    security_opt:
-      - label:disable
-    networks:
-      - default
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-    volumes:
-      - /dev/net:/dev/net:z
-      - ./packages/vpn:/vpn
-    command: '-p "49150" -p "49150;udp"'
-    restart: unless-stopped
-
   transmission:
     image: linuxserver/transmission
     container_name: bobarr-transmission
-    depends_on:
-      - vpn
-    network_mode: "service:vpn"
     env_file: .env
     volumes:
       - ./library/downloads:/downloads
@@ -124,10 +77,6 @@ services:
       - transmission
     environment:
       - TZ=Europe/Paris
-    links:
-      - vpn:transmission
-    networks:
-      - default
     ports:
       - "9091:80"
     command: -w "http://transmission:9091;/"
