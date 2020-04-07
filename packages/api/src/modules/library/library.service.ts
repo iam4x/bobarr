@@ -272,14 +272,13 @@ export class LibraryService {
         }
 
         const alreadExists = await tvSeasonDAO.findOne({
-          where: { tmdbId: tmdbSeason.id },
+          where: { tvShow, seasonNumber },
         });
 
         if (!alreadExists) {
           const season = await tvSeasonDAO.save({
             tvShow,
             seasonNumber,
-            tmdbId: tmdbSeason.id,
           });
 
           this.logger.info('new season added to library', {
