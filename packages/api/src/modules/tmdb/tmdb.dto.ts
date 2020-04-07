@@ -8,7 +8,7 @@ export interface TMDBMovie {
   genres: Array<{ id: number; name: string }>;
   homepage: string;
   imdb_id: number;
-  original_language: string;
+  original_language: string[];
   original_title: string;
   overview: string;
   popularity: number;
@@ -36,7 +36,7 @@ export interface TMDBTVShow {
   name: string;
   number_of_episodes: number;
   number_of_seasons: number;
-  origin_country: string;
+  origin_country: string[];
   original_language: string;
   original_name: string;
   overview: string;

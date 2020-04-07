@@ -75,7 +75,16 @@ export class JackettService {
       language: 'en',
     });
 
-    const queries = uniq([tvShow.title, tvShow.originalTitle, enTVShow.title])
+    const titles = [tvShow.title, enTVShow.title];
+    const canSearchOriginalTitle = !['JP', 'CH'].some((country) =>
+      tvShow.originCountry.includes(country)
+    );
+
+    if (canSearchOriginalTitle) {
+      titles.push(tvShow.originalTitle);
+    }
+
+    const queries = uniq(titles)
       .map((title) => [
         `${title} S${formatNumber(tvSeason.seasonNumber)}`,
         `${title} Season ${formatNumber(tvSeason.seasonNumber)}`,
@@ -109,7 +118,16 @@ export class JackettService {
     const s = formatNumber(tvEpisode.seasonNumber);
     const e = formatNumber(tvEpisode.episodeNumber);
 
-    const queries = uniq([tvShow.title, tvShow.originalTitle, enTVShow.title])
+    const titles = [tvShow.title, enTVShow.title];
+    const canSearchOriginalTitle = !['JP', 'CH'].some((country) =>
+      tvShow.originCountry.includes(country)
+    );
+
+    if (canSearchOriginalTitle) {
+      titles.push(tvShow.originalTitle);
+    }
+
+    const queries = uniq(titles)
       .map((title) => [
         `${title} S${s}E${e}`,
         `${title} Season ${s} Episode ${e}`,
