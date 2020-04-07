@@ -10,6 +10,8 @@ import {
 
 import introspectionResult from './introspection-result';
 
+const host = typeof window === 'undefined' ? 'api' : window.location.hostname;
+
 export function createApolloClient(
   initialState: Record<string, any>,
   ctx?: NextPageContext
@@ -19,7 +21,7 @@ export function createApolloClient(
   return new ApolloClient({
     ssrMode: Boolean(ctx),
     link: new HttpLink({
-      uri: `http://localhost:4000/graphql`,
+      uri: `http://${host}:4000/graphql`,
       fetch,
     }),
     cache: new InMemoryCache({
