@@ -85,7 +85,13 @@ export class ScanLibraryProcessor {
           const episodes = Object.keys(episodeObj).reduce<number[]>(
             (res, str) => {
               // if file is a srt file dont try to add as an episode
-              if (str.startsWith('.') || str.endsWith('.srt')) return res;
+              if (
+                str.startsWith('.') ||
+                str.endsWith('.srt') ||
+                str.endsWith('.nfo')
+              ) {
+                return res;
+              }
 
               // parse episode number from title
               const [, episodeNumber] = /E(\d+)/.exec(str) || [];
@@ -116,6 +122,11 @@ export class ScanLibraryProcessor {
         });
 
         await map(episodes, async (episodeNumber) => {
+          this.logger.info(`start processing episode`, {
+            season: seasonNumber,
+            episode: episodeNumber,
+          });
+
           const episode = await tvEpisodeDAO.findOrCreate({
             tvShow,
             episodeNumber,
@@ -169,13 +180,13 @@ export class ScanLibraryProcessor {
         language: 'en',
       });
 
+      this.logger.info(`found ${results.length} potential match on tmdb`);
       const [tmdbMovie] = results.filter(
-        (result) =>
-          dayjs(result.releaseDate).format('YYYY') === year &&
-          result.title === title
+        (result) => dayjs(result.releaseDate).format('YYYY') === year
       );
 
       if (!tmdbMovie) {
+        this.logger.error('no movie found matching title and year');
         throw new Error(`movie ${title} not found in tmdb`);
       }
 
