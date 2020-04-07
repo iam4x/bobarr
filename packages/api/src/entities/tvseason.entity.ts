@@ -28,6 +28,7 @@ export class TVSeason {
   public state: DownloadableMediaState = DownloadableMediaState.MISSING;
 
   @ManyToOne((_type) => TVShow, (tvshow) => tvshow.seasons, {
+    nullable: false,
     onDelete: 'CASCADE',
   })
   public tvShow!: TVShow;

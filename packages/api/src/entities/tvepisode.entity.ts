@@ -29,11 +29,13 @@ export class TVEpisode {
   public state: DownloadableMediaState = DownloadableMediaState.MISSING;
 
   @ManyToOne((_type) => TVSeason, (season) => season.episodes, {
+    nullable: false,
     onDelete: 'CASCADE',
   })
   public season!: TVSeason;
 
   @ManyToOne((_type) => TVShow, (tvshow) => tvshow.episodes, {
+    nullable: false,
     onDelete: 'CASCADE',
   })
   public tvShow!: TVShow;

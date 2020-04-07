@@ -42,6 +42,7 @@ export class ScanLibraryProcessor {
       .createQueryBuilder('episode')
       .distinctOn(['episode.tvShow'])
       .leftJoinAndSelect('episode.tvShow', 'tvShow')
+      .leftJoinAndSelect('episode.season', 'season')
       .orderBy('episode.tvShow', 'DESC')
       .addOrderBy('episode.seasonNumber', 'DESC')
       .addOrderBy('episode.episodeNumber', 'DESC')
@@ -196,9 +197,11 @@ export class ScanLibraryProcessor {
             episodeNumber,
             seasonNumber,
           });
+
           await tvEpisodeDAO.save({
             id: episode.id,
             state: DownloadableMediaState.PROCESSED,
+            season: tvSeason,
           });
         });
 
