@@ -1,0 +1,6 @@
+mutation startScanLibrary {
+  result: startScanLibraryJob {
+    success
+    message
+  }
+}

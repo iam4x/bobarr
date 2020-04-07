@@ -33,6 +33,7 @@ export enum JobsQueue {
   DOWNLOAD = 'download',
   REFRESH_TORRENT = 'refresh_torrent',
   RENAME_AND_LINK = 'rename_and_link',
+  SCAN_LIBRARY = 'scan_library',
 }
 
 export enum DownloadQueueProcessors {

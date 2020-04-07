@@ -62,6 +62,17 @@ And makes sure to restart the all stack with
 * The files will be downloaded into `library/downloads`
 * The files will be simlinked and organized into `library/tvshows` or `library/movies`
 
+## Import your own library
+
+If you were using radarr or sonarr already you may have a tvshow or movies folder. You can easily import your already existing library into bobarr.
+
+* Change in docker-compose.yml the folder link `- ./library:/usr/library`
+* Point to your own library folder `- /mnt/storage/your/own/library:/usr/library`
+
+The only requirement is to have a folder `tvshows` and a folder `movies` then bobarr can catch up and download to your user defined library folder.
+
+You can now head to http://localhost:3000 and hit that "Scan library folder" button.
+
 ## Services
 
 * Bobarr http://localhost:3000

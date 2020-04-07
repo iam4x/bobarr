@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   OneToMany,
+  Unique,
 } from 'typeorm';
 
 import { DownloadableMediaState } from 'src/app.dto';
@@ -15,12 +16,10 @@ import { TVEpisode } from './tvepisode.entity';
 import { formatNumber } from 'src/utils/format-number';
 
 @Entity()
+@Unique(['seasonNumber', 'tvShow'])
 export class TVSeason {
   @PrimaryGeneratedColumn()
   public id!: number;
-
-  @Column('int', { unique: true })
-  public tmdbId!: number;
 
   @Column('int')
   public seasonNumber!: number;

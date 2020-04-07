@@ -70,16 +70,27 @@ export class TMDBService {
     );
   }
 
+  public async searchMovie(query: string, params = {}) {
+    const { data } = await this.request<{ results: TMDBMovie[] }>(
+      '/search/movie',
+      { query, ...params }
+    );
+    return data.results.map(this.mapMovie);
+  }
+
+  public async searchTVShow(query: string, params = {}) {
+    const { data } = await this.request<{ results: TMDBTVShow[] }>(
+      '/search/tv',
+      { query, ...params }
+    );
+    return data.results.map(this.mapTVShow);
+  }
+
   public async search(query: string) {
-    const [movies, tvShows] = await Promise.all([
-      this.request<{ results: TMDBMovie[] }>('/search/movie', {
-        query,
-      }).then(({ data }) => data.results.map(this.mapMovie)),
-      this.request<{ results: TMDBTVShow[] }>('/search/tv', {
-        query,
-      }).then(({ data }) => data.results.map(this.mapTVShow)),
-    ]);
-    return { movies, tvShows };
+    return {
+      movies: await this.searchMovie(query),
+      tvShows: await this.searchTVShow(query),
+    };
   }
 
   public async getPopular() {
