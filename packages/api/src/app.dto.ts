@@ -48,6 +48,11 @@ export enum RenameAndLinkQueueProcessors {
   HANDLE_EPISODE = 'handle_episode',
 }
 
+export enum ScanLibraryQueueProcessors {
+  SCAN_LIBRARY_FOLDER = 'scan_library_folder',
+  FIND_NEW_EPISODES = 'find_new_episodes',
+}
+
 @ObjectType()
 export class GraphQLCommonResponse {
   @Field() public success!: boolean;
