@@ -1,0 +1,24 @@
+version: "3.6"
+
+services:
+  vpn:
+    restart: always
+    entrypoint: ["/sbin/tini", "--", "/usr/bin/openvpn.sh"]
+    command: '-p "49150" -p "49150;udp"'
+
+  api:
+    links:
+      - vpn:transmission
+    networks:
+      - default
+
+  transmission:
+    network_mode: "service:vpn"
+    depends_on:
+      - vpn
+
+  transmission-web:
+    links:
+      - vpn:transmission
+    networks:
+      - default

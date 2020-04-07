@@ -4,7 +4,10 @@
   "author": "iam4x <iam4x@me.com>",
   "license": "MIT",
   "scripts": {
-    "postinstall": "(cd packages/web && yarn) && (cd packages/api && yarn)"
+    "postinstall": "(cd packages/web && yarn) && (cd packages/api && yarn)",
+    "start": "docker-compose up --build --force-recreate -d",
+    "start:vpn": "docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up --build  --force-recreate -d",
+    "dev": "docker-compose -f docker-compose.yml -f docker-compose.vpn.yml -f docker-compose.dev.yml up --force-recreate -d && docker-compose logs --tail 20 -f api web"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.12.0",

@@ -1,0 +1,33 @@
+version: "3.6"
+
+volumes:
+  api_node_modules:
+  web_node_modules:
+  web_build:
+  api_build:
+
+networks:
+  default:
+
+services:
+  api:
+    command: yarn dev
+    volumes:
+      - ./packages/api:/usr/src/app
+      - api_node_modules:/usr/src/app/node_modules
+      - api_build:/usr/src/app/dist
+
+  web:
+    command: yarn dev
+    volumes:
+      - ./packages/web:/usr/src/app
+      - web_node_modules:/usr/src/app/node_modules
+      - web_build:/usr/src/app/.next
+
+  postgres:
+    ports:
+      - 5432:5432
+
+  redis:
+    ports:
+      - 6379:6379
