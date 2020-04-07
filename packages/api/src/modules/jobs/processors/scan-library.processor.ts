@@ -191,8 +191,8 @@ export class ScanLibraryProcessor {
         });
       } else {
         await movieDAO.save({
+          title,
           tmdbId: tmdbMovie.id,
-          title: tmdbMovie.title,
           state: DownloadableMediaState.PROCESSED,
         });
         this.logger.info('new movie saved in database', {

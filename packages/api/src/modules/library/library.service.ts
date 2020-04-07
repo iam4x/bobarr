@@ -145,7 +145,7 @@ export class LibraryService {
 
     const enrichedMovie = await this.getMovie(movie.id);
     const year = dayjs(enrichedMovie.releaseDate).format('YYYY');
-    const folderName = `${enrichedMovie.title} (${year})`;
+    const folderName = `${movie.title} (${year})`;
     const folderPath = path.resolve(
       __dirname,
       '../../../../../library/movies',
