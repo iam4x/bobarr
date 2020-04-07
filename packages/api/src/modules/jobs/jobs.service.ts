@@ -1,11 +1,15 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
+import { Queue, JobOptions } from 'bull';
 import { setQueues } from 'bull-board';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
-import { JobsQueue, DownloadQueueProcessors } from 'src/app.dto';
+import {
+  JobsQueue,
+  DownloadQueueProcessors,
+  ScanLibraryQueueProcessors,
+} from 'src/app.dto';
 
 @Injectable()
 export class JobsService {
@@ -44,15 +48,20 @@ export class JobsService {
         },
       }
     );
-    this.scanLibraryQueue.add(
-      {},
-      {
-        repeat: {
-          cron: '0 1 * * *', // every day at 1am
-          startDate: new Date(),
-        },
-      }
-    );
+
+    this.startScanLibrary({
+      repeat: {
+        cron: '0 */6 * * *', // every 6 hours
+        startDate: new Date(),
+      },
+    });
+
+    this.startFindNewEpisodes({
+      repeat: {
+        cron: '0 */6 * * *', // every 6 hours
+        startDate: new Date(),
+      },
+    });
   }
 
   public startDownloadMovie(movieId: number) {
@@ -71,8 +80,29 @@ export class JobsService {
     );
   }
 
-  public startScanLibrary() {
+  public startDownloadEpisode(episodeId: number) {
+    this.logger.info('add download episode job', { episodeId });
+    return this.downloadQueue.add(
+      DownloadQueueProcessors.DOWNLOAD_EPISODE,
+      episodeId
+    );
+  }
+
+  public startScanLibrary(options?: JobOptions) {
     this.logger.info('add scan library job');
-    return this.scanLibraryQueue.add({});
+    return this.scanLibraryQueue.add(
+      ScanLibraryQueueProcessors.SCAN_LIBRARY_FOLDER,
+      {},
+      options
+    );
+  }
+
+  public startFindNewEpisodes(options?: JobOptions) {
+    this.logger.info('start find new episodes');
+    return this.scanLibraryQueue.add(
+      ScanLibraryQueueProcessors.FIND_NEW_EPISODES,
+      {},
+      options
+    );
   }
 }

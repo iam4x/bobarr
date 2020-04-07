@@ -7,25 +7,89 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { forEachSeries, map } from 'p-iteration';
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
-import { isPlainObject } from 'lodash';
+import { isPlainObject, times } from 'lodash';
 
-import { JobsQueue, DownloadableMediaState } from 'src/app.dto';
+import {
+  JobsQueue,
+  DownloadableMediaState,
+  ScanLibraryQueueProcessors,
+} from 'src/app.dto';
+
 import { TMDBService } from 'src/modules/tmdb/tmdb.service';
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { TVShowDAO } from 'src/entities/dao/tvshow.dao';
 import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 
+import { JobsService } from '../jobs.service';
+
 @Processor(JobsQueue.SCAN_LIBRARY)
 export class ScanLibraryProcessor {
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
-    private readonly tmdbService: TMDBService
+    private readonly jobsService: JobsService,
+    private readonly tmdbService: TMDBService,
+    private readonly tvEpisodeDAO: TVEpisodeDAO
   ) {
     this.logger = logger.child({ context: 'ScanLibrary' });
   }
 
-  @Process()
+  @Process(ScanLibraryQueueProcessors.FIND_NEW_EPISODES)
+  public async findNewEpisodes() {
+    this.logger.info('start find new tvshow episodes');
+
+    const tvShowLastEpisodeTracked = await this.tvEpisodeDAO
+      .createQueryBuilder('episode')
+      .distinctOn(['episode.tvShow'])
+      .leftJoinAndSelect('episode.tvShow', 'tvShow')
+      .orderBy('episode.tvShow', 'DESC')
+      .addOrderBy('episode.seasonNumber', 'DESC')
+      .addOrderBy('episode.episodeNumber', 'DESC')
+      .getMany();
+
+    this.logger.info(`found ${tvShowLastEpisodeTracked.length} seasons`);
+
+    await forEachSeries(tvShowLastEpisodeTracked, async (episode) => {
+      const tmdbResult = await this.tmdbService
+        .getTVShowSeasons(episode.tvShow.tmdbId)
+        .then((seasons) =>
+          seasons.find((season) => season.seasonNumber === episode.seasonNumber)
+        );
+
+      if (!tmdbResult) {
+        this.logger.info('did not find tmdb season', { episode });
+        throw new Error('did not find tmdb season');
+      }
+
+      if (tmdbResult.episodeCount > episode.episodeNumber) {
+        const newEpisodesCount =
+          tmdbResult.episodeCount - episode.episodeNumber;
+
+        this.logger.info(`found ${newEpisodesCount} new episodes`, {
+          tvShow: episode.tvShow.title,
+          seasonNumber: episode.seasonNumber,
+          episodeNumber: episode.episodeNumber,
+        });
+
+        const newEpisodes = await this.tvEpisodeDAO.save(
+          times(newEpisodesCount, (index) => ({
+            tvShow: episode.tvShow,
+            season: episode.season,
+            episodeNumber: episode.episodeNumber + index + 1,
+            seasonNumber: episode.seasonNumber,
+          }))
+        );
+
+        await map(newEpisodes, ({ id }) => {
+          this.jobsService.startDownloadEpisode(id);
+        });
+      }
+    });
+
+    this.logger.info('finish find new tsvhow episodes');
+  }
+
+  @Process(ScanLibraryQueueProcessors.SCAN_LIBRARY_FOLDER)
   public async scanLibrary() {
     this.logger.info('start scan library');
     await this.scanMoviesFolder();
