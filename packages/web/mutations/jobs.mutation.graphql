@@ -4,3 +4,10 @@ mutation startScanLibrary {
     message
   }
 }
+
+mutation startFindNewEpisodes {
+  result: startFindNewEpisodesJob {
+    success
+    message
+  }
+}

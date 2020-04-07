@@ -16,4 +16,12 @@ export const SettingsComponentStyles = styled.div`
   .ant-card {
     width: 500px;
   }
+
+  .actions {
+    .ant-btn {
+      display: block;
+      margin-bottom: 8px;
+      width: 100%;
+    }
+  }
 `;

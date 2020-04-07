@@ -74,6 +74,7 @@ export type Mutation = {
    __typename?: 'Mutation';
   updateParam: GraphQlCommonResponse;
   startScanLibraryJob: GraphQlCommonResponse;
+  startFindNewEpisodesJob: GraphQlCommonResponse;
   trackMovie: Movie;
   removeMovie: GraphQlCommonResponse;
   trackTVShow: TvShow;
@@ -224,6 +225,17 @@ export type StartScanLibraryMutationVariables = {};
 
 
 export type StartScanLibraryMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
+export type StartFindNewEpisodesMutationVariables = {};
+
+
+export type StartFindNewEpisodesMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
@@ -439,6 +451,38 @@ export function useStartScanLibraryMutation(baseOptions?: ApolloReactHooks.Mutat
 export type StartScanLibraryMutationHookResult = ReturnType<typeof useStartScanLibraryMutation>;
 export type StartScanLibraryMutationResult = ApolloReactCommon.MutationResult<StartScanLibraryMutation>;
 export type StartScanLibraryMutationOptions = ApolloReactCommon.BaseMutationOptions<StartScanLibraryMutation, StartScanLibraryMutationVariables>;
+export const StartFindNewEpisodesDocument = gql`
+    mutation startFindNewEpisodes {
+  result: startFindNewEpisodesJob {
+    success
+    message
+  }
+}
+    `;
+export type StartFindNewEpisodesMutationFn = ApolloReactCommon.MutationFunction<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>;
+
+/**
+ * __useStartFindNewEpisodesMutation__
+ *
+ * To run a mutation, you first call `useStartFindNewEpisodesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStartFindNewEpisodesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [startFindNewEpisodesMutation, { data, loading, error }] = useStartFindNewEpisodesMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useStartFindNewEpisodesMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>) {
+        return ApolloReactHooks.useMutation<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>(StartFindNewEpisodesDocument, baseOptions);
+      }
+export type StartFindNewEpisodesMutationHookResult = ReturnType<typeof useStartFindNewEpisodesMutation>;
+export type StartFindNewEpisodesMutationResult = ApolloReactCommon.MutationResult<StartFindNewEpisodesMutation>;
+export type StartFindNewEpisodesMutationOptions = ApolloReactCommon.BaseMutationOptions<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>;
 export const RemoveMovieDocument = gql`
     mutation removeMovie($tmdbId: Int!) {
   result: removeMovie(tmdbId: $tmdbId) {
