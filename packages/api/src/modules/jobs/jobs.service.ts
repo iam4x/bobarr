@@ -70,4 +70,9 @@ export class JobsService {
       seasonId
     );
   }
+
+  public startScanLibrary() {
+    this.logger.info('add scan library job');
+    return this.scanLibraryQueue.add({});
+  }
 }

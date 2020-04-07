@@ -1,27 +1,24 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Skeleton, Form, Input, Button, Card, notification } from 'antd';
+import { Form, Input, Button, Card, notification } from 'antd';
 
 import {
   useGetParamsQuery,
   useUpdateParamMutation,
   ParameterKey,
+  useStartScanLibraryMutation,
 } from '../../utils/graphql';
 
-const SettingsComponentStyles = styled.div`
-  padding-top: 48px;
-
-  .wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-`;
+import { SettingsComponentStyles } from './settings.styles';
 
 export function SettingsComponent() {
   const [form] = Form.useForm();
 
   const { data, loading, refetch } = useGetParamsQuery();
   const [updateParam] = useUpdateParamMutation();
+  const [scanLibrary] = useStartScanLibraryMutation({
+    onCompleted: () =>
+      notification.success({ message: 'Scan library folder started' }),
+  });
 
   const fields = Object.keys(data?.params || {}).filter(
     (key) => key !== '__typename'
@@ -55,8 +52,8 @@ export function SettingsComponent() {
   return (
     <SettingsComponentStyles>
       <div className="wrapper">
-        <Skeleton active={true} loading={loading}>
-          <Card style={{ width: 600 }}>
+        <div className="flex">
+          <Card loading={loading} title="Settings">
             <Form
               form={form}
               initialValues={data?.params || {}}
@@ -72,12 +69,17 @@ export function SettingsComponent() {
                   <Input />
                 </Form.Item>
               ))}
-              <Button type="primary" htmlType="submit">
+              <Button type="default" htmlType="submit">
                 Update
               </Button>
             </Form>
           </Card>
-        </Skeleton>
+          <Card title="Actions">
+            <Button type="default" onClick={() => scanLibrary()}>
+              Scan library folder
+            </Button>
+          </Card>
+        </div>
       </div>
     </SettingsComponentStyles>
   );

@@ -65,6 +65,7 @@ type Movie {
 
 type Mutation {
   updateParam(value: String!, key: ParameterKey!): GraphQLCommonResponse!
+  startScanLibraryJob: GraphQLCommonResponse!
   trackMovie(tmdbId: Int!, title: String!): Movie!
   removeMovie(tmdbId: Int!): GraphQLCommonResponse!
   trackTVShow(seasonNumbers: [Int!]!, tmdbId: Int!): TVShow!

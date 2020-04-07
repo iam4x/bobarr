@@ -73,6 +73,7 @@ export type Movie = {
 export type Mutation = {
    __typename?: 'Mutation';
   updateParam: GraphQlCommonResponse;
+  startScanLibraryJob: GraphQlCommonResponse;
   trackMovie: Movie;
   removeMovie: GraphQlCommonResponse;
   trackTVShow: TvShow;
@@ -218,6 +219,17 @@ export type TvShow = {
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
 };
+
+export type StartScanLibraryMutationVariables = {};
+
+
+export type StartScanLibraryMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
 
 export type RemoveMovieMutationVariables = {
   tmdbId: Scalars['Int'];
@@ -395,6 +407,38 @@ export type SearchQuery = (
 );
 
 
+export const StartScanLibraryDocument = gql`
+    mutation startScanLibrary {
+  result: startScanLibraryJob {
+    success
+    message
+  }
+}
+    `;
+export type StartScanLibraryMutationFn = ApolloReactCommon.MutationFunction<StartScanLibraryMutation, StartScanLibraryMutationVariables>;
+
+/**
+ * __useStartScanLibraryMutation__
+ *
+ * To run a mutation, you first call `useStartScanLibraryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStartScanLibraryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [startScanLibraryMutation, { data, loading, error }] = useStartScanLibraryMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useStartScanLibraryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<StartScanLibraryMutation, StartScanLibraryMutationVariables>) {
+        return ApolloReactHooks.useMutation<StartScanLibraryMutation, StartScanLibraryMutationVariables>(StartScanLibraryDocument, baseOptions);
+      }
+export type StartScanLibraryMutationHookResult = ReturnType<typeof useStartScanLibraryMutation>;
+export type StartScanLibraryMutationResult = ApolloReactCommon.MutationResult<StartScanLibraryMutation>;
+export type StartScanLibraryMutationOptions = ApolloReactCommon.BaseMutationOptions<StartScanLibraryMutation, StartScanLibraryMutationVariables>;
 export const RemoveMovieDocument = gql`
     mutation removeMovie($tmdbId: Int!) {
   result: removeMovie(tmdbId: $tmdbId) {

@@ -13,6 +13,7 @@ import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 import { JackettModule } from 'src/modules/jackett/jackett.module';
 import { LibraryModule } from 'src/modules/library/library.module';
 import { TransmissionModule } from 'src/modules/transmission/transmission.module';
+import { TMDBModule } from 'src/modules/tmdb/tmdb.module';
 
 import { DownloadProcessor } from './processors/download.processor';
 import { RefreshTorrentProcessor } from './processors/refresh-torrent.processor';
@@ -20,7 +21,7 @@ import { RenameAndLinkProcessor } from './processors/rename-and-link.processor';
 import { ScanLibraryProcessor } from './processors/scan-library.processor';
 
 import { JobsService } from './jobs.service';
-import { TMDBModule } from '../tmdb/tmdb.module';
+import { JobsResolver } from './jobs.resolver';
 
 const queues = [
   { name: JobsQueue.REFRESH_TORRENT, redis: REDIS_CONFIG },
@@ -44,6 +45,7 @@ const queues = [
     RenameAndLinkProcessor,
     ScanLibraryProcessor,
     JobsService,
+    JobsResolver,
   ],
   exports: [JobsService],
 })
