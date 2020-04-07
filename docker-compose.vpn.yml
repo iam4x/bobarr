@@ -2,22 +2,9 @@ version: "3.6"
 
 services:
   vpn:
-    image: dperson/openvpn-client
-    container_name: bobarr-vpn
-    cap_add:
-      - net_admin
-    security_opt:
-      - label:disable
-    networks:
-      - default
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-    volumes:
-      - /dev/net:/dev/net:z
-      - ./packages/vpn:/vpn
+    restart: always
+    entrypoint: ["/sbin/tini", "--", "/usr/bin/openvpn.sh"]
     command: '-p "49150" -p "49150;udp"'
-    restart: unless-stopped
 
   api:
     links:
