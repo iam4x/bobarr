@@ -246,6 +246,11 @@ export class ScanLibraryProcessor {
 
       this.logger.info('parsed filename', { title, year });
 
+      if (await movieDAO.findOne({ where: { title } })) {
+        this.logger.info('movie already in database', { title, year });
+        return;
+      }
+
       const localizedResults = await this.tmdbService.searchMovie(title);
       const englishResults = await this.tmdbService.searchMovie(title, {
         language: 'en',
