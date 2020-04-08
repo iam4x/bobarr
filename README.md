@@ -48,9 +48,9 @@ And to have something with a better ui, less configuration and faster 🚀
 
 You can easily enforce all downloads through your VPN
 * Copy your open vpn config file (.ovpn) into the folder `packages/vpn`
-* Run the docker-compose.with-vpn.yml file
+* Run the docker-compose.vpn.yml file
   * if you have npm -> `$ npm run start:vpn`
-  * otherwise -> `$ docker-compose up -f docker-compose.yml -f docker-compose.with-vpn.yml up -d`
+  * otherwise -> `$ docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up -d`
 
 ## Usage
 
