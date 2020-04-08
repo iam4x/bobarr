@@ -5,6 +5,7 @@ services:
     restart: always
     entrypoint: ["/sbin/tini", "--", "/usr/bin/openvpn.sh"]
     command: '-p "49150" -p "49150;udp"'
+    tty: true
 
   api:
     links:
