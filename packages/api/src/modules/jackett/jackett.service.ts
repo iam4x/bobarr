@@ -8,6 +8,7 @@ import { Logger } from 'winston';
 
 import { ParameterKey } from 'src/app.dto';
 import { formatNumber } from 'src/utils/format-number';
+import { sanitize } from 'src/utils/sanitize';
 
 import { ParamsService } from 'src/modules/params/params.service';
 import { LibraryService } from 'src/modules/library/library.service';
@@ -147,16 +148,7 @@ export class JackettService {
     );
 
     const rawResults = await mapSeries(uniq(queries), async (query) => {
-      const normalizedQuery = query
-        .toLowerCase()
-        .replace(/,/g, ' ')
-        .replace(/\./g, ' ')
-        .replace(/-/g, ' ')
-        .replace(/\(|\)/g, '')
-        .replace(/\[|\]/g, '')
-        .replace(/[az]'/g, ' ')
-        .replace(/:/g, ' ');
-
+      const normalizedQuery = sanitize(query);
       this.logger.info('search torrents with query', {
         query: normalizedQuery,
       });
@@ -208,13 +200,7 @@ export class JackettService {
   }
 
   private formatSearchResult = (result: JackettResult) => {
-    const normalizedTitle = result.Title.toLowerCase()
-      .replace(/,/g, ' ')
-      .replace(/\./g, ' ')
-      .replace(/-/g, ' ')
-      .replace(/\(|\)/g, '')
-      .replace(/\[|\]/g, '')
-      .split(' ');
+    const normalizedTitle = sanitize(result.Title).split(' ');
 
     return {
       normalizedTitle,

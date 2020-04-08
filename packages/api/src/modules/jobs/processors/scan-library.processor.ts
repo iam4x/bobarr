@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import scan from 'scandirectory';
+import leven from 'leven';
 import { promises as fs } from 'fs';
 import { Processor, Process } from '@nestjs/bull';
 import { Inject } from '@nestjs/common';
@@ -7,13 +8,15 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { forEachSeries, map } from 'p-iteration';
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
-import { isPlainObject, times } from 'lodash';
+import { isPlainObject, times, orderBy } from 'lodash';
 
 import {
   JobsQueue,
   DownloadableMediaState,
   ScanLibraryQueueProcessors,
 } from 'src/app.dto';
+
+import { sanitize } from 'src/utils/sanitize';
 
 import { TMDBService } from 'src/modules/tmdb/tmdb.service';
 import { MovieDAO } from 'src/entities/dao/movie.dao';
@@ -233,7 +236,7 @@ export class ScanLibraryProcessor {
 
     this.logger.info(`found ${movies.length} movies on disk`);
 
-    await forEachSeries(movies, async (movie) => {
+    await forEachSeries(movies.reverse(), async (movie) => {
       this.logger.info('processing movie', { movie });
       const [, title, year] = /^(.+) \((\d+)/.exec(movie) || [];
 
@@ -243,18 +246,51 @@ export class ScanLibraryProcessor {
 
       this.logger.info('parsed filename', { title, year });
 
-      const results = await this.tmdbService.searchMovie(title, {
+      const localizedResults = await this.tmdbService.searchMovie(title);
+      const englishResults = await this.tmdbService.searchMovie(title, {
         language: 'en',
       });
 
+      const results = [...localizedResults, ...englishResults];
       this.logger.info(`found ${results.length} potential match on tmdb`);
-      const [tmdbMovie] = results.filter(
-        (result) => dayjs(result.releaseDate).format('YYYY') === year
-      );
+
+      const tmdbMovie = (() => {
+        const [exactMatch] = results.filter((result) => {
+          return (
+            dayjs(result.releaseDate).format('YYYY') === year &&
+            (sanitize(title) === sanitize(result.title) ||
+              sanitize(title) === sanitize(result.originalTitle))
+          );
+        });
+
+        if (exactMatch) {
+          return exactMatch;
+        }
+
+        this.logger.warn('could not find exact match movie');
+        this.logger.warn('fallback to year match and levenstein');
+
+        const [bestMatch] = orderBy(
+          results.filter(
+            (result) => dayjs(result.releaseDate).format('YYYY') === year
+          ),
+          [(result) => leven(result.title, title)],
+          ['asc']
+        );
+
+        if (bestMatch) {
+          this.logger.warn(`best guessed match for ${title}`);
+          this.logger.warn(bestMatch.title);
+          return bestMatch;
+        }
+
+        return undefined;
+      })();
 
       if (!tmdbMovie) {
-        this.logger.error('no movie found matching title and year');
-        throw new Error(`movie ${title} not found in tmdb`);
+        this.logger.error('no movie found matching title and year for');
+        this.logger.error(`${title} (${year})`);
+        return;
       }
 
       this.logger.info('found movie on tmdb', { tmdbId: tmdbMovie.tmdbId });
