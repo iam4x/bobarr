@@ -1,8 +1,10 @@
 /* eslint @typescript-eslint/camelcase:off */
 
 import axios from 'axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { map } from 'p-iteration';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 import { ParameterKey } from 'src/app.dto';
 import { recursiveCamelCase } from 'src/utils/recursive-camel-case';
@@ -14,9 +16,12 @@ import { TMDBMovie, TMDBTVShow, TMDBTVSeason } from './tmdb.dto';
 @Injectable()
 export class TMDBService {
   public constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private readonly paramsService: ParamsService,
     private readonly tvSeasonDAO: TVSeasonDAO
-  ) {}
+  ) {
+    this.logger = logger.child({ context: 'TMDBService' });
+  }
 
   private async request<TData>(
     path: string,
@@ -71,19 +76,31 @@ export class TMDBService {
   }
 
   public async searchMovie(query: string, params = {}) {
+    this.logger.info('start search movie', { query, params });
+
     const { data } = await this.request<{ results: TMDBMovie[] }>(
       '/search/movie',
       { query, ...params }
     );
-    return data.results.map(this.mapMovie);
+
+    const results = data.results.map(this.mapMovie);
+    this.logger.info(`found ${results.length} movies`, { query, params });
+
+    return results;
   }
 
   public async searchTVShow(query: string, params = {}) {
+    this.logger.info('start search tvshow', { query, params });
+
     const { data } = await this.request<{ results: TMDBTVShow[] }>(
       '/search/tv',
       { query, ...params }
     );
-    return data.results.map(this.mapTVShow);
+
+    const results = data.results.map(this.mapTVShow);
+    this.logger.info(`found ${results.length} tvshows`);
+
+    return results;
   }
 
   public async search(query: string) {
@@ -94,6 +111,8 @@ export class TMDBService {
   }
 
   public async getPopular() {
+    this.logger.info('start get popular');
+
     const region = await this.paramsService.get(ParameterKey.REGION);
     const [movies, tvShows] = await Promise.all([
       this.request<{ results: TMDBMovie[] }>('/movie/popular', {
@@ -103,6 +122,9 @@ export class TMDBService {
         region,
       }).then(({ data }) => data.results.map(this.mapTVShow)),
     ]);
+
+    this.logger.info('finish get popular');
+
     return { movies, tvShows };
   }
 
@@ -111,6 +133,7 @@ export class TMDBService {
       id: result.id,
       tmdbId: result.id,
       title: result.title,
+      originalTitle: result.original_title,
       releaseDate: result.release_date,
       posterPath: result.poster_path,
       voteAverage: result.vote_average,
@@ -122,6 +145,7 @@ export class TMDBService {
       id: result.id,
       tmdbId: result.id,
       title: result.name,
+      originalTitle: result.original_name,
       releaseDate: result.first_air_date,
       posterPath: result.poster_path,
       voteAverage: result.vote_average,
