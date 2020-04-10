@@ -3,8 +3,7 @@ import { Skeleton, Empty } from 'antd';
 
 import { useGetLibraryMoviesQuery } from '../../utils/graphql';
 
-import { DownloadingComponent } from '../downloading/downloading.component';
-import { MissingComponent } from '../missing/missing.component';
+import { LibraryHeaderComponent } from '../library-header/library-header.component';
 import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
 
 import { MoviesComponentStyles } from './movies.styles';
@@ -14,10 +13,7 @@ export function MoviesComponent() {
 
   return (
     <>
-      <div style={{ background: '#A4BCC2', padding: '24px 0' }}>
-        <DownloadingComponent types={['movie']} />
-        <MissingComponent />
-      </div>
+      <LibraryHeaderComponent types={['movie']} />
       <MoviesComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>

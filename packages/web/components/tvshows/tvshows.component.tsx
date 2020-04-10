@@ -4,10 +4,10 @@ import { Skeleton, Empty } from 'antd';
 
 import { useGetLibraryTvShowsQuery } from '../../utils/graphql';
 
-import { MoviesComponentStyles } from '../movies/movies.styles';
-import { DownloadingComponent } from '../downloading/downloading.component';
-import { MissingComponent } from '../missing/missing.component';
+import { LibraryHeaderComponent } from '../library-header/library-header.component';
 import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
+
+import { MoviesComponentStyles } from '../movies/movies.styles';
 
 const TVShowsComponentStyles = styled(MoviesComponentStyles)``;
 
@@ -16,10 +16,7 @@ export function TVShowsComponent() {
 
   return (
     <>
-      <div style={{ background: '#A4BCC2', padding: '24px 0' }}>
-        <DownloadingComponent types={['season', 'episode']} />
-        <MissingComponent />
-      </div>
+      <LibraryHeaderComponent types={['season', 'episode']} />
       <TVShowsComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>
