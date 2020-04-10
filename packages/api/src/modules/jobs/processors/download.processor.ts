@@ -48,16 +48,7 @@ export class DownloadProcessor {
       this.downloadQueue.add(DownloadQueueProcessors.DOWNLOAD_MOVIE, movie.id)
     );
 
-    const missingEpisodes = await this.tvEpisodeDAO
-      .createQueryBuilder('episode')
-      .innerJoin('episode.season', 'season', 'season.state != :seasonState', {
-        seasonState: DownloadableMediaState.DOWNLOADING,
-      })
-      .where('episode.state = :episodeState', {
-        episodeState: DownloadableMediaState.MISSING,
-      })
-      .getMany();
-
+    const missingEpisodes = await this.tvEpisodeDAO.findMissingFromLibrary();
     this.logger.info(`found ${missingEpisodes.length} missing tv episodes`);
 
     await forEachSeries(missingEpisodes, (episode) =>

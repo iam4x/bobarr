@@ -11,7 +11,12 @@ import { recursiveCamelCase } from 'src/utils/recursive-camel-case';
 import { ParamsService } from 'src/modules/params/params.service';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 
-import { TMDBMovie, TMDBTVShow, TMDBTVSeason } from './tmdb.dto';
+import {
+  TMDBMovie,
+  TMDBTVShow,
+  TMDBFormattedTVSeason,
+  TMDBTVEpisode,
+} from './tmdb.dto';
 
 @Injectable()
 export class TMDBService {
@@ -39,33 +44,40 @@ export class TMDBService {
       baseURL: 'https://api.themoviedb.org/3/',
     });
 
-    return client.get<TData>(path, { params });
+    return client
+      .get<TData>(path, { params })
+      .then(({ data }) => data);
   }
 
-  public async getMovie(movieTMDBId: number) {
-    const { data } = await this.request<TMDBMovie>(`/movie/${movieTMDBId}`);
-    return data;
+  public getMovie(movieTMDBId: number) {
+    return this.request<TMDBMovie>(`/movie/${movieTMDBId}`);
   }
 
-  public async getTVShow(tvShowTMDBId: number, params?: { language: string }) {
-    const { data } = await this.request<TMDBTVShow>(
-      `/tv/${tvShowTMDBId}`,
-      params
-    );
-    return data;
+  public getTVShow(tvShowTMDBId: number, params?: { language: string }) {
+    return this.request<TMDBTVShow>(`/tv/${tvShowTMDBId}`, params);
   }
 
   public async getEnglishTVShowName(tvShowTMDBId: number) {
-    const { data } = await this.request<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
+    const { name } = await this.request<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
       language: 'en',
     });
-    return data.name;
+    return name;
+  }
+
+  public getTVEpisode(
+    tvShowTMDBId: number,
+    seasonNumber: number,
+    episodeNumber: number
+  ) {
+    return this.request<TMDBTVEpisode>(
+      `/tv/${tvShowTMDBId}/season/${seasonNumber}/episode/${episodeNumber}`
+    );
   }
 
   public async getTVShowSeasons(tvShowTMDBId: number) {
     const tvShow = await this.getTVShow(tvShowTMDBId);
     return map(tvShow.seasons, async (season) =>
-      recursiveCamelCase<TMDBTVSeason>({
+      recursiveCamelCase<TMDBFormattedTVSeason>({
         ...season,
         inLibrary: await this.tvSeasonDAO.inLibrary(
           tvShowTMDBId,
@@ -78,10 +90,10 @@ export class TMDBService {
   public async searchMovie(query: string, params = {}) {
     this.logger.info('start search movie', { query, params });
 
-    const { data } = await this.request<{ results: TMDBMovie[] }>(
-      '/search/movie',
-      { query, ...params }
-    );
+    const data = await this.request<{ results: TMDBMovie[] }>('/search/movie', {
+      query,
+      ...params,
+    });
 
     const results = data.results.map(this.mapMovie);
     this.logger.info(`found ${results.length} movies`, { query, params });
@@ -92,10 +104,10 @@ export class TMDBService {
   public async searchTVShow(query: string, params = {}) {
     this.logger.info('start search tvshow', { query, params });
 
-    const { data } = await this.request<{ results: TMDBTVShow[] }>(
-      '/search/tv',
-      { query, ...params }
-    );
+    const data = await this.request<{ results: TMDBTVShow[] }>('/search/tv', {
+      query,
+      ...params,
+    });
 
     const results = data.results.map(this.mapTVShow);
     this.logger.info(`found ${results.length} tvshows`);
@@ -117,10 +129,10 @@ export class TMDBService {
     const [movies, tvShows] = await Promise.all([
       this.request<{ results: TMDBMovie[] }>('/movie/popular', {
         region,
-      }).then(({ data }) => data.results.map(this.mapMovie)),
+      }).then(({ results }) => results.map(this.mapMovie)),
       this.request<{ results: TMDBTVShow[] }>('/tv/popular', {
         region,
-      }).then(({ data }) => data.results.map(this.mapTVShow)),
+      }).then(({ results }) => results.map(this.mapTVShow)),
     ]);
 
     this.logger.info('finish get popular');

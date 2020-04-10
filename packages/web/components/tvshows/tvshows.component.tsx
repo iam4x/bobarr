@@ -6,6 +6,7 @@ import { useGetLibraryTvShowsQuery } from '../../utils/graphql';
 
 import { MoviesComponentStyles } from '../movies/movies.styles';
 import { DownloadingComponent } from '../downloading/downloading.component';
+import { MissingComponent } from '../missing/missing.component';
 import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
 
 const TVShowsComponentStyles = styled(MoviesComponentStyles)``;
@@ -16,6 +17,7 @@ export function TVShowsComponent() {
   return (
     <>
       <DownloadingComponent types={['season', 'episode']} />
+      <MissingComponent />
       <TVShowsComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>
