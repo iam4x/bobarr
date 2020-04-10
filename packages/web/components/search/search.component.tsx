@@ -1,13 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Skeleton, Empty } from 'antd';
 import { useTheme } from 'styled-components';
+import { LoadingOutlined, SearchOutlined } from '@ant-design/icons';
 
-import {
-  FaSearch,
-  FaChevronCircleLeft,
-  FaChevronCircleRight,
-  FaCircleNotch,
-} from 'react-icons/fa';
+import { FaChevronCircleLeft, FaChevronCircleRight } from 'react-icons/fa';
 
 import {
   CarouselProvider,
@@ -35,7 +31,6 @@ export function SearchComponent() {
   const popularQuery = useGetPopularQuery();
   const [search, { data, loading }] = useSearchLazyQuery();
 
-  const SearchIcon = loading ? FaCircleNotch : FaSearch;
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     search({ variables: { query: searchQuery } });
@@ -56,7 +51,10 @@ export function SearchComponent() {
                 onChange={({ target }) => setSearchQuery(target.value)}
               />
               <button type="submit" className="search-bar--input-submit">
-                <SearchIcon style={{ marginRight: 8 }} /> Search
+                <span style={{ marginRight: 8 }}>
+                  {loading ? <LoadingOutlined /> : <SearchOutlined />}
+                </span>
+                Search
               </button>
             </div>
           </form>
