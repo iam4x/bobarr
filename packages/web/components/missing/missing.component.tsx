@@ -16,7 +16,10 @@ import { MissingComponentStyles } from './missing.styles';
 
 export function MissingComponent() {
   const { pathname } = useRouter();
-  const { data } = useGetMissingQuery();
+  const { data } = useGetMissingQuery({
+    fetchPolicy: 'cache-and-network',
+    pollInterval: 30 * 1000,
+  });
 
   const isMovies = pathname.includes('movies');
   const rows: Array<Partial<EnrichedMovie> | Partial<EnrichedTvEpisode>> =
