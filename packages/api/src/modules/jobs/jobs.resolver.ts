@@ -18,4 +18,10 @@ export class JobsResolver {
     await this.jobsService.startFindNewEpisodes();
     return { success: true, message: 'FIND_NEW_EPISODES_STARTED' };
   }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
+  public async startDownloadMissingJob() {
+    await this.jobsService.startDownloadMissing();
+    return { success: true, message: 'DOWNLOAD_MISSING_STARTED' };
+  }
 }

@@ -75,6 +75,7 @@ export type Mutation = {
   updateParam: GraphQlCommonResponse;
   startScanLibraryJob: GraphQlCommonResponse;
   startFindNewEpisodesJob: GraphQlCommonResponse;
+  startDownloadMissingJob: GraphQlCommonResponse;
   trackMovie: Movie;
   removeMovie: GraphQlCommonResponse;
   trackTVShow: TvShow;
@@ -236,6 +237,17 @@ export type StartFindNewEpisodesMutationVariables = {};
 
 
 export type StartFindNewEpisodesMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
+export type StartDownloadMissingMutationVariables = {};
+
+
+export type StartDownloadMissingMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
@@ -483,6 +495,38 @@ export function useStartFindNewEpisodesMutation(baseOptions?: ApolloReactHooks.M
 export type StartFindNewEpisodesMutationHookResult = ReturnType<typeof useStartFindNewEpisodesMutation>;
 export type StartFindNewEpisodesMutationResult = ApolloReactCommon.MutationResult<StartFindNewEpisodesMutation>;
 export type StartFindNewEpisodesMutationOptions = ApolloReactCommon.BaseMutationOptions<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>;
+export const StartDownloadMissingDocument = gql`
+    mutation startDownloadMissing {
+  result: startDownloadMissingJob {
+    success
+    message
+  }
+}
+    `;
+export type StartDownloadMissingMutationFn = ApolloReactCommon.MutationFunction<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>;
+
+/**
+ * __useStartDownloadMissingMutation__
+ *
+ * To run a mutation, you first call `useStartDownloadMissingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStartDownloadMissingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [startDownloadMissingMutation, { data, loading, error }] = useStartDownloadMissingMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useStartDownloadMissingMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>) {
+        return ApolloReactHooks.useMutation<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>(StartDownloadMissingDocument, baseOptions);
+      }
+export type StartDownloadMissingMutationHookResult = ReturnType<typeof useStartDownloadMissingMutation>;
+export type StartDownloadMissingMutationResult = ApolloReactCommon.MutationResult<StartDownloadMissingMutation>;
+export type StartDownloadMissingMutationOptions = ApolloReactCommon.BaseMutationOptions<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>;
 export const RemoveMovieDocument = gql`
     mutation removeMovie($tmdbId: Int!) {
   result: removeMovie(tmdbId: $tmdbId) {
