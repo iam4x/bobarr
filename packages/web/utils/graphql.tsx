@@ -25,6 +25,9 @@ export enum DownloadableMediaState {
 export type DownloadingMedia = {
    __typename?: 'DownloadingMedia';
   title: Scalars['String'];
+  tag: Scalars['String'];
+  quality: Scalars['String'];
+  torrent: Scalars['String'];
   resourceId: Scalars['Float'];
   resourceType: Scalars['String'];
 };
@@ -345,7 +348,7 @@ export type GetDownloadingQuery = (
   { __typename?: 'Query' }
   & { rows: Array<(
     { __typename?: 'DownloadingMedia' }
-    & Pick<DownloadingMedia, 'title' | 'resourceId' | 'resourceType'>
+    & Pick<DownloadingMedia, 'title' | 'tag' | 'quality' | 'torrent' | 'resourceId' | 'resourceType'>
   )> }
 );
 
@@ -730,6 +733,9 @@ export const GetDownloadingDocument = gql`
     query getDownloading {
   rows: getDownloadingMedias {
     title
+    tag
+    quality
+    torrent
     resourceId
     resourceType
   }

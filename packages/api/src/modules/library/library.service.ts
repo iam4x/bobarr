@@ -81,14 +81,15 @@ export class LibraryService {
     ];
 
     const withTorrentQuality = await map(mixed, async (resource) => {
-      const { tag, quality } = await this.torrentDAO.findOneOrFail({
-        where: {
-          resourceId: resource.resourceId,
-          resourceType: resource.resourceType,
-        },
+      const {
+        tag,
+        quality,
+        transmissionTorrent: { name: torrent },
+      } = await this.transmissionService.getResourceTorrent({
+        resourceId: resource.resourceId,
+        resourceType: resource.resourceType,
       });
-      const newTitle = `${resource.title} - ${tag.toUpperCase()} ${quality}`;
-      return { ...resource, title: newTitle };
+      return { ...resource, tag, quality, torrent };
     });
 
     return withTorrentQuality;

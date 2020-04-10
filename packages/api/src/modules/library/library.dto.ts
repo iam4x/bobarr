@@ -27,6 +27,9 @@ export class EnrichedTVEpisode extends TVEpisode {
 @ObjectType()
 export class DownloadingMedia {
   @Field() public title!: string;
+  @Field() public tag!: string;
+  @Field() public quality!: string;
+  @Field() public torrent!: string;
   @Field() public resourceId!: number;
   @Field() public resourceType!: string;
 }

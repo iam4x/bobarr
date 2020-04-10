@@ -31,12 +31,20 @@ export const DownloadingComponentStyles = styled.div`
     }
 
     .progress {
-      width: 400px;
+      width: 250px;
     }
 
     .name {
       text-transform: uppercase;
       font-weight: 600;
+    }
+
+    .torrent-name {
+      flex: 1;
+      font-size: 0.7em;
+      margin-left: 4px;
+      text-align: center;
+      text-transform: uppercase;
     }
   }
 `;

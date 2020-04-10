@@ -22,6 +22,9 @@ enum DownloadableMediaState {
 
 type DownloadingMedia {
   title: String!
+  tag: String!
+  quality: String!
+  torrent: String!
   resourceId: Float!
   resourceType: String!
 }

@@ -1,6 +1,9 @@
 query getDownloading {
   rows: getDownloadingMedias {
     title
+    tag
+    quality
+    torrent
     resourceId
     resourceType
   }

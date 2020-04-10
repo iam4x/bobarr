@@ -64,6 +64,7 @@ function DownloadRow(props: DownloadingMedia) {
           )}
         </div>
         <div className="name">{props.title}</div>
+        <div className="torrent-name">({props.torrent})</div>
         <div className="speed">
           ({percent}%
           {downloadSpeed ? <> - {prettySize(downloadSpeed)}/s</> : null})
