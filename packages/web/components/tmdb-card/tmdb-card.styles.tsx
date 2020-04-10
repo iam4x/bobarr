@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 
 interface Props {
-  posterPath: string;
   vote: number;
 }
 
@@ -30,7 +29,6 @@ export const TMDBCardStyles = styled.div<Props>`
 
     .poster {
       background: #fecea8;
-      background-image: url(${(props) => props.posterPath});
     }
 
     .overlay {

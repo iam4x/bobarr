@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Skeleton, Empty } from 'antd';
 import { useTheme } from 'styled-components';
+import { LoadingOutlined, SearchOutlined } from '@ant-design/icons';
+import { debounce, throttle } from 'throttle-debounce';
 
-import {
-  FaSearch,
-  FaChevronCircleLeft,
-  FaChevronCircleRight,
-  FaCircleNotch,
-} from 'react-icons/fa';
+import { FaChevronCircleLeft, FaChevronCircleRight } from 'react-icons/fa';
 
 import {
   CarouselProvider,
@@ -15,6 +12,7 @@ import {
   Slide,
   ButtonBack,
   ButtonNext,
+  CarouselContext,
 } from 'pure-react-carousel';
 
 import {
@@ -34,11 +32,29 @@ export function SearchComponent() {
   const popularQuery = useGetPopularQuery();
   const [search, { data, loading }] = useSearchLazyQuery();
 
-  const SearchIcon = loading ? FaCircleNotch : FaSearch;
+  const { current: debouncedSearch } = useRef(debounce(500, search));
+  const { current: throttledSearch } = useRef(throttle(500, search));
+
+  const displaySearchResults = searchQuery && searchQuery.trim();
+  const moviesSearchResults = data?.results?.movies || [];
+  const tvShowSearchResults = data?.results?.tvShows || [];
+  const hasNoSearchResults =
+    moviesSearchResults.length === 0 && tvShowSearchResults.length === 0;
+
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     search({ variables: { query: searchQuery } });
   };
+
+  useEffect(() => {
+    if (searchQuery && searchQuery.trim()) {
+      if (searchQuery.length < 5) {
+        throttledSearch({ variables: { query: searchQuery } });
+      } else {
+        debouncedSearch({ variables: { query: searchQuery } });
+      }
+    }
+  }, [debouncedSearch, searchQuery, throttledSearch]);
 
   return (
     <SearchStyles>
@@ -55,7 +71,10 @@ export function SearchComponent() {
                 onChange={({ target }) => setSearchQuery(target.value)}
               />
               <button type="submit" className="search-bar--input-submit">
-                <SearchIcon style={{ marginRight: 8 }} /> Search
+                <span style={{ marginRight: 8 }}>
+                  {loading ? <LoadingOutlined /> : <SearchOutlined />}
+                </span>
+                Search
               </button>
             </div>
           </form>
@@ -64,36 +83,50 @@ export function SearchComponent() {
 
       <Wrapper>
         <div className="search-results--container">
-          <Skeleton active={true} loading={popularQuery.loading}>
-            {searchQuery &&
-            data?.results.tvShows?.length === 0 &&
-            data?.results.movies?.length === 0 ? (
+          <Skeleton
+            active={true}
+            loading={popularQuery.loading || (hasNoSearchResults && loading)}
+          >
+            {displaySearchResults && hasNoSearchResults ? (
               <Empty description="No results... 😔" />
             ) : (
               <>
-                <div className="search-results--category">
-                  {searchQuery && data ? 'Found Movies' : 'Popular Movies'}
-                </div>
-                <ResultsCarousel
-                  type="movie"
-                  results={
-                    searchQuery && data
-                      ? data?.results?.movies || []
-                      : popularQuery.data?.results?.movies || []
-                  }
-                />
-                <div className="spacer" />
-                <div className="search-results--category">
-                  {searchQuery && data ? 'Found TV Shows' : 'Popular TV Shows'}
-                </div>
-                <ResultsCarousel
-                  type="tvshow"
-                  results={
-                    searchQuery && data
-                      ? data?.results?.tvShows || []
-                      : popularQuery.data?.results?.tvShows || []
-                  }
-                />
+                {(displaySearchResults
+                  ? moviesSearchResults.length > 0
+                  : true) && (
+                  <>
+                    <div className="search-results--category">
+                      {displaySearchResults ? 'Found Movies' : 'Popular Movies'}
+                    </div>
+                    <ResultsCarousel
+                      type="movie"
+                      results={
+                        displaySearchResults
+                          ? moviesSearchResults
+                          : popularQuery.data?.results?.movies || []
+                      }
+                    />
+                  </>
+                )}
+                {(displaySearchResults
+                  ? tvShowSearchResults.length > 0
+                  : true) && (
+                  <>
+                    <div className="search-results--category">
+                      {displaySearchResults
+                        ? 'Found TV Shows'
+                        : 'Popular TV Shows'}
+                    </div>
+                    <ResultsCarousel
+                      type="tvshow"
+                      results={
+                        displaySearchResults
+                          ? tvShowSearchResults
+                          : popularQuery.data?.results?.tvShows || []
+                      }
+                    />
+                  </>
+                )}
               </>
             )}
           </Skeleton>
@@ -129,9 +162,7 @@ function ResultsCarousel({
         visibleSlides={5}
         step={5}
       >
-        <ButtonBack className="arrow-left">
-          <FaChevronCircleLeft size={16} />
-        </ButtonBack>
+        <ResetCarouselSlideAndGoBack watch={results} />
         <Slider>
           {results.map((result, index) => (
             <Slide
@@ -148,10 +179,43 @@ function ResultsCarousel({
             </Slide>
           ))}
         </Slider>
-        <ButtonNext className="arrow-right">
-          <FaChevronCircleRight size={16} />
-        </ButtonNext>
+        {results.length > 5 && (
+          <ButtonNext className="arrow-right">
+            <FaChevronCircleRight size={16} />
+          </ButtonNext>
+        )}
       </CarouselProvider>
     </div>
+  );
+}
+
+function ResetCarouselSlideAndGoBack({ watch }: { watch: any }) {
+  const carouselContext = useContext(CarouselContext);
+  const [currentSlide, setCurrentSlide] = useState(
+    carouselContext.state.currentSlide
+  );
+
+  useEffect(() => {
+    function onChange() {
+      setCurrentSlide(carouselContext.state.currentSlide);
+    }
+    carouselContext.subscribe(onChange);
+    return () => carouselContext.unsubscribe(onChange);
+  }, [carouselContext]);
+
+  useEffect(() => {
+    if (carouselContext.state.currentSlide !== 0) {
+      carouselContext.setStoreState({ currentSlide: 0 });
+    }
+  }, [carouselContext, watch]);
+
+  if (currentSlide === 0) {
+    return <noscript />;
+  }
+
+  return (
+    <ButtonBack className="arrow-left">
+      <FaChevronCircleLeft size={16} />
+    </ButtonBack>
   );
 }
