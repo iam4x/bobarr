@@ -40,10 +40,8 @@ export const DownloadingComponentStyles = styled.div`
     }
 
     .torrent-name {
-      flex: 1;
       font-size: 0.7em;
       margin-left: 4px;
-      text-align: center;
       text-transform: uppercase;
     }
   }
