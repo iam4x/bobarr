@@ -78,8 +78,21 @@ export interface TMDBTVShow {
   }>;
 }
 
+export interface TMDBTVEpisode {
+  id: number;
+  air_date: string;
+  episode_number: number;
+  name: string;
+  overview: string;
+  production_code: string;
+  season_number: number;
+  still_path: string;
+  vote_average: number;
+  vote_count: number;
+}
+
 @ObjectType()
-export class TVEpisode {
+export class TMDBFormattedTVEpisode {
   @Field() public id!: number;
   @Field() public episodeNumber!: number;
   @Field() public name!: string;
@@ -92,7 +105,7 @@ export class TVEpisode {
 }
 
 @ObjectType()
-export class TMDBTVSeason {
+export class TMDBFormattedTVSeason {
   @Field() public id!: number;
   @Field() public name!: string;
   @Field() public seasonNumber!: number;
@@ -101,8 +114,8 @@ export class TMDBTVSeason {
   @Field({ nullable: true }) public airDate!: string;
   @Field({ nullable: true }) public episodeCount!: number;
   @Field({ nullable: true }) public posterPath!: string;
-  @Field((_type) => [TVEpisode], { nullable: true })
-  public episodes!: TVEpisode[];
+  @Field((_type) => [TMDBFormattedTVEpisode], { nullable: true })
+  public episodes!: TMDBFormattedTVEpisode[];
 }
 
 @ObjectType()

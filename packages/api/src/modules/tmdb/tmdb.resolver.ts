@@ -1,7 +1,7 @@
 import { Resolver, Args, Query, Int } from '@nestjs/graphql';
 
 import { TMDBService } from './tmdb.service';
-import { TMDBSearchResults, TMDBTVSeason } from './tmdb.dto';
+import { TMDBSearchResults, TMDBFormattedTVSeason } from './tmdb.dto';
 
 @Resolver()
 export class TMDBResolver {
@@ -17,7 +17,7 @@ export class TMDBResolver {
     return this.tmdbService.getPopular();
   }
 
-  @Query((_returns) => [TMDBTVSeason])
+  @Query((_returns) => [TMDBFormattedTVSeason])
   public getTVShowSeasons(
     @Args('tvShowTMDBId', { type: () => Int }) tmdbId: number
   ) {
