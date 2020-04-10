@@ -35,6 +35,12 @@ export function SearchComponent() {
   const { current: debouncedSearch } = useRef(debounce(500, search));
   const { current: throttledSearch } = useRef(throttle(500, search));
 
+  const displaySearchResults = searchQuery && searchQuery.trim();
+  const moviesSearchResults = data?.results?.movies || [];
+  const tvShowSearchResults = data?.results?.tvShows || [];
+  const hasNoSearchResults =
+    moviesSearchResults.length === 0 && tvShowSearchResults.length === 0;
+
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     search({ variables: { query: searchQuery } });
@@ -77,36 +83,50 @@ export function SearchComponent() {
 
       <Wrapper>
         <div className="search-results--container">
-          <Skeleton active={true} loading={popularQuery.loading}>
-            {searchQuery &&
-            data?.results.tvShows?.length === 0 &&
-            data?.results.movies?.length === 0 ? (
+          <Skeleton
+            active={true}
+            loading={popularQuery.loading || (hasNoSearchResults && loading)}
+          >
+            {displaySearchResults && hasNoSearchResults ? (
               <Empty description="No results... 😔" />
             ) : (
               <>
-                <div className="search-results--category">
-                  {searchQuery && data ? 'Found Movies' : 'Popular Movies'}
-                </div>
-                <ResultsCarousel
-                  type="movie"
-                  results={
-                    searchQuery && data
-                      ? data?.results?.movies || []
-                      : popularQuery.data?.results?.movies || []
-                  }
-                />
-                <div className="spacer" />
-                <div className="search-results--category">
-                  {searchQuery && data ? 'Found TV Shows' : 'Popular TV Shows'}
-                </div>
-                <ResultsCarousel
-                  type="tvshow"
-                  results={
-                    searchQuery && data
-                      ? data?.results?.tvShows || []
-                      : popularQuery.data?.results?.tvShows || []
-                  }
-                />
+                {(displaySearchResults
+                  ? moviesSearchResults.length > 0
+                  : true) && (
+                  <>
+                    <div className="search-results--category">
+                      {displaySearchResults ? 'Found Movies' : 'Popular Movies'}
+                    </div>
+                    <ResultsCarousel
+                      type="movie"
+                      results={
+                        displaySearchResults
+                          ? moviesSearchResults
+                          : popularQuery.data?.results?.movies || []
+                      }
+                    />
+                  </>
+                )}
+                {(displaySearchResults
+                  ? tvShowSearchResults.length > 0
+                  : true) && (
+                  <>
+                    <div className="search-results--category">
+                      {displaySearchResults
+                        ? 'Found TV Shows'
+                        : 'Popular TV Shows'}
+                    </div>
+                    <ResultsCarousel
+                      type="tvshow"
+                      results={
+                        displaySearchResults
+                          ? tvShowSearchResults
+                          : popularQuery.data?.results?.tvShows || []
+                      }
+                    />
+                  </>
+                )}
               </>
             )}
           </Skeleton>

@@ -6,10 +6,6 @@ export const Wrapper = styled.div`
 `;
 
 export const SearchStyles = styled.div`
-  .spacer {
-    height: 32px;
-  }
-
   .search-bar {
     &--input {
       border: none;
@@ -45,8 +41,8 @@ export const SearchStyles = styled.div`
 
     &--container {
       background-color: ${({ theme }) => theme.colors.coral};
-      padding-top: 64px;
-      padding-bottom: 64px;
+      padding-top: 32px;
+      padding-bottom: 32px;
     }
 
     &--title {
