@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import React from 'react';
 
 import { withApollo } from '../components/with-apollo';
@@ -6,9 +7,14 @@ import { SettingsComponent } from '../components/settings/settings.component';
 
 function SettingsPage() {
   return (
-    <LayoutComponent>
-      <SettingsComponent />
-    </LayoutComponent>
+    <>
+      <Head>
+        <title>Bobarr - Settings</title>
+      </Head>
+      <LayoutComponent>
+        <SettingsComponent />
+      </LayoutComponent>
+    </>
   );
 }
 
