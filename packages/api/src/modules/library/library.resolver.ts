@@ -36,6 +36,11 @@ export class LibraryResolver {
     return this.libraryService.findMissingTVEpisodes();
   }
 
+  @Query((_returns) => [EnrichedMovie])
+  public getMissingMovies() {
+    return this.libraryService.findMissingMovies();
+  }
+
   @Mutation((_returns) => Movie, { name: 'trackMovie' })
   public trackMovie(
     @Args('title') title: string,

@@ -116,6 +116,7 @@ type Query {
   getMovies: [EnrichedMovie!]!
   getTVShows: [EnrichedTVShow!]!
   getMissingTVEpisodes: [EnrichedTVEpisode!]!
+  getMissingMovies: [EnrichedMovie!]!
 }
 
 type TMDBFormattedTVEpisode {

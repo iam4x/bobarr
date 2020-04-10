@@ -128,6 +128,13 @@ export class LibraryService {
     return rows.map(this.enrichTVEpisode);
   }
 
+  public async findMissingMovies() {
+    const rows = await this.movieDAO.find({
+      where: { state: DownloadableMediaState.MISSING },
+    });
+    return rows.map(this.enrichMovie);
+  }
+
   @Transaction()
   public async removeMovie(
     tmdbId: number,

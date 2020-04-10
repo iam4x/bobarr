@@ -9,4 +9,10 @@ query getMissing {
       title
     }
   }
+
+  movies: getMissingMovies {
+    id
+    title
+    releaseDate
+  }
 }

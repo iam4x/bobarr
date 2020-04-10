@@ -155,6 +155,7 @@ export type Query = {
   getMovies: Array<EnrichedMovie>;
   getTVShows: Array<EnrichedTvShow>;
   getMissingTVEpisodes: Array<EnrichedTvEpisode>;
+  getMissingMovies: Array<EnrichedMovie>;
 };
 
 
@@ -382,6 +383,9 @@ export type GetMissingQuery = (
       { __typename?: 'TVShow' }
       & Pick<TvShow, 'id' | 'title'>
     ) }
+  )>, movies: Array<(
+    { __typename?: 'EnrichedMovie' }
+    & Pick<EnrichedMovie, 'id' | 'title' | 'releaseDate'>
   )> }
 );
 
@@ -846,6 +850,11 @@ export const GetMissingDocument = gql`
       id
       title
     }
+  }
+  movies: getMissingMovies {
+    id
+    title
+    releaseDate
   }
 }
     `;
