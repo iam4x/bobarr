@@ -16,8 +16,10 @@ export function TVShowsComponent() {
 
   return (
     <>
-      <DownloadingComponent types={['season', 'episode']} />
-      <MissingComponent />
+      <div style={{ background: '#A4BCC2', padding: '24px 0' }}>
+        <DownloadingComponent types={['season', 'episode']} />
+        <MissingComponent />
+      </div>
       <TVShowsComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>

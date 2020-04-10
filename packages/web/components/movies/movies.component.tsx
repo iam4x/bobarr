@@ -14,8 +14,10 @@ export function MoviesComponent() {
 
   return (
     <>
-      <DownloadingComponent types={['movie']} />
-      <MissingComponent />
+      <div style={{ background: '#A4BCC2', padding: '24px 0' }}>
+        <DownloadingComponent types={['movie']} />
+        <MissingComponent />
+      </div>
       <MoviesComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>

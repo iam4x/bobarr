@@ -1,10 +1,6 @@
 import styled from 'styled-components';
 
 export const MissingComponentStyles = styled.div`
-  background: #a7dbd8;
-  padding-top: 24px;
-  padding-bottom: 24px;
-
   .wrapper {
     max-width: 1200px;
     margin: 0 auto;
