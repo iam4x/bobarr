@@ -7,6 +7,7 @@ import {
   GetLibraryMoviesDocument,
   useRemoveMovieMutation,
   GetDownloadingDocument,
+  GetMissingDocument,
 } from '../../utils/graphql';
 
 export function useRemoveLibrary({
@@ -21,6 +22,7 @@ export function useRemoveLibrary({
     refetchQueries: [
       { query: GetLibraryMoviesDocument },
       { query: GetDownloadingDocument },
+      { query: GetMissingDocument },
     ],
     onError: ({ message }) =>
       notification.error({

@@ -7,6 +7,7 @@ import {
   EnrichedMovie,
   GetLibraryMoviesDocument,
   GetDownloadingDocument,
+  GetMissingDocument,
 } from '../../utils/graphql';
 
 export function useAddLibrary({
@@ -21,6 +22,7 @@ export function useAddLibrary({
     refetchQueries: [
       { query: GetLibraryMoviesDocument },
       { query: GetDownloadingDocument },
+      { query: GetMissingDocument },
     ],
     onError: ({ message }) =>
       notification.error({
