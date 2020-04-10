@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Skeleton, Empty } from 'antd';
 import { useTheme } from 'styled-components';
 
@@ -15,6 +15,7 @@ import {
   Slide,
   ButtonBack,
   ButtonNext,
+  CarouselContext,
 } from 'pure-react-carousel';
 
 import {
@@ -129,6 +130,7 @@ function ResultsCarousel({
         visibleSlides={5}
         step={5}
       >
+        <ResetCarouselSlide watch={results} />
         <ButtonBack className="arrow-left">
           <FaChevronCircleLeft size={16} />
         </ButtonBack>
@@ -154,4 +156,14 @@ function ResultsCarousel({
       </CarouselProvider>
     </div>
   );
+}
+
+function ResetCarouselSlide({ watch }: { watch: any }) {
+  const carouselContext = useContext(CarouselContext);
+
+  useEffect(() => {
+    carouselContext.setStoreState({ currentSlide: 0 });
+  }, [carouselContext, watch]);
+
+  return <noscript />;
 }
