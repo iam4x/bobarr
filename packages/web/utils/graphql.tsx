@@ -42,6 +42,19 @@ export type EnrichedMovie = {
   releaseDate: Scalars['String'];
 };
 
+export type EnrichedTvEpisode = {
+   __typename?: 'EnrichedTVEpisode';
+  id: Scalars['Float'];
+  episodeNumber: Scalars['Float'];
+  seasonNumber: Scalars['Float'];
+  state: DownloadableMediaState;
+  tvShow: TvShow;
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  voteAverage: Scalars['Float'];
+  releaseDate: Scalars['String'];
+};
+
 export type EnrichedTvShow = {
    __typename?: 'EnrichedTVShow';
   id: Scalars['Float'];
@@ -136,11 +149,12 @@ export type Query = {
   getParams: ParamsHash;
   search: TmdbSearchResults;
   getPopular: TmdbSearchResults;
-  getTVShowSeasons: Array<TmdbtvSeason>;
+  getTVShowSeasons: Array<TmdbFormattedTvSeason>;
   getTorrentStatus: TorrentStatus;
   getDownloadingMedias: Array<DownloadingMedia>;
   getMovies: Array<EnrichedMovie>;
   getTVShows: Array<EnrichedTvShow>;
+  getMissingTVEpisodes: Array<EnrichedTvEpisode>;
 };
 
 
@@ -159,6 +173,32 @@ export type QueryGetTorrentStatusArgs = {
   resourceId: Scalars['Int'];
 };
 
+export type TmdbFormattedTvEpisode = {
+   __typename?: 'TMDBFormattedTVEpisode';
+  id: Scalars['Float'];
+  episodeNumber: Scalars['Float'];
+  name: Scalars['String'];
+  overview: Scalars['String'];
+  seasonNumber: Scalars['Float'];
+  voteCount?: Maybe<Scalars['Float']>;
+  voteAverage?: Maybe<Scalars['Float']>;
+  airDate?: Maybe<Scalars['String']>;
+  stillPath?: Maybe<Scalars['String']>;
+};
+
+export type TmdbFormattedTvSeason = {
+   __typename?: 'TMDBFormattedTVSeason';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  seasonNumber: Scalars['Float'];
+  inLibrary: Scalars['Boolean'];
+  overview?: Maybe<Scalars['String']>;
+  airDate?: Maybe<Scalars['String']>;
+  episodeCount?: Maybe<Scalars['Float']>;
+  posterPath?: Maybe<Scalars['String']>;
+  episodes?: Maybe<Array<TmdbFormattedTvEpisode>>;
+};
+
 export type TmdbSearchResult = {
    __typename?: 'TMDBSearchResult';
   id: Scalars['Float'];
@@ -175,19 +215,6 @@ export type TmdbSearchResults = {
   tvShows: Array<TmdbSearchResult>;
 };
 
-export type TmdbtvSeason = {
-   __typename?: 'TMDBTVSeason';
-  id: Scalars['Float'];
-  name: Scalars['String'];
-  seasonNumber: Scalars['Float'];
-  inLibrary: Scalars['Boolean'];
-  overview?: Maybe<Scalars['String']>;
-  airDate?: Maybe<Scalars['String']>;
-  episodeCount?: Maybe<Scalars['Float']>;
-  posterPath?: Maybe<Scalars['String']>;
-  episodes?: Maybe<Array<TvEpisode>>;
-};
-
 export type TorrentStatus = {
    __typename?: 'TorrentStatus';
   id: Scalars['Int'];
@@ -198,19 +225,6 @@ export type TorrentStatus = {
   uploadedEver: Scalars['BigInt'];
   totalSize: Scalars['BigInt'];
   status: Scalars['Int'];
-};
-
-export type TvEpisode = {
-   __typename?: 'TVEpisode';
-  id: Scalars['Float'];
-  episodeNumber: Scalars['Float'];
-  name: Scalars['String'];
-  overview: Scalars['String'];
-  seasonNumber: Scalars['Float'];
-  voteCount?: Maybe<Scalars['Float']>;
-  voteAverage?: Maybe<Scalars['Float']>;
-  airDate?: Maybe<Scalars['String']>;
-  stillPath?: Maybe<Scalars['String']>;
 };
 
 export type TvShow = {
@@ -356,6 +370,21 @@ export type GetLibraryTvShowsQuery = (
   )> }
 );
 
+export type GetMissingQueryVariables = {};
+
+
+export type GetMissingQuery = (
+  { __typename?: 'Query' }
+  & { tvEpisodes: Array<(
+    { __typename?: 'EnrichedTVEpisode' }
+    & Pick<EnrichedTvEpisode, 'id' | 'seasonNumber' | 'episodeNumber' | 'releaseDate'>
+    & { tvShow: (
+      { __typename?: 'TVShow' }
+      & Pick<TvShow, 'id' | 'title'>
+    ) }
+  )> }
+);
+
 export type GetParamsQueryVariables = {};
 
 
@@ -406,8 +435,8 @@ export type GetTvShowSeasonsQueryVariables = {
 export type GetTvShowSeasonsQuery = (
   { __typename?: 'Query' }
   & { seasons: Array<(
-    { __typename?: 'TMDBTVSeason' }
-    & Pick<TmdbtvSeason, 'id' | 'name' | 'seasonNumber' | 'episodeCount' | 'overview' | 'posterPath' | 'airDate' | 'inLibrary'>
+    { __typename?: 'TMDBFormattedTVSeason' }
+    & Pick<TmdbFormattedTvSeason, 'id' | 'name' | 'seasonNumber' | 'episodeCount' | 'overview' | 'posterPath' | 'airDate' | 'inLibrary'>
   )> }
 );
 
@@ -806,6 +835,45 @@ export function useGetLibraryTvShowsLazyQuery(baseOptions?: ApolloReactHooks.Laz
 export type GetLibraryTvShowsQueryHookResult = ReturnType<typeof useGetLibraryTvShowsQuery>;
 export type GetLibraryTvShowsLazyQueryHookResult = ReturnType<typeof useGetLibraryTvShowsLazyQuery>;
 export type GetLibraryTvShowsQueryResult = ApolloReactCommon.QueryResult<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>;
+export const GetMissingDocument = gql`
+    query getMissing {
+  tvEpisodes: getMissingTVEpisodes {
+    id
+    seasonNumber
+    episodeNumber
+    releaseDate
+    tvShow {
+      id
+      title
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetMissingQuery__
+ *
+ * To run a query within a React component, call `useGetMissingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMissingQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMissingQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMissingQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetMissingQuery, GetMissingQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetMissingQuery, GetMissingQueryVariables>(GetMissingDocument, baseOptions);
+      }
+export function useGetMissingLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetMissingQuery, GetMissingQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetMissingQuery, GetMissingQueryVariables>(GetMissingDocument, baseOptions);
+        }
+export type GetMissingQueryHookResult = ReturnType<typeof useGetMissingQuery>;
+export type GetMissingLazyQueryHookResult = ReturnType<typeof useGetMissingLazyQuery>;
+export type GetMissingQueryResult = ApolloReactCommon.QueryResult<GetMissingQuery, GetMissingQueryVariables>;
 export const GetParamsDocument = gql`
     query getParams {
   params: getParams {

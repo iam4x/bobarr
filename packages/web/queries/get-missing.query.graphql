@@ -1,0 +1,12 @@
+query getMissing {
+  tvEpisodes: getMissingTVEpisodes {
+    id
+    seasonNumber
+    episodeNumber
+    releaseDate
+    tvShow {
+      id
+      title
+    }
+  }
+}

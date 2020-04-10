@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
 export const DownloadingComponentStyles = styled.div`
-  background: #a7dbd8;
-  padding-top: 64px;
-  padding-bottom: 64px;
+  background: #cff09e;
+  padding-top: 48px;
+  padding-bottom: 48px;
 
   .wrapper {
     margin: 0 auto;
