@@ -162,10 +162,7 @@ function ResultsCarousel({
         visibleSlides={5}
         step={5}
       >
-        <ResetCarouselSlide watch={results} />
-        <ButtonBack className="arrow-left">
-          <FaChevronCircleLeft size={16} />
-        </ButtonBack>
+        <ResetCarouselSlideAndGoBack watch={results} />
         <Slider>
           {results.map((result, index) => (
             <Slide
@@ -182,16 +179,29 @@ function ResultsCarousel({
             </Slide>
           ))}
         </Slider>
-        <ButtonNext className="arrow-right">
-          <FaChevronCircleRight size={16} />
-        </ButtonNext>
+        {results.length > 5 && (
+          <ButtonNext className="arrow-right">
+            <FaChevronCircleRight size={16} />
+          </ButtonNext>
+        )}
       </CarouselProvider>
     </div>
   );
 }
 
-function ResetCarouselSlide({ watch }: { watch: any }) {
+function ResetCarouselSlideAndGoBack({ watch }: { watch: any }) {
   const carouselContext = useContext(CarouselContext);
+  const [currentSlide, setCurrentSlide] = useState(
+    carouselContext.state.currentSlide
+  );
+
+  useEffect(() => {
+    function onChange() {
+      setCurrentSlide(carouselContext.state.currentSlide);
+    }
+    carouselContext.subscribe(onChange);
+    return () => carouselContext.unsubscribe(onChange);
+  }, [carouselContext]);
 
   useEffect(() => {
     if (carouselContext.state.currentSlide !== 0) {
@@ -199,5 +209,13 @@ function ResetCarouselSlide({ watch }: { watch: any }) {
     }
   }, [carouselContext, watch]);
 
-  return <noscript />;
+  if (currentSlide === 0) {
+    return <noscript />;
+  }
+
+  return (
+    <ButtonBack className="arrow-left">
+      <FaChevronCircleLeft size={16} />
+    </ButtonBack>
+  );
 }
