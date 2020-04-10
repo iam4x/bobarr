@@ -34,18 +34,50 @@ export class DownloadProcessor {
     this.logger = logger.child({ context: 'DownloadProcessor' });
   }
 
+  @Process(DownloadQueueProcessors.DOWNLOAD_MISSING)
+  public async downloadMissing() {
+    this.logger.info('start try download missing files');
+
+    const missingMovies = await this.movieDAO.find({
+      where: { state: DownloadableMediaState.MISSING },
+    });
+
+    this.logger.info(`found ${missingMovies.length} missing movies`);
+
+    await forEachSeries(missingMovies, (movie) =>
+      this.downloadQueue.add(DownloadQueueProcessors.DOWNLOAD_MOVIE, movie.id)
+    );
+
+    const missingEpisodes = await this.tvEpisodeDAO
+      .createQueryBuilder('episode')
+      .innerJoin('episode.season', 'season', 'season.state != :seasonState', {
+        seasonState: DownloadableMediaState.DOWNLOADING,
+      })
+      .where('episode.state = :episodeState', {
+        episodeState: DownloadableMediaState.MISSING,
+      })
+      .getMany();
+
+    this.logger.info(`found ${missingEpisodes.length} missing tv episodes`);
+
+    await forEachSeries(missingEpisodes, (episode) =>
+      this.downloadQueue.add(
+        DownloadQueueProcessors.DOWNLOAD_EPISODE,
+        episode.id
+      )
+    );
+
+    this.logger.info('finish try download missing files');
+  }
+
   @Process(DownloadQueueProcessors.DOWNLOAD_MOVIE)
   public async downloadMovie({ data: movieId }: Job<number>) {
     this.logger.info('start download movie', { movieId });
     const [bestResult] = await this.jackettService.searchMovie(movieId);
 
     if (bestResult === undefined) {
-      this.logger.error('movie torrent not found, it will retry in 1h');
-      return this.downloadQueue.add(
-        DownloadQueueProcessors.DOWNLOAD_MOVIE,
-        movieId,
-        { delay: 1000 * 60 * 60 } // retry in a hour
-      );
+      this.logger.error('movie torrent not found');
+      return;
     }
 
     this.logger.info('found movie torrent to download');
@@ -66,9 +98,12 @@ export class DownloadProcessor {
       state: DownloadableMediaState.DOWNLOADING,
     });
 
-    this.logger.info('download movie started', { movieId });
+    this.logger.info('download movie started', {
+      movieId,
+      torrentId: torrent.id,
+    });
 
-    return torrent;
+    return;
   }
 
   @Process(DownloadQueueProcessors.DOWNLOAD_SEASON)
@@ -120,12 +155,8 @@ export class DownloadProcessor {
     const [bestResult] = await this.jackettService.searchEpisode(episodeId);
 
     if (bestResult === undefined) {
-      this.logger.error('episode torrent not found, it will retry in 1h');
-      return this.downloadQueue.add(
-        DownloadQueueProcessors.DOWNLOAD_EPISODE,
-        episodeId,
-        { delay: 1000 * 60 * 60 } // retry in a hour
-      );
+      this.logger.error('episode torrent not found');
+      return;
     }
 
     this.logger.info('found episode torrent to download');
@@ -146,8 +177,11 @@ export class DownloadProcessor {
       state: DownloadableMediaState.DOWNLOADING,
     });
 
-    this.logger.info('download episode started', { episodeId });
+    this.logger.info('download episode started', {
+      episodeId,
+      torrentId: torrent.id,
+    });
 
-    return torrent;
+    return;
   }
 }

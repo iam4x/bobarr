@@ -65,16 +65,14 @@ export class ScanLibraryProcessor {
         throw new Error('did not find tmdb season');
       }
 
-      if (tmdbResult.episodeCount > episode.episodeNumber) {
-        const newEpisodesCount =
-          tmdbResult.episodeCount - episode.episodeNumber;
+      const newEpisodesCount = tmdbResult.episodeCount - episode.episodeNumber;
 
-        this.logger.info(`found ${newEpisodesCount} new episodes`, {
-          tvShow: episode.tvShow.title,
-          seasonNumber: episode.seasonNumber,
-          episodeNumber: episode.episodeNumber,
-        });
+      this.logger.info(`found ${newEpisodesCount} new episodes`, {
+        tvShow: episode.tvShow.title,
+        seasonNumber: episode.seasonNumber,
+      });
 
+      if (newEpisodesCount > 0) {
         const newEpisodes = await this.tvEpisodeDAO.save(
           times(newEpisodesCount, (index) => ({
             tvShow: episode.tvShow,

@@ -11,3 +11,10 @@ mutation startFindNewEpisodes {
     message
   }
 }
+
+mutation startDownloadMissing {
+  result: startDownloadMissingJob {
+    success
+    message
+  }
+}

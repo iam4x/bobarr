@@ -62,6 +62,13 @@ export class JobsService {
         startDate: new Date(),
       },
     });
+
+    this.startDownloadMissing({
+      repeat: {
+        cron: '*/30 * * * *', // every 30 minutes
+        startDate: new Date(),
+      },
+    });
   }
 
   public startDownloadMovie(movieId: number) {
@@ -101,6 +108,15 @@ export class JobsService {
     this.logger.info('start find new episodes');
     return this.scanLibraryQueue.add(
       ScanLibraryQueueProcessors.FIND_NEW_EPISODES,
+      {},
+      options
+    );
+  }
+
+  public startDownloadMissing(options?: JobOptions) {
+    this.logger.info('start download missing files');
+    return this.downloadQueue.add(
+      DownloadQueueProcessors.DOWNLOAD_MISSING,
       {},
       options
     );
