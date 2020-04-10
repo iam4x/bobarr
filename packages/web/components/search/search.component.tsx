@@ -174,7 +174,9 @@ function ResetCarouselSlide({ watch }: { watch: any }) {
   const carouselContext = useContext(CarouselContext);
 
   useEffect(() => {
-    carouselContext.setStoreState({ currentSlide: 0 });
+    if (carouselContext.state.currentSlide !== 0) {
+      carouselContext.setStoreState({ currentSlide: 0 });
+    }
   }, [carouselContext, watch]);
 
   return <noscript />;
