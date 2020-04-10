@@ -38,6 +38,18 @@ type EnrichedMovie {
   releaseDate: String!
 }
 
+type EnrichedTVEpisode {
+  id: Float!
+  episodeNumber: Float!
+  seasonNumber: Float!
+  state: DownloadableMediaState!
+  tvShow: TVShow!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  voteAverage: Float!
+  releaseDate: String!
+}
+
 type EnrichedTVShow {
   id: Float!
   tmdbId: Float!
@@ -98,11 +110,36 @@ type Query {
   getParams: ParamsHash!
   search(query: String!): TMDBSearchResults!
   getPopular: TMDBSearchResults!
-  getTVShowSeasons(tvShowTMDBId: Int!): [TMDBTVSeason!]!
+  getTVShowSeasons(tvShowTMDBId: Int!): [TMDBFormattedTVSeason!]!
   getTorrentStatus(resourceType: String!, resourceId: Int!): TorrentStatus!
   getDownloadingMedias: [DownloadingMedia!]!
   getMovies: [EnrichedMovie!]!
   getTVShows: [EnrichedTVShow!]!
+  getMissingTVEpisodes: [EnrichedTVEpisode!]!
+}
+
+type TMDBFormattedTVEpisode {
+  id: Float!
+  episodeNumber: Float!
+  name: String!
+  overview: String!
+  seasonNumber: Float!
+  voteCount: Float
+  voteAverage: Float
+  airDate: String
+  stillPath: String
+}
+
+type TMDBFormattedTVSeason {
+  id: Float!
+  name: String!
+  seasonNumber: Float!
+  inLibrary: Boolean!
+  overview: String
+  airDate: String
+  episodeCount: Float
+  posterPath: String
+  episodes: [TMDBFormattedTVEpisode!]
 }
 
 type TMDBSearchResult {
@@ -119,18 +156,6 @@ type TMDBSearchResults {
   tvShows: [TMDBSearchResult!]!
 }
 
-type TMDBTVSeason {
-  id: Float!
-  name: String!
-  seasonNumber: Float!
-  inLibrary: Boolean!
-  overview: String
-  airDate: String
-  episodeCount: Float
-  posterPath: String
-  episodes: [TVEpisode!]
-}
-
 type TorrentStatus {
   id: Int!
   percentDone: Float!
@@ -140,18 +165,6 @@ type TorrentStatus {
   uploadedEver: BigInt!
   totalSize: BigInt!
   status: Int!
-}
-
-type TVEpisode {
-  id: Float!
-  episodeNumber: Float!
-  name: String!
-  overview: String!
-  seasonNumber: Float!
-  voteCount: Float
-  voteAverage: Float
-  airDate: String
-  stillPath: String
 }
 
 type TVShow {

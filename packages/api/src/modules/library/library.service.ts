@@ -28,6 +28,7 @@ import { JobsService } from 'src/modules/jobs/jobs.service';
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
 import { TVShow } from 'src/entities/tvshow.entity';
 import { TVSeason } from 'src/entities/tvseason.entity';
+import { TVEpisode } from 'src/entities/tvepisode.entity';
 
 @Injectable()
 export class LibraryService {
@@ -120,6 +121,11 @@ export class LibraryService {
   public async getTVShow(tvShowId: number, params?: { language: string }) {
     const tvShow = await this.tvShowDAO.findOneOrFail(tvShowId);
     return this.enrichTVShow(tvShow, params);
+  }
+
+  public async findMissingTVEpisodes() {
+    const rows = await this.tvEpisodeDAO.findMissingFromLibrary();
+    return rows.map(this.enrichTVEpisode);
   }
 
   @Transaction()
@@ -338,6 +344,19 @@ export class LibraryService {
       posterPath: tmdbResult.poster_path,
       voteAverage: tmdbResult.vote_average,
       releaseDate: tmdbResult.first_air_date,
+    };
+  };
+
+  private enrichTVEpisode = async (tvEpisode: TVEpisode) => {
+    const tmdbResult = await this.tmdbService.getTVEpisode(
+      tvEpisode.tvShow.tmdbId,
+      tvEpisode.seasonNumber,
+      tvEpisode.episodeNumber
+    );
+
+    return {
+      ...tvEpisode,
+      releaseDate: tmdbResult.air_date,
     };
   };
 }
