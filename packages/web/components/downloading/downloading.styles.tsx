@@ -1,10 +1,6 @@
 import styled from 'styled-components';
 
 export const DownloadingComponentStyles = styled.div`
-  background: #cff09e;
-  padding-top: 24px;
-  padding-bottom: 24px;
-
   .wrapper {
     margin: 0 auto;
     max-width: 1200px;
@@ -19,10 +15,6 @@ export const DownloadingComponentStyles = styled.div`
     margin-bottom: 8px;
     display: flex;
     width: 100%;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
 
     .speed {
       font-size: 0.7em;
