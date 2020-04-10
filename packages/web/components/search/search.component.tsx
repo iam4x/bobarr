@@ -1,7 +1,8 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Skeleton, Empty } from 'antd';
 import { useTheme } from 'styled-components';
 import { LoadingOutlined, SearchOutlined } from '@ant-design/icons';
+import { debounce, throttle } from 'throttle-debounce';
 
 import { FaChevronCircleLeft, FaChevronCircleRight } from 'react-icons/fa';
 
@@ -31,10 +32,23 @@ export function SearchComponent() {
   const popularQuery = useGetPopularQuery();
   const [search, { data, loading }] = useSearchLazyQuery();
 
+  const { current: debouncedSearch } = useRef(debounce(500, search));
+  const { current: throttledSearch } = useRef(throttle(500, search));
+
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     search({ variables: { query: searchQuery } });
   };
+
+  useEffect(() => {
+    if (searchQuery && searchQuery.trim()) {
+      if (searchQuery.length < 5) {
+        throttledSearch({ variables: { query: searchQuery } });
+      } else {
+        debouncedSearch({ variables: { query: searchQuery } });
+      }
+    }
+  }, [debouncedSearch, searchQuery, throttledSearch]);
 
   return (
     <SearchStyles>
