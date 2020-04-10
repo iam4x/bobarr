@@ -10,7 +10,7 @@ function IndexPage() {
   const router = useRouter();
   useEffect(() => {
     router.replace('/search');
-  }, []);
+  });
   return <noscript />;
 }
 
