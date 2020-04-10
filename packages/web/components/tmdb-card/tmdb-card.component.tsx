@@ -39,7 +39,7 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
       vote={result.voteAverage * 10}
     >
       {/* display season picker modal when it's tvshow */}
-      {type === 'tvshow' && (
+      {type === 'tvshow' && tvSeasonModalActive && (
         <TVShowSeasonsModalComponent
           tvShow={result as TmdbSearchResult}
           visible={tvSeasonModalActive}
