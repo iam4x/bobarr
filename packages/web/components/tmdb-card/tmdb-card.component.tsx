@@ -34,10 +34,7 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
     type === 'movie' ? movieHandler : () => setTVSeasonModalActive(true);
 
   return (
-    <TMDBCardStyles
-      posterPath={`https://image.tmdb.org/t/p/w220_and_h330_face${result.posterPath}`}
-      vote={result.voteAverage * 10}
-    >
+    <TMDBCardStyles vote={result.voteAverage * 10}>
       {/* display season picker modal when it's tvshow */}
       {type === 'tvshow' && tvSeasonModalActive && (
         <TVShowSeasonsModalComponent
@@ -49,7 +46,12 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
       )}
 
       <div className="poster--container" onClick={onPosterClickHandler}>
-        <div className="poster" />
+        <div
+          className="poster"
+          style={{
+            backgroundImage: `url(https://image.tmdb.org/t/p/w220_and_h330_face${result.posterPath})`,
+          }}
+        />
         <div className="overlay">
           {type === 'tvshow' && (
             <>
