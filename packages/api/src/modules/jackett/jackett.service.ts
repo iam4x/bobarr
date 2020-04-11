@@ -139,7 +139,7 @@ export class JackettService {
     return this.search(queries, { maxSize });
   }
 
-  private async search(
+  public async search(
     queries: string[],
     { maxSize, isSeason }: { maxSize: number; isSeason?: boolean }
   ) {
@@ -200,10 +200,13 @@ export class JackettService {
   }
 
   private formatSearchResult = (result: JackettResult) => {
-    const normalizedTitle = sanitize(result.Title).split(' ');
+    const normalizedTitle = sanitize(result.Title)
+      .split(' ')
+      .filter((str) => str && str.trim());
 
     return {
       normalizedTitle,
+      id: result.Guid,
       title: result.Title,
       quality: this.parseQuality(normalizedTitle),
       size: result.Size,
@@ -212,6 +215,7 @@ export class JackettService {
       link: result.Guid,
       downloadLink: result.Link,
       tag: this.parseTag(normalizedTitle),
+      publishDate: result.PublishDate,
     };
   };
 

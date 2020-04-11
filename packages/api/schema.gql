@@ -69,6 +69,22 @@ type GraphQLCommonResponse {
   message: String
 }
 
+type JackettFormattedResult {
+  id: String!
+  title: String!
+  quality: String!
+  qualityScore: Float!
+  seeders: Float!
+  peers: Float!
+  link: String!
+  downloadLink: String!
+  tag: String!
+  tagScore: Float!
+  publishDate: String!
+  normalizedTitle: [String!]!
+  size: BigInt!
+}
+
 type Movie {
   id: Float!
   tmdbId: Float!
@@ -114,6 +130,7 @@ type Query {
   search(query: String!): TMDBSearchResults!
   getPopular: TMDBSearchResults!
   getTVShowSeasons(tvShowTMDBId: Int!): [TMDBFormattedTVSeason!]!
+  searchJackett(query: String!): [JackettFormattedResult!]!
   getTorrentStatus(resourceType: String!, resourceId: Int!): TorrentStatus!
   getDownloadingMedias: [DownloadingMedia!]!
   getMovies: [EnrichedMovie!]!

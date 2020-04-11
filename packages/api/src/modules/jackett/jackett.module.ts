@@ -8,6 +8,7 @@ import { ParamsModule } from 'src/modules/params/params.module';
 import { LibraryModule } from 'src/modules/library/library.module';
 
 import { JackettService } from './jackett.service';
+import { JackettResolver } from './jackett.resolver';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { JackettService } from './jackett.service';
     ParamsModule,
     forwardRef(() => LibraryModule),
   ],
-  providers: [JackettService],
+  providers: [JackettService, JackettResolver],
   exports: [JackettService],
 })
 export class JackettModule {}
