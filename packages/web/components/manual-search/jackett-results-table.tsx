@@ -13,6 +13,8 @@ import {
   GetLibraryMoviesDocument,
   GetDownloadingDocument,
   GetMissingDocument,
+  useDownloadTvEpisodeMutation,
+  GetLibraryTvShowsDocument,
 } from '../../utils/graphql';
 
 import { Media } from './manual-search.helpers';
@@ -99,7 +101,7 @@ function ManualDownloadMedia({
     'tag',
   ]);
 
-  const [downloadMovie, { loading }] = useDownloadMovieMutation({
+  const [downloadMovie, { loading: loading1 }] = useDownloadMovieMutation({
     awaitRefetchQueries: true,
     refetchQueries: [
       { query: GetLibraryMoviesDocument },
@@ -118,6 +120,28 @@ function ManualDownloadMedia({
       }),
   });
 
+  const [
+    downloadTVEpisode,
+    { loading: loading2 },
+  ] = useDownloadTvEpisodeMutation({
+    awaitRefetchQueries: true,
+    refetchQueries: [
+      { query: GetLibraryTvShowsDocument },
+      { query: GetDownloadingDocument },
+      { query: GetMissingDocument },
+    ],
+    onError: ({ message }) =>
+      notification.error({
+        message: message.replace('GraphQL error: ', ''),
+        placement: 'bottomRight',
+      }),
+    onCompleted: () =>
+      notification.success({
+        message: 'Download episode started',
+        placement: 'bottomRight',
+      }),
+  });
+
   const handleClick = () => {
     if (media.__typename === 'EnrichedMovie') {
       downloadMovie({
@@ -127,9 +151,18 @@ function ManualDownloadMedia({
         },
       });
     }
+
+    if (media.__typename === 'EnrichedTVEpisode') {
+      downloadTVEpisode({
+        variables: {
+          episodeId: media.id!,
+          jackettResult: jackettInput,
+        },
+      });
+    }
   };
 
-  return loading ? (
+  return loading1 || loading2 ? (
     <LoadingOutlined />
   ) : (
     <DownloadOutlined style={{ cursor: 'pointer' }} onClick={handleClick} />

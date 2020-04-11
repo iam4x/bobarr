@@ -136,27 +136,11 @@ export class DownloadProcessor {
       return;
     }
 
-    this.logger.info('found episode torrent to download');
-    this.logger.info(bestResult.title);
-
-    const torrent = await this.transmissionService.addTorrentURL(
-      bestResult.downloadLink,
-      {
-        resourceType: FileType.EPISODE,
-        resourceId: episodeId,
-        quality: bestResult.quality.label,
-        tag: bestResult.tag.label,
-      }
-    );
-
-    await this.tvEpisodeDAO.save({
-      id: episodeId,
-      state: DownloadableMediaState.DOWNLOADING,
-    });
-
-    this.logger.info('download episode started', {
-      episodeId,
-      torrentId: torrent.id,
+    await this.libraryService.downloadTVEpisode(episodeId, {
+      title: bestResult.title,
+      downloadLink: bestResult.downloadLink,
+      tag: bestResult.tag.label,
+      quality: bestResult.quality.label,
     });
 
     return;

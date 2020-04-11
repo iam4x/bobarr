@@ -235,7 +235,7 @@ export class LibraryService {
   }
 
   public async downloadMovie(movieId: number, jackettResult: JackettInput) {
-    this.logger.info('start manual download movie', { movieId });
+    this.logger.info('start download movie', { movieId });
     this.logger.info(jackettResult.title);
 
     const torrent = await this.transmissionService.addTorrentURL(
@@ -256,6 +256,34 @@ export class LibraryService {
     this.logger.info('download movie started', {
       movieId,
       torrent: torrent.id,
+    });
+  }
+
+  public async downloadTVEpisode(
+    episodeId: number,
+    jackettResult: JackettInput
+  ) {
+    this.logger.info('start download tv episode', { episodeId });
+    this.logger.info(jackettResult.title);
+
+    const torrent = await this.transmissionService.addTorrentURL(
+      jackettResult.downloadLink,
+      {
+        resourceType: FileType.EPISODE,
+        resourceId: episodeId,
+        quality: jackettResult.quality,
+        tag: jackettResult.tag,
+      }
+    );
+
+    await this.tvEpisodeDAO.save({
+      id: episodeId,
+      state: DownloadableMediaState.DOWNLOADING,
+    });
+
+    this.logger.info('download episode started', {
+      episodeId,
+      torrentId: torrent.id,
     });
   }
 

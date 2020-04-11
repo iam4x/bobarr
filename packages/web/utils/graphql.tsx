@@ -117,6 +117,7 @@ export type Mutation = {
   startFindNewEpisodesJob: GraphQlCommonResponse;
   startDownloadMissingJob: GraphQlCommonResponse;
   downloadMovie: GraphQlCommonResponse;
+  downloadTVEpisode: GraphQlCommonResponse;
   trackMovie: Movie;
   removeMovie: GraphQlCommonResponse;
   trackTVShow: TvShow;
@@ -133,6 +134,12 @@ export type MutationUpdateParamArgs = {
 export type MutationDownloadMovieArgs = {
   jackettResult: JackettInput;
   movieId: Scalars['Int'];
+};
+
+
+export type MutationDownloadTvEpisodeArgs = {
+  jackettResult: JackettInput;
+  episodeId: Scalars['Int'];
 };
 
 
@@ -317,6 +324,20 @@ export type DownloadMovieMutationVariables = {
 
 
 export type DownloadMovieMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
+export type DownloadTvEpisodeMutationVariables = {
+  episodeId: Scalars['Int'];
+  jackettResult: JackettInput;
+};
+
+
+export type DownloadTvEpisodeMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
@@ -661,6 +682,40 @@ export function useDownloadMovieMutation(baseOptions?: ApolloReactHooks.Mutation
 export type DownloadMovieMutationHookResult = ReturnType<typeof useDownloadMovieMutation>;
 export type DownloadMovieMutationResult = ApolloReactCommon.MutationResult<DownloadMovieMutation>;
 export type DownloadMovieMutationOptions = ApolloReactCommon.BaseMutationOptions<DownloadMovieMutation, DownloadMovieMutationVariables>;
+export const DownloadTvEpisodeDocument = gql`
+    mutation downloadTVEpisode($episodeId: Int!, $jackettResult: JackettInput!) {
+  result: downloadTVEpisode(episodeId: $episodeId, jackettResult: $jackettResult) {
+    success
+    message
+  }
+}
+    `;
+export type DownloadTvEpisodeMutationFn = ApolloReactCommon.MutationFunction<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>;
+
+/**
+ * __useDownloadTvEpisodeMutation__
+ *
+ * To run a mutation, you first call `useDownloadTvEpisodeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDownloadTvEpisodeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [downloadTvEpisodeMutation, { data, loading, error }] = useDownloadTvEpisodeMutation({
+ *   variables: {
+ *      episodeId: // value for 'episodeId'
+ *      jackettResult: // value for 'jackettResult'
+ *   },
+ * });
+ */
+export function useDownloadTvEpisodeMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>) {
+        return ApolloReactHooks.useMutation<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>(DownloadTvEpisodeDocument, baseOptions);
+      }
+export type DownloadTvEpisodeMutationHookResult = ReturnType<typeof useDownloadTvEpisodeMutation>;
+export type DownloadTvEpisodeMutationResult = ApolloReactCommon.MutationResult<DownloadTvEpisodeMutation>;
+export type DownloadTvEpisodeMutationOptions = ApolloReactCommon.BaseMutationOptions<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>;
 export const RemoveMovieDocument = gql`
     mutation removeMovie($tmdbId: Int!) {
   result: removeMovie(tmdbId: $tmdbId) {
