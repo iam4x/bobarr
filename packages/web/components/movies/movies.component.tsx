@@ -1,49 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Mansonry from 'react-masonry-component';
-import { orderBy } from 'lodash';
-import { Skeleton, Empty, Button, Input } from 'antd';
+import { Skeleton, Empty } from 'antd';
 
-import {
-  SortDescendingOutlined,
-  SortAscendingOutlined,
-} from '@ant-design/icons';
-
-import { useGetLibraryMoviesQuery } from '../../utils/graphql';
-import { createSearchFunction } from '../../utils/create-search-function';
+import { useGetLibraryMoviesQuery, EnrichedMovie } from '../../utils/graphql';
 
 import { LibraryHeaderComponent } from '../library-header/library-header.component';
 import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
 
 import { MoviesComponentStyles } from './movies.styles';
+import { useSortable } from '../sortable/sortable.component';
 
 const sortAttributes = [
   { label: 'Name', key: 'title' },
-  { label: 'Added at', key: 'createdAt' },
   { label: 'Release date', key: 'releaseDate' },
   { label: 'Score', key: 'voteAverage' },
-] as const;
+  { label: 'Added at', key: 'createdAt' },
+];
 
 export function MoviesComponent() {
   const { data, loading } = useGetLibraryMoviesQuery();
-
-  const [orderByAttribute, setOderByAttribute] = useState('title:asc');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const searchFn = createSearchFunction(['title', 'releaseDate'], searchQuery);
-
-  const [key, order] = orderByAttribute.split(':') as [string, 'desc' | 'asc'];
-  const rows = orderBy(data?.movies, [key], [order]).filter((row) =>
-    searchQuery.trim() && searchQuery.trim().length >= 3 ? searchFn(row) : true
-  );
-
-  const handleSort = (newSort: { label: string; key: string }) => {
-    if (newSort.key === key) {
-      return setOderByAttribute(
-        order === 'asc' ? `${newSort.key}:desc` : `${newSort.key}:asc`
-      );
-    }
-    return setOderByAttribute(`${newSort.key}:desc`);
-  };
+  const { renderSortable, results } = useSortable<EnrichedMovie>({
+    sortAttributes,
+    searchableAttributes: ['title', 'releaseDate'],
+    rows: data?.movies,
+  });
 
   return (
     <>
@@ -51,38 +31,12 @@ export function MoviesComponent() {
       <MoviesComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>
-            <div className="header">
-              <div className="sort-buttons">
-                {sortAttributes.map((sortAttr) => (
-                  <Button
-                    key={sortAttr.key}
-                    type={sortAttr.key === key ? 'default' : 'dashed'}
-                    onClick={() => handleSort(sortAttr)}
-                    icon={
-                      sortAttr.key === key
-                        ? (order === 'asc' && <SortDescendingOutlined />) || (
-                            <SortAscendingOutlined />
-                          )
-                        : undefined
-                    }
-                  >
-                    {sortAttr.label}
-                  </Button>
-                ))}
-              </div>
-              <div className="search-input">
-                <Input.Search
-                  value={searchQuery}
-                  onChange={({ target }) => setSearchQuery(target.value)}
-                />
-              </div>
-            </div>
-
-            {rows.length === 0 ? (
+            {renderSortable()}
+            {results.length === 0 ? (
               <Empty />
             ) : (
               <Mansonry className="flex">
-                {rows.map((movie) => (
+                {results.map((movie) => (
                   <div className="movie-card" key={movie.id}>
                     <TMDBCardComponent
                       type="movie"

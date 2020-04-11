@@ -22,17 +22,17 @@ export const MoviesComponentStyles = styled.div`
     height: ${({ theme }) => theme.tmdbCardHeight}px;
   }
 
-  .header {
+  .sortable {
     display: flex;
     margin-bottom: 24px;
-  }
 
-  .sort-buttons button {
-    margin-right: 8px;
-  }
+    .sort-buttons button {
+      margin-right: 8px;
+    }
 
-  .search-input {
-    margin-left: auto;
-    width: 300px;
+    .search-input {
+      margin-left: auto;
+      width: 300px;
+    }
   }
 `;
