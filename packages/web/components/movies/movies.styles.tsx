@@ -30,4 +30,9 @@ export const MoviesComponentStyles = styled.div`
   .sort-buttons button {
     margin-right: 8px;
   }
+
+  .search-input {
+    margin-left: auto;
+    width: 300px;
+  }
 `;
