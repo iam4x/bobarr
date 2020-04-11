@@ -141,8 +141,14 @@ export class JackettService {
 
   public async search(
     queries: string[],
-    { maxSize, isSeason }: { maxSize: number; isSeason?: boolean }
+    opts: { maxSize?: number; isSeason?: boolean; withoutFilter?: boolean }
   ) {
+    const {
+      maxSize = Infinity,
+      isSeason = false,
+      withoutFilter = false,
+    } = opts;
+
     const preferredTags = await this.paramsService.getList(
       ParameterKey.PREFERRED_TAGS
     );
@@ -168,18 +174,21 @@ export class JackettService {
     this.logger.info(`found ${rawResults.flat().length} potential results`);
     const results = uniqBy(rawResults.flat(), 'Guid')
       .map(this.formatSearchResult)
-      .filter(
-        (result) =>
-          // maxSize allowed
-          result.size < maxSize &&
-          // has at least 10 seeders
-          result.seeders >= 10 &&
-          // if tv season searched, filter out results with 'episode' in name
-          (!isSeason ||
-            !result.normalizedTitle.some((titlePart) =>
-              titlePart.match(/e\d+|episode|episode\d+|ep|ep\d+/)
-            ))
-      );
+      .filter((result) => {
+        if (withoutFilter) return true;
+
+        const hasAcceptableSize = result.size < maxSize;
+        const hasSeeders = result.seeders >= 5 && result.seeders > result.peers;
+
+        if (isSeason) {
+          const isEpisode = result.normalizedTitle.some((titlePart) =>
+            titlePart.match(/e\d+|episode|episode\d+|ep|ep\d+/)
+          );
+          return hasAcceptableSize && hasSeeders && !isEpisode;
+        }
+
+        return hasAcceptableSize && hasSeeders;
+      });
 
     this.logger.info(`found ${results.length} downloadable results`);
     const withPreferredTags = results.filter(

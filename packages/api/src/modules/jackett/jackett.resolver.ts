@@ -10,7 +10,7 @@ export class JackettResolver {
   @Query((_returns) => [JackettFormattedResult])
   public async searchJackett(@Args('query') query: string) {
     const results = await this.jacketService.search([query], {
-      maxSize: Infinity,
+      withoutFilter: true,
     });
     return results.map((result) => ({
       ...result,
