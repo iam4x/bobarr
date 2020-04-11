@@ -24,7 +24,7 @@ export function TVShowsComponent() {
   const { data, loading } = useGetLibraryTvShowsQuery();
   const { renderSortable, results } = useSortable<EnrichedTvShow>({
     sortAttributes,
-    searchableAttributes: ['title', 'releaseDate'],
+    searchableAttributes: ['title', 'originalTitle', 'releaseDate'],
     rows: data?.tvShows,
   });
 

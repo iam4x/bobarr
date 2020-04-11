@@ -21,7 +21,7 @@ export function MoviesComponent() {
   const { data, loading } = useGetLibraryMoviesQuery();
   const { renderSortable, results } = useSortable<EnrichedMovie>({
     sortAttributes,
-    searchableAttributes: ['title', 'releaseDate'],
+    searchableAttributes: ['title', 'originalTitle', 'releaseDate'],
     rows: data?.movies,
   });
 

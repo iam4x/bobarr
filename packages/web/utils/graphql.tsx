@@ -40,6 +40,7 @@ export type EnrichedMovie = {
   state: DownloadableMediaState;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  originalTitle?: Maybe<Scalars['String']>;
   posterPath?: Maybe<Scalars['String']>;
   voteAverage: Scalars['Float'];
   releaseDate: Scalars['String'];
@@ -65,6 +66,7 @@ export type EnrichedTvShow = {
   title: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  originalTitle?: Maybe<Scalars['String']>;
   posterPath?: Maybe<Scalars['String']>;
   voteAverage: Scalars['Float'];
   releaseDate: Scalars['String'];
@@ -431,7 +433,7 @@ export type GetLibraryMoviesQuery = (
   { __typename?: 'Query' }
   & { movies: Array<(
     { __typename?: 'EnrichedMovie' }
-    & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'state' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
+    & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'state' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -442,7 +444,7 @@ export type GetLibraryTvShowsQuery = (
   { __typename?: 'Query' }
   & { tvShows: Array<(
     { __typename?: 'EnrichedTVShow' }
-    & Pick<EnrichedTvShow, 'id' | 'tmdbId' | 'title' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
+    & Pick<EnrichedTvShow, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -925,6 +927,7 @@ export const GetLibraryMoviesDocument = gql`
     id
     tmdbId
     title
+    originalTitle
     state
     posterPath
     voteAverage
@@ -965,6 +968,7 @@ export const GetLibraryTvShowsDocument = gql`
     id
     tmdbId
     title
+    originalTitle
     posterPath
     voteAverage
     releaseDate
