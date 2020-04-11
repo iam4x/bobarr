@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { Tag } from 'antd';
-import { orderBy } from 'lodash';
+import { orderBy, uniqBy } from 'lodash';
 import { useRouter } from 'next/router';
 
 import { formatNumber } from '../../utils/format-number';
@@ -32,10 +32,16 @@ export function MissingComponent() {
       ['asc']
     );
 
+    const missing = withDate.filter((row) => row.date.isBefore(new Date()));
+    const notAired = uniqBy(
+      withDate.filter((row) => row.date.isAfter(new Date())),
+      'tvShow.id'
+    );
+
     return (
       <MissingComponentStyles>
         <div className="wrapper">
-          {withDate.map((row) => (
+          {missing.map((row) => (
             <div key={row.id} className="row">
               {/* missing movie */}
               {row.__typename === 'EnrichedMovie' && (
@@ -56,9 +62,32 @@ export function MissingComponent() {
                 </div>
               )}
 
-              <Tag>
-                {row.date.isAfter(new Date()) ? `not aired yet` : 'missing'}
-              </Tag>
+              <Tag>Missing</Tag>
+            </div>
+          ))}
+
+          {notAired.map((row) => (
+            <div key={row.id} className="row">
+              {/* not released movie */}
+              {row.__typename === 'EnrichedMovie' && (
+                <div>
+                  <span className="title">{row.title}</span>
+                  <span className="date">({row.date.format('YYYY')})</span>
+                </div>
+              )}
+
+              {/* not aired tv episode */}
+              {row.__typename === 'EnrichedTVEpisode' && (
+                <div>
+                  <span className="title">{row.tvShow?.title}</span>
+                  <span className="episode-number">
+                    S{formatNumber(row.seasonNumber!)}E
+                    {formatNumber(row.episodeNumber!)}
+                  </span>
+                </div>
+              )}
+
+              <AvailableIn date={row.date} />
             </div>
           ))}
         </div>
@@ -67,4 +96,14 @@ export function MissingComponent() {
   }
 
   return <noscript />;
+}
+
+function AvailableIn({ date }: { date: dayjs.Dayjs }) {
+  const days = date.diff(new Date(), 'day');
+
+  let label = `Available in ${days} days`;
+  if (days === 0) label = `On air today`;
+  if (days > 14) label = `Avaible on ${date.format('DD/MM')}`;
+
+  return <Tag>{label}</Tag>;
 }
