@@ -25,7 +25,7 @@ And to have something with a better ui, less configuration and faster 🚀
 
 ## Installation
 
-* Clone the repo `$ git clone ssh://github.com/iam4x/bobarr.git && cd bobarr`
+* Clone the repo `$ git clone git@github.com:iam4x/bobarr.git && cd bobarr`
 
 * Set `PUID` and `PGID` in `.env` (see .env for explanation)
 * Start the bobarr minimal stack `$ docker-compose up --build -d` (see below to add vpn)
