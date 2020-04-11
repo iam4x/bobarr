@@ -20,18 +20,18 @@ export function useSortable<TEntity>(props: UseSortableProps<TEntity>) {
 
   const [results, setResults] = useState(rows || []);
   const [searchQuery, setSearchQuery] = useState('');
-  const [orderByAttribute, setOderByAttribute] = useState(
+  const [orderByAttribute, setOrderByAttribute] = useState(
     `${sortAttributes[0].key}:asc`
   );
 
   const [key, order] = orderByAttribute.split(':') as [string, 'desc' | 'asc'];
   const handleSort = (newSort: { label: string; key: string }) => {
     if (newSort.key === key) {
-      return setOderByAttribute(
+      return setOrderByAttribute(
         order === 'asc' ? `${newSort.key}:desc` : `${newSort.key}:asc`
       );
     }
-    return setOderByAttribute(`${newSort.key}:desc`);
+    return setOrderByAttribute(`${newSort.key}:desc`);
   };
 
   useEffect(() => {
@@ -42,7 +42,8 @@ export function useSortable<TEntity>(props: UseSortableProps<TEntity>) {
         : true
     );
     setResults(filteredAndOrdered);
-  }, [searchQuery, orderByAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows, searchQuery, orderByAttribute]);
 
   const renderSortable = () => (
     <div className="sortable">
