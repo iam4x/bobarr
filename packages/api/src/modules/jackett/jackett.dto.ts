@@ -1,23 +1,40 @@
 import { ObjectType, Field } from '@nestjs/graphql';
+import BigInt from 'graphql-bigint';
+
+export interface JackettResult {
+  FirstSeen: string;
+  Tracker: string;
+  TrackerId: string;
+  CategoryDesc: string;
+  Title: string;
+  Guid: string;
+  Link: string;
+  Comments: string;
+  PublishDate: string;
+  Category: number[];
+  Size: number;
+  Grabs: number;
+  Seeders: number;
+  Peers: number;
+  MinimumRatio: number;
+  MinimumSeedTime: number;
+  DownloadVolumeFactor: number;
+  UploadVolumeFactor: number;
+}
 
 @ObjectType()
-export class JackettResult {
-  @Field() public FirstSeen!: string;
-  @Field() public Tracker!: string;
-  @Field() public TrackerId!: string;
-  @Field() public CategoryDesc!: string;
-  @Field() public Title!: string;
-  @Field() public Guid!: string;
-  @Field() public Link!: string;
-  @Field() public Comments!: string;
-  @Field() public PublishDate!: string;
-  @Field() public Category!: number[];
-  @Field() public Size!: number;
-  @Field() public Grabs!: number;
-  @Field() public Seeders!: number;
-  @Field() public Peers!: number;
-  @Field() public MinimumRatio!: number;
-  @Field() public MinimumSeedTime!: number;
-  @Field() public DownloadVolumeFactor!: number;
-  @Field() public UploadVolumeFactor!: number;
+export class JackettFormattedResult {
+  @Field() public id!: string;
+  @Field() public title!: string;
+  @Field() public quality!: string;
+  @Field() public qualityScore!: number;
+  @Field() public seeders!: number;
+  @Field() public peers!: number;
+  @Field() public link!: string;
+  @Field() public downloadLink!: string;
+  @Field() public tag!: string;
+  @Field() public tagScore!: number;
+  @Field() public publishDate!: string;
+  @Field((_type) => [String]) public normalizedTitle!: string[];
+  @Field((_type) => BigInt) public size!: BigInt;
 }

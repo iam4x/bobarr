@@ -76,6 +76,30 @@ export type GraphQlCommonResponse = {
   message?: Maybe<Scalars['String']>;
 };
 
+export type JackettFormattedResult = {
+   __typename?: 'JackettFormattedResult';
+  id: Scalars['String'];
+  title: Scalars['String'];
+  quality: Scalars['String'];
+  qualityScore: Scalars['Float'];
+  seeders: Scalars['Float'];
+  peers: Scalars['Float'];
+  link: Scalars['String'];
+  downloadLink: Scalars['String'];
+  tag: Scalars['String'];
+  tagScore: Scalars['Float'];
+  publishDate: Scalars['String'];
+  normalizedTitle: Array<Scalars['String']>;
+  size: Scalars['BigInt'];
+};
+
+export type JackettInput = {
+  title: Scalars['String'];
+  downloadLink: Scalars['String'];
+  quality: Scalars['String'];
+  tag: Scalars['String'];
+};
+
 export type Movie = {
    __typename?: 'Movie';
   id: Scalars['Float'];
@@ -92,6 +116,8 @@ export type Mutation = {
   startScanLibraryJob: GraphQlCommonResponse;
   startFindNewEpisodesJob: GraphQlCommonResponse;
   startDownloadMissingJob: GraphQlCommonResponse;
+  downloadMovie: GraphQlCommonResponse;
+  downloadTVEpisode: GraphQlCommonResponse;
   trackMovie: Movie;
   removeMovie: GraphQlCommonResponse;
   trackTVShow: TvShow;
@@ -102,6 +128,18 @@ export type Mutation = {
 export type MutationUpdateParamArgs = {
   value: Scalars['String'];
   key: ParameterKey;
+};
+
+
+export type MutationDownloadMovieArgs = {
+  jackettResult: JackettInput;
+  movieId: Scalars['Int'];
+};
+
+
+export type MutationDownloadTvEpisodeArgs = {
+  jackettResult: JackettInput;
+  episodeId: Scalars['Int'];
 };
 
 
@@ -153,6 +191,7 @@ export type Query = {
   search: TmdbSearchResults;
   getPopular: TmdbSearchResults;
   getTVShowSeasons: Array<TmdbFormattedTvSeason>;
+  searchJackett: Array<JackettFormattedResult>;
   getTorrentStatus: TorrentStatus;
   getDownloadingMedias: Array<DownloadingMedia>;
   getMovies: Array<EnrichedMovie>;
@@ -169,6 +208,11 @@ export type QuerySearchArgs = {
 
 export type QueryGetTvShowSeasonsArgs = {
   tvShowTMDBId: Scalars['Int'];
+};
+
+
+export type QuerySearchJackettArgs = {
+  query: Scalars['String'];
 };
 
 
@@ -266,6 +310,34 @@ export type StartDownloadMissingMutationVariables = {};
 
 
 export type StartDownloadMissingMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
+export type DownloadMovieMutationVariables = {
+  movieId: Scalars['Int'];
+  jackettResult: JackettInput;
+};
+
+
+export type DownloadMovieMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
+export type DownloadTvEpisodeMutationVariables = {
+  episodeId: Scalars['Int'];
+  jackettResult: JackettInput;
+};
+
+
+export type DownloadTvEpisodeMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
@@ -447,6 +519,19 @@ export type GetTvShowSeasonsQuery = (
   )> }
 );
 
+export type SearchTorrentQueryVariables = {
+  query: Scalars['String'];
+};
+
+
+export type SearchTorrentQuery = (
+  { __typename?: 'Query' }
+  & { results: Array<(
+    { __typename?: 'JackettFormattedResult' }
+    & Pick<JackettFormattedResult, 'id' | 'title' | 'quality' | 'qualityScore' | 'seeders' | 'peers' | 'link' | 'downloadLink' | 'tag' | 'tagScore' | 'normalizedTitle' | 'size' | 'publishDate'>
+  )> }
+);
+
 export type SearchQueryVariables = {
   query: Scalars['String'];
 };
@@ -563,6 +648,74 @@ export function useStartDownloadMissingMutation(baseOptions?: ApolloReactHooks.M
 export type StartDownloadMissingMutationHookResult = ReturnType<typeof useStartDownloadMissingMutation>;
 export type StartDownloadMissingMutationResult = ApolloReactCommon.MutationResult<StartDownloadMissingMutation>;
 export type StartDownloadMissingMutationOptions = ApolloReactCommon.BaseMutationOptions<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>;
+export const DownloadMovieDocument = gql`
+    mutation downloadMovie($movieId: Int!, $jackettResult: JackettInput!) {
+  result: downloadMovie(movieId: $movieId, jackettResult: $jackettResult) {
+    success
+    message
+  }
+}
+    `;
+export type DownloadMovieMutationFn = ApolloReactCommon.MutationFunction<DownloadMovieMutation, DownloadMovieMutationVariables>;
+
+/**
+ * __useDownloadMovieMutation__
+ *
+ * To run a mutation, you first call `useDownloadMovieMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDownloadMovieMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [downloadMovieMutation, { data, loading, error }] = useDownloadMovieMutation({
+ *   variables: {
+ *      movieId: // value for 'movieId'
+ *      jackettResult: // value for 'jackettResult'
+ *   },
+ * });
+ */
+export function useDownloadMovieMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DownloadMovieMutation, DownloadMovieMutationVariables>) {
+        return ApolloReactHooks.useMutation<DownloadMovieMutation, DownloadMovieMutationVariables>(DownloadMovieDocument, baseOptions);
+      }
+export type DownloadMovieMutationHookResult = ReturnType<typeof useDownloadMovieMutation>;
+export type DownloadMovieMutationResult = ApolloReactCommon.MutationResult<DownloadMovieMutation>;
+export type DownloadMovieMutationOptions = ApolloReactCommon.BaseMutationOptions<DownloadMovieMutation, DownloadMovieMutationVariables>;
+export const DownloadTvEpisodeDocument = gql`
+    mutation downloadTVEpisode($episodeId: Int!, $jackettResult: JackettInput!) {
+  result: downloadTVEpisode(episodeId: $episodeId, jackettResult: $jackettResult) {
+    success
+    message
+  }
+}
+    `;
+export type DownloadTvEpisodeMutationFn = ApolloReactCommon.MutationFunction<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>;
+
+/**
+ * __useDownloadTvEpisodeMutation__
+ *
+ * To run a mutation, you first call `useDownloadTvEpisodeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDownloadTvEpisodeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [downloadTvEpisodeMutation, { data, loading, error }] = useDownloadTvEpisodeMutation({
+ *   variables: {
+ *      episodeId: // value for 'episodeId'
+ *      jackettResult: // value for 'jackettResult'
+ *   },
+ * });
+ */
+export function useDownloadTvEpisodeMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>) {
+        return ApolloReactHooks.useMutation<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>(DownloadTvEpisodeDocument, baseOptions);
+      }
+export type DownloadTvEpisodeMutationHookResult = ReturnType<typeof useDownloadTvEpisodeMutation>;
+export type DownloadTvEpisodeMutationResult = ApolloReactCommon.MutationResult<DownloadTvEpisodeMutation>;
+export type DownloadTvEpisodeMutationOptions = ApolloReactCommon.BaseMutationOptions<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>;
 export const RemoveMovieDocument = gql`
     mutation removeMovie($tmdbId: Int!) {
   result: removeMovie(tmdbId: $tmdbId) {
@@ -1055,6 +1208,51 @@ export function useGetTvShowSeasonsLazyQuery(baseOptions?: ApolloReactHooks.Lazy
 export type GetTvShowSeasonsQueryHookResult = ReturnType<typeof useGetTvShowSeasonsQuery>;
 export type GetTvShowSeasonsLazyQueryHookResult = ReturnType<typeof useGetTvShowSeasonsLazyQuery>;
 export type GetTvShowSeasonsQueryResult = ApolloReactCommon.QueryResult<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>;
+export const SearchTorrentDocument = gql`
+    query searchTorrent($query: String!) {
+  results: searchJackett(query: $query) {
+    id
+    title
+    quality
+    qualityScore
+    seeders
+    peers
+    link
+    downloadLink
+    tag
+    tagScore
+    normalizedTitle
+    size
+    publishDate
+  }
+}
+    `;
+
+/**
+ * __useSearchTorrentQuery__
+ *
+ * To run a query within a React component, call `useSearchTorrentQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchTorrentQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchTorrentQuery({
+ *   variables: {
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useSearchTorrentQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
+        return ApolloReactHooks.useQuery<SearchTorrentQuery, SearchTorrentQueryVariables>(SearchTorrentDocument, baseOptions);
+      }
+export function useSearchTorrentLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<SearchTorrentQuery, SearchTorrentQueryVariables>(SearchTorrentDocument, baseOptions);
+        }
+export type SearchTorrentQueryHookResult = ReturnType<typeof useSearchTorrentQuery>;
+export type SearchTorrentLazyQueryHookResult = ReturnType<typeof useSearchTorrentLazyQuery>;
+export type SearchTorrentQueryResult = ApolloReactCommon.QueryResult<SearchTorrentQuery, SearchTorrentQueryVariables>;
 export const SearchDocument = gql`
     query search($query: String!) {
   results: search(query: $query) {

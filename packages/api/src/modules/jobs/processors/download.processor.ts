@@ -18,6 +18,7 @@ import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 
 import { JackettService } from 'src/modules/jackett/jackett.service';
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
+import { LibraryService } from 'src/modules/library/library.service';
 
 @Processor(JobsQueue.DOWNLOAD)
 export class DownloadProcessor {
@@ -29,7 +30,8 @@ export class DownloadProcessor {
     private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tvEpisodeDAO: TVEpisodeDAO,
     private readonly jackettService: JackettService,
-    private readonly transmissionService: TransmissionService
+    private readonly transmissionService: TransmissionService,
+    private readonly libraryService: LibraryService
   ) {
     this.logger = logger.child({ context: 'DownloadProcessor' });
   }
@@ -71,27 +73,11 @@ export class DownloadProcessor {
       return;
     }
 
-    this.logger.info('found movie torrent to download');
-    this.logger.info(bestResult.title);
-
-    const torrent = await this.transmissionService.addTorrentURL(
-      bestResult.downloadLink,
-      {
-        resourceType: FileType.MOVIE,
-        resourceId: movieId,
-        quality: bestResult.quality.label,
-        tag: bestResult.tag.label,
-      }
-    );
-
-    await this.movieDAO.save({
-      id: movieId,
-      state: DownloadableMediaState.DOWNLOADING,
-    });
-
-    this.logger.info('download movie started', {
-      movieId,
-      torrentId: torrent.id,
+    await this.libraryService.downloadMovie(movieId, {
+      title: bestResult.title,
+      downloadLink: bestResult.downloadLink,
+      tag: bestResult.tag.label,
+      quality: bestResult.quality.label,
     });
 
     return;
@@ -150,27 +136,11 @@ export class DownloadProcessor {
       return;
     }
 
-    this.logger.info('found episode torrent to download');
-    this.logger.info(bestResult.title);
-
-    const torrent = await this.transmissionService.addTorrentURL(
-      bestResult.downloadLink,
-      {
-        resourceType: FileType.EPISODE,
-        resourceId: episodeId,
-        quality: bestResult.quality.label,
-        tag: bestResult.tag.label,
-      }
-    );
-
-    await this.tvEpisodeDAO.save({
-      id: episodeId,
-      state: DownloadableMediaState.DOWNLOADING,
-    });
-
-    this.logger.info('download episode started', {
-      episodeId,
-      torrentId: torrent.id,
+    await this.libraryService.downloadTVEpisode(episodeId, {
+      title: bestResult.title,
+      downloadLink: bestResult.downloadLink,
+      tag: bestResult.tag.label,
+      quality: bestResult.quality.label,
     });
 
     return;
