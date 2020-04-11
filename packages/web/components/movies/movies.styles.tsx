@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const MoviesComponentStyles = styled.div`
-  padding-top: 64px;
+  padding-top: 32px;
 
   .wrapper {
     max-width: 1200px;
@@ -20,5 +20,14 @@ export const MoviesComponentStyles = styled.div`
     margin-left: 12px;
     margin-right: 12px;
     height: ${({ theme }) => theme.tmdbCardHeight}px;
+  }
+
+  .header {
+    display: flex;
+    margin-bottom: 24px;
+  }
+
+  .sort-buttons button {
+    margin-right: 8px;
   }
 `;
