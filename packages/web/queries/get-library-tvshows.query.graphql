@@ -3,6 +3,7 @@ query getLibraryTVShows {
     id
     tmdbId
     title
+    originalTitle
     posterPath
     voteAverage
     releaseDate

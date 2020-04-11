@@ -3,6 +3,7 @@ query getLibraryMovies {
     id
     tmdbId
     title
+    originalTitle
     state
     posterPath
     voteAverage

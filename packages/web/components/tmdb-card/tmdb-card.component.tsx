@@ -6,7 +6,11 @@ import {
   FolderOpenOutlined,
 } from '@ant-design/icons';
 
-import { TmdbSearchResult, EnrichedMovie } from '../../utils/graphql';
+import {
+  TmdbSearchResult,
+  EnrichedMovie,
+  EnrichedTvShow,
+} from '../../utils/graphql';
 
 import { TMDBCardStyles } from './tmdb-card.styles';
 import { useAddLibrary } from './use-add-library.hook';
@@ -15,7 +19,7 @@ import { TVShowSeasonsModalComponent } from '../tvshow-seasons-modal/tvshow-seas
 
 interface TMDBCardComponentProps {
   type: 'tvshow' | 'movie';
-  result: TmdbSearchResult | EnrichedMovie;
+  result: TmdbSearchResult | EnrichedMovie | EnrichedTvShow;
   inLibrary?: boolean;
 }
 

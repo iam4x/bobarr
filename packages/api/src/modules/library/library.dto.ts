@@ -6,6 +6,7 @@ import { TVEpisode } from 'src/entities/tvepisode.entity';
 
 @ObjectType()
 export class EnrichedMovie extends Movie {
+  @Field({ nullable: true }) public originalTitle?: string;
   @Field({ nullable: true }) public posterPath?: string;
   @Field() public voteAverage!: number;
   @Field() public releaseDate!: string;
@@ -13,6 +14,7 @@ export class EnrichedMovie extends Movie {
 
 @ObjectType()
 export class EnrichedTVShow extends TVShow {
+  @Field({ nullable: true }) public originalTitle?: string;
   @Field({ nullable: true }) public posterPath?: string;
   @Field() public voteAverage!: number;
   @Field() public releaseDate!: string;

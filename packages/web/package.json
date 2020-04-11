@@ -31,6 +31,7 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-icons": "^3.9.0",
+    "react-masonry-component": "^6.2.1",
     "react-modal": "^3.11.2",
     "styled-components": "^5.0.1",
     "styled-reset": "^4.1.2",
