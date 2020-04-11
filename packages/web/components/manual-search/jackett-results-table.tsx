@@ -27,6 +27,9 @@ export function JackettResultsTable(props: JackettResultTableProps) {
     {
       title: 'Age',
       width: 75,
+      sorter: (a, b) =>
+        Number(dayjs(a.publishDate).toDate()) -
+        Number(dayjs(b.publishDate).toDate()),
       render: (row: JackettFormattedResult) => {
         const diff = Math.abs(dayjs(row.publishDate).diff(new Date(), 'day'));
         return `${diff} days`;
