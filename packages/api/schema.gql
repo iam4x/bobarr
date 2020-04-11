@@ -85,6 +85,13 @@ type JackettFormattedResult {
   size: BigInt!
 }
 
+input JackettInput {
+  title: String!
+  downloadLink: String!
+  quality: String!
+  tag: String!
+}
+
 type Movie {
   id: Float!
   tmdbId: Float!
@@ -99,6 +106,7 @@ type Mutation {
   startScanLibraryJob: GraphQLCommonResponse!
   startFindNewEpisodesJob: GraphQLCommonResponse!
   startDownloadMissingJob: GraphQLCommonResponse!
+  downloadMovie(jackettResult: JackettInput!, movieId: Int!): GraphQLCommonResponse!
   trackMovie(tmdbId: Int!, title: String!): Movie!
   removeMovie(tmdbId: Int!): GraphQLCommonResponse!
   trackTVShow(seasonNumbers: [Int!]!, tmdbId: Int!): TVShow!

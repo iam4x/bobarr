@@ -1,4 +1,4 @@
-import { ObjectType, Field } from '@nestjs/graphql';
+import { ObjectType, Field, InputType } from '@nestjs/graphql';
 
 import { Movie } from 'src/entities/movie.entity';
 import { TVShow } from 'src/entities/tvshow.entity';
@@ -32,4 +32,12 @@ export class DownloadingMedia {
   @Field() public torrent!: string;
   @Field() public resourceId!: number;
   @Field() public resourceType!: string;
+}
+
+@InputType()
+export class JackettInput {
+  @Field() public title!: string;
+  @Field() public downloadLink!: string;
+  @Field() public quality!: string;
+  @Field() public tag!: string;
 }

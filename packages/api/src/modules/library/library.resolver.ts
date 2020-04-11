@@ -5,11 +5,13 @@ import { Movie } from 'src/entities/movie.entity';
 import { TVShow } from 'src/entities/tvshow.entity';
 
 import { LibraryService } from './library.service';
+
 import {
   EnrichedMovie,
   EnrichedTVShow,
   DownloadingMedia,
   EnrichedTVEpisode,
+  JackettInput,
 } from './library.dto';
 
 @Resolver()
@@ -39,6 +41,16 @@ export class LibraryResolver {
   @Query((_returns) => [EnrichedMovie])
   public getMissingMovies() {
     return this.libraryService.findMissingMovies();
+  }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
+  public async downloadMovie(
+    @Args('movieId', { type: () => Int }) movieId: number,
+    @Args('jackettResult', { type: () => JackettInput })
+    jackettResult: JackettInput
+  ) {
+    await this.libraryService.downloadMovie(movieId, jackettResult);
+    return { success: true, message: 'MOVIE_DOWNLOAD_STARTED' };
   }
 
   @Mutation((_returns) => Movie, { name: 'trackMovie' })

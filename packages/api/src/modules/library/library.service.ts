@@ -30,6 +30,8 @@ import { TVShow } from 'src/entities/tvshow.entity';
 import { TVSeason } from 'src/entities/tvseason.entity';
 import { TVEpisode } from 'src/entities/tvepisode.entity';
 
+import { JackettInput } from './library.dto';
+
 @Injectable()
 export class LibraryService {
   // eslint-disable-next-line max-params
@@ -230,6 +232,31 @@ export class LibraryService {
 
     await tvShowDAO.remove(tvShow);
     this.logger.info('finish remove tv show', { tmdbId });
+  }
+
+  public async downloadMovie(movieId: number, jackettResult: JackettInput) {
+    this.logger.info('start manual download movie', { movieId });
+    this.logger.info(jackettResult.title);
+
+    const torrent = await this.transmissionService.addTorrentURL(
+      jackettResult.downloadLink,
+      {
+        resourceType: FileType.MOVIE,
+        resourceId: movieId,
+        quality: jackettResult.quality,
+        tag: jackettResult.tag,
+      }
+    );
+
+    await this.movieDAO.save({
+      id: movieId,
+      state: DownloadableMediaState.DOWNLOADING,
+    });
+
+    this.logger.info('download movie started', {
+      movieId,
+      torrent: torrent.id,
+    });
   }
 
   public async trackTVShow({
