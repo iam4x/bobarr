@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { Tag } from 'antd';
 import { orderBy, uniqBy } from 'lodash';
 import { useRouter } from 'next/router';
+import { SearchOutlined } from '@ant-design/icons';
 
 import { formatNumber } from '../../utils/format-number';
 
@@ -12,6 +13,7 @@ import {
   EnrichedTvEpisode,
 } from '../../utils/graphql';
 
+import { ManualSearchComponent } from '../manual-search/manual-search.component';
 import { MissingComponentStyles } from './missing.styles';
 
 export function MissingComponent() {
@@ -20,6 +22,10 @@ export function MissingComponent() {
     fetchPolicy: 'cache-and-network',
     pollInterval: 30 * 1000,
   });
+
+  const [manualSearch, setManualSearch] = useState<
+    Partial<EnrichedMovie> | Partial<EnrichedTvEpisode> | null
+  >(null);
 
   const isMovies = pathname.includes('movies');
   const rows: Array<Partial<EnrichedMovie> | Partial<EnrichedTvEpisode>> =
@@ -39,59 +45,73 @@ export function MissingComponent() {
     );
 
     return (
-      <MissingComponentStyles>
-        <div className="wrapper">
-          {missing.map((row) => (
-            <div key={row.id} className="row">
-              {/* missing movie */}
-              {row.__typename === 'EnrichedMovie' && (
-                <div>
-                  <span className="title">{row.title}</span>
-                  <span className="date">({row.date.format('YYYY')})</span>
-                </div>
-              )}
+      <>
+        {manualSearch && (
+          <ManualSearchComponent
+            media={manualSearch}
+            onRequestClose={() => setManualSearch(null)}
+          />
+        )}
 
-              {/* missing tv episode */}
-              {row.__typename === 'EnrichedTVEpisode' && (
-                <div>
-                  <span className="title">{row.tvShow?.title}</span>
-                  <span className="episode-number">
-                    S{formatNumber(row.seasonNumber!)}E
-                    {formatNumber(row.episodeNumber!)}
-                  </span>
-                </div>
-              )}
+        <MissingComponentStyles>
+          <div className="wrapper">
+            {missing.map((row) => (
+              <div key={row.id} className="row">
+                {/* missing movie */}
+                {row.__typename === 'EnrichedMovie' && (
+                  <div>
+                    <span className="title">{row.title}</span>
+                    <span className="date">({row.date.format('YYYY')})</span>
+                  </div>
+                )}
 
-              <Tag>Missing</Tag>
-            </div>
-          ))}
+                {/* missing tv episode */}
+                {row.__typename === 'EnrichedTVEpisode' && (
+                  <div>
+                    <span className="title">{row.tvShow?.title}</span>
+                    <span className="episode-number">
+                      S{formatNumber(row.seasonNumber!)}E
+                      {formatNumber(row.episodeNumber!)}
+                    </span>
+                  </div>
+                )}
 
-          {notAired.map((row) => (
-            <div key={row.id} className="row">
-              {/* not released movie */}
-              {row.__typename === 'EnrichedMovie' && (
-                <div>
-                  <span className="title">{row.title}</span>
-                  <span className="date">({row.date.format('YYYY')})</span>
-                </div>
-              )}
+                <Tag
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setManualSearch(row)}
+                >
+                  <SearchOutlined /> Missing
+                </Tag>
+              </div>
+            ))}
 
-              {/* not aired tv episode */}
-              {row.__typename === 'EnrichedTVEpisode' && (
-                <div>
-                  <span className="title">{row.tvShow?.title}</span>
-                  <span className="episode-number">
-                    S{formatNumber(row.seasonNumber!)}E
-                    {formatNumber(row.episodeNumber!)}
-                  </span>
-                </div>
-              )}
+            {notAired.map((row) => (
+              <div key={row.id} className="row">
+                {/* not released movie */}
+                {row.__typename === 'EnrichedMovie' && (
+                  <div>
+                    <span className="title">{row.title}</span>
+                    <span className="date">({row.date.format('YYYY')})</span>
+                  </div>
+                )}
 
-              <AvailableIn date={row.date} />
-            </div>
-          ))}
-        </div>
-      </MissingComponentStyles>
+                {/* not aired tv episode */}
+                {row.__typename === 'EnrichedTVEpisode' && (
+                  <div>
+                    <span className="title">{row.tvShow?.title}</span>
+                    <span className="episode-number">
+                      S{formatNumber(row.seasonNumber!)}E
+                      {formatNumber(row.episodeNumber!)}
+                    </span>
+                  </div>
+                )}
+
+                <AvailableIn date={row.date} />
+              </div>
+            ))}
+          </div>
+        </MissingComponentStyles>
+      </>
     );
   }
 

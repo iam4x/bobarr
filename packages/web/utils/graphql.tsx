@@ -76,6 +76,23 @@ export type GraphQlCommonResponse = {
   message?: Maybe<Scalars['String']>;
 };
 
+export type JackettFormattedResult = {
+   __typename?: 'JackettFormattedResult';
+  id: Scalars['String'];
+  title: Scalars['String'];
+  quality: Scalars['String'];
+  qualityScore: Scalars['Float'];
+  seeders: Scalars['Float'];
+  peers: Scalars['Float'];
+  link: Scalars['String'];
+  downloadLink: Scalars['String'];
+  tag: Scalars['String'];
+  tagScore: Scalars['Float'];
+  publishDate: Scalars['String'];
+  normalizedTitle: Array<Scalars['String']>;
+  size: Scalars['BigInt'];
+};
+
 export type Movie = {
    __typename?: 'Movie';
   id: Scalars['Float'];
@@ -153,6 +170,7 @@ export type Query = {
   search: TmdbSearchResults;
   getPopular: TmdbSearchResults;
   getTVShowSeasons: Array<TmdbFormattedTvSeason>;
+  searchJackett: Array<JackettFormattedResult>;
   getTorrentStatus: TorrentStatus;
   getDownloadingMedias: Array<DownloadingMedia>;
   getMovies: Array<EnrichedMovie>;
@@ -169,6 +187,11 @@ export type QuerySearchArgs = {
 
 export type QueryGetTvShowSeasonsArgs = {
   tvShowTMDBId: Scalars['Int'];
+};
+
+
+export type QuerySearchJackettArgs = {
+  query: Scalars['String'];
 };
 
 
@@ -444,6 +467,19 @@ export type GetTvShowSeasonsQuery = (
   & { seasons: Array<(
     { __typename?: 'TMDBFormattedTVSeason' }
     & Pick<TmdbFormattedTvSeason, 'id' | 'name' | 'seasonNumber' | 'episodeCount' | 'overview' | 'posterPath' | 'airDate' | 'inLibrary'>
+  )> }
+);
+
+export type SearchTorrentQueryVariables = {
+  query: Scalars['String'];
+};
+
+
+export type SearchTorrentQuery = (
+  { __typename?: 'Query' }
+  & { results: Array<(
+    { __typename?: 'JackettFormattedResult' }
+    & Pick<JackettFormattedResult, 'id' | 'title' | 'quality' | 'qualityScore' | 'seeders' | 'peers' | 'link' | 'downloadLink' | 'tag' | 'tagScore' | 'normalizedTitle' | 'size' | 'publishDate'>
   )> }
 );
 
@@ -1055,6 +1091,51 @@ export function useGetTvShowSeasonsLazyQuery(baseOptions?: ApolloReactHooks.Lazy
 export type GetTvShowSeasonsQueryHookResult = ReturnType<typeof useGetTvShowSeasonsQuery>;
 export type GetTvShowSeasonsLazyQueryHookResult = ReturnType<typeof useGetTvShowSeasonsLazyQuery>;
 export type GetTvShowSeasonsQueryResult = ApolloReactCommon.QueryResult<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>;
+export const SearchTorrentDocument = gql`
+    query searchTorrent($query: String!) {
+  results: searchJackett(query: $query) {
+    id
+    title
+    quality
+    qualityScore
+    seeders
+    peers
+    link
+    downloadLink
+    tag
+    tagScore
+    normalizedTitle
+    size
+    publishDate
+  }
+}
+    `;
+
+/**
+ * __useSearchTorrentQuery__
+ *
+ * To run a query within a React component, call `useSearchTorrentQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchTorrentQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchTorrentQuery({
+ *   variables: {
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useSearchTorrentQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
+        return ApolloReactHooks.useQuery<SearchTorrentQuery, SearchTorrentQueryVariables>(SearchTorrentDocument, baseOptions);
+      }
+export function useSearchTorrentLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<SearchTorrentQuery, SearchTorrentQueryVariables>(SearchTorrentDocument, baseOptions);
+        }
+export type SearchTorrentQueryHookResult = ReturnType<typeof useSearchTorrentQuery>;
+export type SearchTorrentLazyQueryHookResult = ReturnType<typeof useSearchTorrentLazyQuery>;
+export type SearchTorrentQueryResult = ApolloReactCommon.QueryResult<SearchTorrentQuery, SearchTorrentQueryVariables>;
 export const SearchDocument = gql`
     query search($query: String!) {
   results: search(query: $query) {
