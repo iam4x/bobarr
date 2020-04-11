@@ -8,6 +8,7 @@ import {
   useRemoveMovieMutation,
   GetDownloadingDocument,
   GetMissingDocument,
+  EnrichedTvShow,
 } from '../../utils/graphql';
 
 export function useRemoveLibrary({
@@ -15,7 +16,7 @@ export function useRemoveLibrary({
   result,
 }: {
   type: 'movie' | 'tvshow';
-  result: TmdbSearchResult | EnrichedMovie;
+  result: TmdbSearchResult | EnrichedMovie | EnrichedTvShow;
 }) {
   const [removeMovie] = useRemoveMovieMutation({
     awaitRefetchQueries: true,

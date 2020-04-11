@@ -8,6 +8,7 @@ import {
   GetLibraryMoviesDocument,
   GetDownloadingDocument,
   GetMissingDocument,
+  EnrichedTvShow,
 } from '../../utils/graphql';
 
 export function useAddLibrary({
@@ -15,7 +16,7 @@ export function useAddLibrary({
   result,
 }: {
   type: 'movie' | 'tvshow';
-  result: TmdbSearchResult | EnrichedMovie;
+  result: TmdbSearchResult | EnrichedMovie | EnrichedTvShow;
 }) {
   const [trackMovie] = useTrackMovieMutation({
     awaitRefetchQueries: true,
