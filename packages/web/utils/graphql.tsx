@@ -93,6 +93,13 @@ export type JackettFormattedResult = {
   size: Scalars['BigInt'];
 };
 
+export type JackettInput = {
+  title: Scalars['String'];
+  downloadLink: Scalars['String'];
+  quality: Scalars['String'];
+  tag: Scalars['String'];
+};
+
 export type Movie = {
    __typename?: 'Movie';
   id: Scalars['Float'];
@@ -109,6 +116,7 @@ export type Mutation = {
   startScanLibraryJob: GraphQlCommonResponse;
   startFindNewEpisodesJob: GraphQlCommonResponse;
   startDownloadMissingJob: GraphQlCommonResponse;
+  downloadMovie: GraphQlCommonResponse;
   trackMovie: Movie;
   removeMovie: GraphQlCommonResponse;
   trackTVShow: TvShow;
@@ -119,6 +127,12 @@ export type Mutation = {
 export type MutationUpdateParamArgs = {
   value: Scalars['String'];
   key: ParameterKey;
+};
+
+
+export type MutationDownloadMovieArgs = {
+  jackettResult: JackettInput;
+  movieId: Scalars['Int'];
 };
 
 
@@ -289,6 +303,20 @@ export type StartDownloadMissingMutationVariables = {};
 
 
 export type StartDownloadMissingMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
+export type DownloadMovieMutationVariables = {
+  movieId: Scalars['Int'];
+  jackettResult: JackettInput;
+};
+
+
+export type DownloadMovieMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
@@ -599,6 +627,40 @@ export function useStartDownloadMissingMutation(baseOptions?: ApolloReactHooks.M
 export type StartDownloadMissingMutationHookResult = ReturnType<typeof useStartDownloadMissingMutation>;
 export type StartDownloadMissingMutationResult = ApolloReactCommon.MutationResult<StartDownloadMissingMutation>;
 export type StartDownloadMissingMutationOptions = ApolloReactCommon.BaseMutationOptions<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>;
+export const DownloadMovieDocument = gql`
+    mutation downloadMovie($movieId: Int!, $jackettResult: JackettInput!) {
+  result: downloadMovie(movieId: $movieId, jackettResult: $jackettResult) {
+    success
+    message
+  }
+}
+    `;
+export type DownloadMovieMutationFn = ApolloReactCommon.MutationFunction<DownloadMovieMutation, DownloadMovieMutationVariables>;
+
+/**
+ * __useDownloadMovieMutation__
+ *
+ * To run a mutation, you first call `useDownloadMovieMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDownloadMovieMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [downloadMovieMutation, { data, loading, error }] = useDownloadMovieMutation({
+ *   variables: {
+ *      movieId: // value for 'movieId'
+ *      jackettResult: // value for 'jackettResult'
+ *   },
+ * });
+ */
+export function useDownloadMovieMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DownloadMovieMutation, DownloadMovieMutationVariables>) {
+        return ApolloReactHooks.useMutation<DownloadMovieMutation, DownloadMovieMutationVariables>(DownloadMovieDocument, baseOptions);
+      }
+export type DownloadMovieMutationHookResult = ReturnType<typeof useDownloadMovieMutation>;
+export type DownloadMovieMutationResult = ApolloReactCommon.MutationResult<DownloadMovieMutation>;
+export type DownloadMovieMutationOptions = ApolloReactCommon.BaseMutationOptions<DownloadMovieMutation, DownloadMovieMutationVariables>;
 export const RemoveMovieDocument = gql`
     mutation removeMovie($tmdbId: Int!) {
   result: removeMovie(tmdbId: $tmdbId) {

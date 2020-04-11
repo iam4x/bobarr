@@ -1,13 +1,19 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import prettySize from 'prettysize';
-import { truncate } from 'lodash';
+import { truncate, pick } from 'lodash';
 
-import { Table, Popover, Tag } from 'antd';
+import { Table, Popover, Tag, notification } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { DownloadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, LoadingOutlined } from '@ant-design/icons';
 
-import { JackettFormattedResult } from '../../utils/graphql';
+import {
+  JackettFormattedResult,
+  useDownloadMovieMutation,
+  GetLibraryMoviesDocument,
+  GetDownloadingDocument,
+  GetMissingDocument,
+} from '../../utils/graphql';
 
 import { Media } from './manual-search.helpers';
 
@@ -40,7 +46,7 @@ export function JackettResultsTable(props: JackettResultTableProps) {
     {
       title: 'Peers',
       width: 100,
-      defaultSortOrder: 'ascend',
+      defaultSortOrder: 'descend',
       sorter: (a, b) => a.seeders - b.seeders,
       render: (row: JackettFormattedResult) => (
         <Popover content={`${row.seeders} seeders, ${row.peers} leechers`}>
@@ -52,12 +58,13 @@ export function JackettResultsTable(props: JackettResultTableProps) {
     },
     {
       title: 'Quality',
-      width: 100,
+      width: 80,
       sorter: (a, b) => a.qualityScore - b.qualityScore,
       render: (row: JackettFormattedResult) => <Tag>{row.quality}</Tag>,
     },
     {
       title: <DownloadOutlined />,
+      width: 35,
       render: (row: JackettFormattedResult) => (
         // eslint-disable-next-line react/prop-types
         <ManualDownloadMedia media={props.media} jackettResult={row} />
@@ -82,5 +89,46 @@ function ManualDownloadMedia({
   media: Media;
   jackettResult: JackettFormattedResult;
 }) {
-  return <DownloadOutlined style={{ cursor: 'pointer' }} />;
+  const jackettInput = pick(jackettResult, [
+    'title',
+    'downloadLink',
+    'quality',
+    'tag',
+  ]);
+
+  const [downloadMovie, { loading }] = useDownloadMovieMutation({
+    awaitRefetchQueries: true,
+    refetchQueries: [
+      { query: GetLibraryMoviesDocument },
+      { query: GetDownloadingDocument },
+      { query: GetMissingDocument },
+    ],
+    onError: ({ message }) =>
+      notification.error({
+        message: message.replace('GraphQL error: ', ''),
+        placement: 'bottomRight',
+      }),
+    onCompleted: () =>
+      notification.success({
+        message: 'Download movie started',
+        placement: 'bottomRight',
+      }),
+  });
+
+  const handleClick = () => {
+    if (media.__typename === 'EnrichedMovie') {
+      downloadMovie({
+        variables: {
+          movieId: media.id!,
+          jackettResult: jackettInput,
+        },
+      });
+    }
+  };
+
+  return loading ? (
+    <LoadingOutlined />
+  ) : (
+    <DownloadOutlined style={{ cursor: 'pointer' }} onClick={handleClick} />
+  );
 }

@@ -1,0 +1,6 @@
+mutation downloadMovie($movieId: Int!, $jackettResult: JackettInput!) {
+  result: downloadMovie(movieId: $movieId, jackettResult: $jackettResult) {
+    success
+    message
+  }
+}
