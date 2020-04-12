@@ -104,6 +104,7 @@ type Movie {
 }
 
 type Mutation {
+  saveQualityParams(qualities: [QualityInput!]!): GraphQLCommonResponse!
   updateParam(value: String!, key: ParameterKey!): GraphQLCommonResponse!
   startScanLibraryJob: GraphQLCommonResponse!
   startFindNewEpisodesJob: GraphQLCommonResponse!
@@ -136,7 +137,22 @@ type ParamsHash {
   preferred_tags: String!
 }
 
+type Quality {
+  id: Float!
+  name: String!
+  match: [String!]!
+  score: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input QualityInput {
+  id: Float!
+  score: Float!
+}
+
 type Query {
+  getQualityParams: [Quality!]!
   getParams: ParamsHash!
   search(query: String!): TMDBSearchResults!
   getPopular: TMDBSearchResults!
