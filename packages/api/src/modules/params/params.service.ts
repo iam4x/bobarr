@@ -65,4 +65,8 @@ export class ParamsService {
     const param = await this.parameterDAO.findOne({ key });
     return param?.value ? param.value.split(',') : [];
   }
+
+  public getQualities() {
+    return this.qualityDAO.find({ order: { score: 'DESC' } });
+  }
 }

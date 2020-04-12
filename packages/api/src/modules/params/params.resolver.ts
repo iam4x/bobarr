@@ -11,11 +11,13 @@ import { QualityDAO } from 'src/entities/dao/quality.dao';
 import { Quality } from 'src/entities/quality.entity';
 
 import { ParamsHash, QualityInput } from './params.dto';
+import { ParamsService } from './params.service';
 
 @Resolver()
 export class ParamsResolver {
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
+    private readonly paramsService: ParamsService,
     private readonly parameterDAO: ParameterDAO,
     private readonly qualityDAO: QualityDAO
   ) {
@@ -24,7 +26,7 @@ export class ParamsResolver {
 
   @Query((_returns) => [Quality])
   public getQualityParams() {
-    return this.qualityDAO.find({ order: { score: 'DESC' } });
+    return this.paramsService.getQualities();
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)
