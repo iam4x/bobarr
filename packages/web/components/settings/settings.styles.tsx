@@ -28,6 +28,15 @@ export const SettingsComponentStyles = styled.div`
   .quality-preference {
     margin-top: 24px;
 
+    .ant-card-head-title {
+      display: flex;
+
+      .help {
+        cursor: pointer;
+        margin-left: auto;
+      }
+    }
+
     .ant-btn {
       margin-bottom: 4px;
       width: 100%;

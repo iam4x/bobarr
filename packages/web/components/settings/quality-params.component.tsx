@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, notification } from 'antd';
+import { Card, Button, notification, Popover } from 'antd';
+import { FaQuestionCircle } from 'react-icons/fa';
 
 import {
   DragDropContext,
@@ -76,7 +77,16 @@ export function QualityParamsComponent() {
 
   return (
     <Card
-      title="Quality preference"
+      title={
+        <>
+          <div className="title">Quality preference</div>
+          <div className="help">
+            <Popover content="Drag and drop to re-order the list">
+              <FaQuestionCircle />
+            </Popover>
+          </div>
+        </>
+      }
       className="quality-preference"
       loading={loading}
     >
