@@ -86,6 +86,7 @@ export const SearchStyles = styled.div`
 
       .arrow-right,
       .arrow-left {
+        background: transparent;
         position: absolute;
         outline: none;
         border: none;
