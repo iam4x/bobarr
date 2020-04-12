@@ -1,37 +1,40 @@
-import {
-  Resolver,
-  ObjectType,
-  Field,
-  Query,
-  Mutation,
-  Args,
-} from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
-import { ParameterDAO } from 'src/entities/dao/parameter.dao';
 import { GraphQLCommonResponse, ParameterKey } from 'src/app.dto';
 
-@ObjectType()
-class ParamsHash {
-  @Field() public region!: string;
-  @Field() public language!: string;
-  @Field() public tmdb_api_key!: string;
-  @Field() public jackett_api_key!: string;
-  @Field() public max_movie_download_size!: string;
-  @Field() public max_tvshow_episode_download_size!: string;
-  @Field() public preferred_tags!: string;
-}
+import { ParameterDAO } from 'src/entities/dao/parameter.dao';
+import { QualityDAO } from 'src/entities/dao/quality.dao';
+import { Quality } from 'src/entities/quality.entity';
+
+import { ParamsHash, QualityInput } from './params.dto';
+import { ParamsService } from './params.service';
 
 @Resolver()
 export class ParamsResolver {
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
-    private readonly parameterDAO: ParameterDAO
+    private readonly paramsService: ParamsService,
+    private readonly parameterDAO: ParameterDAO,
+    private readonly qualityDAO: QualityDAO
   ) {
     this.logger = logger.child({ context: 'ParamsResolver' });
+  }
+
+  @Query((_returns) => [Quality])
+  public getQualityParams() {
+    return this.paramsService.getQualities();
+  }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
+  public async saveQualityParams(
+    @Args('qualities', { type: () => [QualityInput] }) qualities: QualityInput[]
+  ) {
+    await this.qualityDAO.save(qualities);
+    return { success: true, message: 'QUALITY_PARAMS_UPDATED' };
   }
 
   @Query((_returns) => ParamsHash)

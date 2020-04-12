@@ -1,0 +1,10 @@
+query getQuality {
+  qualities: getQualityParams {
+    id
+    name
+    match
+    score
+    updatedAt
+    createdAt
+  }
+}

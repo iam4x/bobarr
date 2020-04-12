@@ -15,6 +15,7 @@ import { LibraryService } from 'src/modules/library/library.service';
 
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
+import { Quality } from 'src/entities/quality.entity';
 
 import { JackettResult } from './jackett.dto';
 
@@ -149,6 +150,7 @@ export class JackettService {
       withoutFilter = false,
     } = opts;
 
+    const qualityParams = await this.paramsService.getQualities();
     const preferredTags = await this.paramsService.getList(
       ParameterKey.PREFERRED_TAGS
     );
@@ -173,7 +175,7 @@ export class JackettService {
 
     this.logger.info(`found ${rawResults.flat().length} potential results`);
     const results = uniqBy(rawResults.flat(), 'Guid')
-      .map(this.formatSearchResult)
+      .map((result) => this.formatSearchResult(result, qualityParams))
       .filter((result) => {
         if (withoutFilter) return true;
 
@@ -208,7 +210,10 @@ export class JackettService {
     return orderBy(results, ['quality.score', 'seeders'], ['desc', 'desc']);
   }
 
-  private formatSearchResult = (result: JackettResult) => {
+  private formatSearchResult = (
+    result: JackettResult,
+    qualityParams: Quality[]
+  ) => {
     const normalizedTitle = sanitize(result.Title)
       .split(' ')
       .filter((str) => str && str.trim());
@@ -217,7 +222,7 @@ export class JackettService {
       normalizedTitle,
       id: result.Guid,
       title: result.Title,
-      quality: this.parseQuality(normalizedTitle),
+      quality: this.parseQuality(normalizedTitle, qualityParams),
       size: result.Size,
       seeders: result.Seeders,
       peers: result.Peers,
@@ -242,17 +247,15 @@ export class JackettService {
     return { label: 'unknown', score: 0 };
   }
 
-  private parseQuality(normalizedTitle: string[]) {
-    const match = (keywords: string[]) =>
-      keywords.some((keyword) =>
+  private parseQuality(normalizedTitle: string[], qualityParams: Quality[]) {
+    const qualityMatch = qualityParams.find((quality) =>
+      quality.match.some((keyword) =>
         normalizedTitle.find((part) => part === keyword)
-      );
+      )
+    );
 
-    if (match(['uhd', '4k'])) return { label: '4k', score: 5 };
-    if (match(['2160', '2160p'])) return { label: '2160p', score: 4 };
-    if (match(['1440', '1440p'])) return { label: '1440p', score: 3 };
-    if (match(['1080', '1080p'])) return { label: '1080p', score: 2 };
-    if (match(['720', '720p'])) return { label: '720p', score: 1 };
-    return { label: 'unknown', score: 0 };
+    return qualityMatch
+      ? { label: qualityMatch.name, score: qualityMatch.score }
+      : { label: 'unknown', score: 0 };
   }
 }

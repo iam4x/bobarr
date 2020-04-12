@@ -2,12 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { map } from 'p-iteration';
 
 import { ParameterKey } from 'src/app.dto';
+
 import { ParameterDAO } from 'src/entities/dao/parameter.dao';
+import { QualityDAO } from 'src/entities/dao/quality.dao';
 
 @Injectable()
 export class ParamsService {
-  public constructor(private readonly parameterDAO: ParameterDAO) {
+  public constructor(
+    private readonly parameterDAO: ParameterDAO,
+    private readonly qualityDAO: QualityDAO
+  ) {
     this.initializeParamsStore();
+    this.initializeQuality();
   }
 
   private async initializeParamsStore() {
@@ -26,6 +32,25 @@ export class ParamsService {
     );
   }
 
+  private async initializeQuality() {
+    const defaultQualities = [
+      { name: '4K', match: ['uhd', '4k', '2160', '2160p'], score: 4 },
+      { name: '1440p', match: ['1440', '1440p'], score: 3 },
+      { name: '1080p', match: ['1080', '1080p'], score: 2 },
+      { name: '720p', match: ['720', '720p'], score: 1 },
+    ];
+
+    await map(defaultQualities, async (quality) => {
+      const match = await this.qualityDAO.findOne({
+        where: { name: quality.name },
+      });
+
+      if (!match) {
+        await this.qualityDAO.save(quality);
+      }
+    });
+  }
+
   public async get(key: ParameterKey) {
     const param = await this.parameterDAO.findOne({ key });
     return param?.value || '';
@@ -39,5 +64,9 @@ export class ParamsService {
   public async getList(key: ParameterKey) {
     const param = await this.parameterDAO.findOne({ key });
     return param?.value ? param.value.split(',') : [];
+  }
+
+  public getQualities() {
+    return this.qualityDAO.find({ order: { score: 'DESC' } });
   }
 }
