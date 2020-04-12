@@ -13,7 +13,7 @@ export const SettingsComponentStyles = styled.div`
     justify-content: space-evenly;
   }
 
-  .ant-card {
+  .row {
     width: 500px;
   }
 
@@ -22,6 +22,19 @@ export const SettingsComponentStyles = styled.div`
       display: block;
       margin-bottom: 8px;
       width: 100%;
+    }
+  }
+
+  .quality-preference {
+    margin-top: 24px;
+
+    .ant-btn {
+      margin-bottom: 4px;
+      width: 100%;
+    }
+
+    .save-btn {
+      margin-top: 12px;
     }
   }
 `;

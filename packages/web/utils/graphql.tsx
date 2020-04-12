@@ -9,8 +9,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  BigInt: any;
   DateTime: any;
+  BigInt: any;
 };
 
 
@@ -114,6 +114,7 @@ export type Movie = {
 
 export type Mutation = {
    __typename?: 'Mutation';
+  saveQualityParams: GraphQlCommonResponse;
   updateParam: GraphQlCommonResponse;
   startScanLibraryJob: GraphQlCommonResponse;
   startFindNewEpisodesJob: GraphQlCommonResponse;
@@ -124,6 +125,11 @@ export type Mutation = {
   removeMovie: GraphQlCommonResponse;
   trackTVShow: TvShow;
   removeTVShow: GraphQlCommonResponse;
+};
+
+
+export type MutationSaveQualityParamsArgs = {
+  qualities: Array<QualityInput>;
 };
 
 
@@ -187,8 +193,24 @@ export type ParamsHash = {
   preferred_tags: Scalars['String'];
 };
 
+export type Quality = {
+   __typename?: 'Quality';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  match: Array<Scalars['String']>;
+  score: Scalars['Float'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type QualityInput = {
+  id: Scalars['Float'];
+  score: Scalars['Float'];
+};
+
 export type Query = {
    __typename?: 'Query';
+  getQualityParams: Array<Quality>;
   getParams: ParamsHash;
   search: TmdbSearchResults;
   getPopular: TmdbSearchResults;
@@ -373,6 +395,19 @@ export type RemoveTvShowMutation = (
   ) }
 );
 
+export type SaveQualityMutationVariables = {
+  qualities: Array<QualityInput>;
+};
+
+
+export type SaveQualityMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
 export type TrackMovieMutationVariables = {
   title: Scalars['String'];
   tmdbId: Scalars['Int'];
@@ -492,6 +527,17 @@ export type GetPopularQuery = (
       & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
     )> }
   ) }
+);
+
+export type GetQualityQueryVariables = {};
+
+
+export type GetQualityQuery = (
+  { __typename?: 'Query' }
+  & { qualities: Array<(
+    { __typename?: 'Quality' }
+    & Pick<Quality, 'id' | 'name' | 'match' | 'score' | 'updatedAt' | 'createdAt'>
+  )> }
 );
 
 export type GetTorrentStatusQueryVariables = {
@@ -784,6 +830,39 @@ export function useRemoveTvShowMutation(baseOptions?: ApolloReactHooks.MutationH
 export type RemoveTvShowMutationHookResult = ReturnType<typeof useRemoveTvShowMutation>;
 export type RemoveTvShowMutationResult = ApolloReactCommon.MutationResult<RemoveTvShowMutation>;
 export type RemoveTvShowMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveTvShowMutation, RemoveTvShowMutationVariables>;
+export const SaveQualityDocument = gql`
+    mutation saveQuality($qualities: [QualityInput!]!) {
+  result: saveQualityParams(qualities: $qualities) {
+    success
+    message
+  }
+}
+    `;
+export type SaveQualityMutationFn = ApolloReactCommon.MutationFunction<SaveQualityMutation, SaveQualityMutationVariables>;
+
+/**
+ * __useSaveQualityMutation__
+ *
+ * To run a mutation, you first call `useSaveQualityMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveQualityMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveQualityMutation, { data, loading, error }] = useSaveQualityMutation({
+ *   variables: {
+ *      qualities: // value for 'qualities'
+ *   },
+ * });
+ */
+export function useSaveQualityMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SaveQualityMutation, SaveQualityMutationVariables>) {
+        return ApolloReactHooks.useMutation<SaveQualityMutation, SaveQualityMutationVariables>(SaveQualityDocument, baseOptions);
+      }
+export type SaveQualityMutationHookResult = ReturnType<typeof useSaveQualityMutation>;
+export type SaveQualityMutationResult = ApolloReactCommon.MutationResult<SaveQualityMutation>;
+export type SaveQualityMutationOptions = ApolloReactCommon.BaseMutationOptions<SaveQualityMutation, SaveQualityMutationVariables>;
 export const TrackMovieDocument = gql`
     mutation trackMovie($title: String!, $tmdbId: Int!) {
   movie: trackMovie(title: $title, tmdbId: $tmdbId) {
@@ -1131,6 +1210,43 @@ export function useGetPopularLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryH
 export type GetPopularQueryHookResult = ReturnType<typeof useGetPopularQuery>;
 export type GetPopularLazyQueryHookResult = ReturnType<typeof useGetPopularLazyQuery>;
 export type GetPopularQueryResult = ApolloReactCommon.QueryResult<GetPopularQuery, GetPopularQueryVariables>;
+export const GetQualityDocument = gql`
+    query getQuality {
+  qualities: getQualityParams {
+    id
+    name
+    match
+    score
+    updatedAt
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useGetQualityQuery__
+ *
+ * To run a query within a React component, call `useGetQualityQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetQualityQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetQualityQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetQualityQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetQualityQuery, GetQualityQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetQualityQuery, GetQualityQueryVariables>(GetQualityDocument, baseOptions);
+      }
+export function useGetQualityLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetQualityQuery, GetQualityQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetQualityQuery, GetQualityQueryVariables>(GetQualityDocument, baseOptions);
+        }
+export type GetQualityQueryHookResult = ReturnType<typeof useGetQualityQuery>;
+export type GetQualityLazyQueryHookResult = ReturnType<typeof useGetQualityLazyQuery>;
+export type GetQualityQueryResult = ApolloReactCommon.QueryResult<GetQualityQuery, GetQualityQueryVariables>;
 export const GetTorrentStatusDocument = gql`
     query getTorrentStatus($resourceId: Int!, $resourceType: String!) {
   torrent: getTorrentStatus(resourceId: $resourceId, resourceType: $resourceType) {
