@@ -31,21 +31,23 @@ export function MoviesComponent() {
       <MoviesComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>
-            {renderSortable()}
             {results.length === 0 ? (
               <Empty />
             ) : (
-              <Mansonry className="flex">
-                {results.map((movie) => (
-                  <div className="movie-card" key={movie.id}>
-                    <TMDBCardComponent
-                      type="movie"
-                      result={movie}
-                      inLibrary={true}
-                    />
-                  </div>
-                ))}
-              </Mansonry>
+              <>
+                {renderSortable()}
+                <Mansonry className="flex">
+                  {results.map((movie) => (
+                    <div className="movie-card" key={movie.id}>
+                      <TMDBCardComponent
+                        type="movie"
+                        result={movie}
+                        inLibrary={true}
+                      />
+                    </div>
+                  ))}
+                </Mansonry>
+              </>
             )}
           </Skeleton>
         </div>

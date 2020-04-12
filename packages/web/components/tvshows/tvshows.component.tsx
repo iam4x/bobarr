@@ -34,21 +34,23 @@ export function TVShowsComponent() {
       <TVShowsComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>
-            {renderSortable()}
             {results.length === 0 ? (
               <Empty />
             ) : (
-              <Mansonry className="flex">
-                {results.map((tvShow) => (
-                  <div className="tvshow-card" key={tvShow.id}>
-                    <TMDBCardComponent
-                      type="tvshow"
-                      result={tvShow}
-                      inLibrary={true}
-                    />
-                  </div>
-                ))}
-              </Mansonry>
+              <>
+                {renderSortable()}
+                <Mansonry className="flex">
+                  {results.map((tvShow) => (
+                    <div className="tvshow-card" key={tvShow.id}>
+                      <TMDBCardComponent
+                        type="tvshow"
+                        result={tvShow}
+                        inLibrary={true}
+                      />
+                    </div>
+                  ))}
+                </Mansonry>
+              </>
             )}
           </Skeleton>
         </div>
