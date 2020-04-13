@@ -164,22 +164,30 @@ export class JackettService {
     opts: { maxSize?: number; isSeason?: boolean; withoutFilter?: boolean }
   ) {
     const indexers = await this.getConfiguredIndexers();
-    const noResultsError = new Error();
+    const noResultsError = 'NO_RESULTS';
     try {
       const results = await firstOf(
         indexers.map((indexer) =>
           this.searchIndexer({ ...opts, queries, indexer }).then((rows) =>
             rows.length > 0
               ? Promise.resolve(rows)
-              : Promise.reject(noResultsError)
+              : Promise.reject(new Error(noResultsError))
           )
         )
       );
       return results;
     } catch (error) {
       // return empty results array, let application continue it's lifecycle
-      if (error === noResultsError) return [];
+      if (Array.isArray(error) && error[0].message === noResultsError) {
+        return [];
+      }
+
       // its a non handled error, throw
+      // throw first non handled error from promises
+      if (Array.isArray(error)) {
+        throw error[0];
+      }
+
       throw error;
     }
   }
