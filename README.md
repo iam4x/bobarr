@@ -9,9 +9,11 @@ Bobarr is a movies and tv shows collection manager for BitTorrent users. It uses
 
 ## Why ?
 
-Because I was fed up to setup Radarr, Sonarr, my torrent downloader with jackett and have to switch in between all theses tools to track my downloads.
+One of the main idea for bobarr is to be simple to setup, simple to use and having everything at the same place.
+You don't have to choose a torrent client, to setup a VPN, to setup radarr, sonarr, then jackett and connect them all together.
 
-Also Sonarr and Radarr are not compatible with foreigners torrents, I had to search on my own a lot of torrents in the end and I have no time for that!
+It's also built from scratch and it will try to solve long term problem like download multiple qualities and keep them or managing tvshows and movies at the same place.
+You can follow the [roadmap](https://github.com/iam4x/bobarr/projects/1) to check what next features are implemented.
 
 And to have something with a better ui, less configuration and faster 🚀
 
