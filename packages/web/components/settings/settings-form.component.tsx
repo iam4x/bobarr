@@ -30,12 +30,12 @@ export function SettingsFormComponent() {
     (key) => key !== '__typename'
   );
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: Record<string, string>) => {
     await updateParams({
       variables: {
         params: Object.entries(values).map(([key, value]) => ({
-          key: key.toUpperCase(),
-          value: value as string,
+          key,
+          value,
         })),
       },
     });
