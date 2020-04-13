@@ -20,12 +20,11 @@ And to have something with a better ui, less configuration and faster 🚀
 ### Requirement
 
 * docker installed (https://get.docker.com/) with docker-compose
-* an open vpn configuration file (.ovpn)
-* an account on a torrent website
+* an account on a torrent website that is supported by jackett
 
 ## Installation
 
-* Clone the repo `$ git clone git@github.com:iam4x/bobarr.git && cd bobarr`
+* Clone the repo `$ git clone https://github.com/iam4x/bobarr.git && cd bobarr`
 
 * Set `PUID` and `PGID` in `.env` (see .env for explanation)
 * Start the bobarr minimal stack `$ docker-compose up --build -d` (see below to add vpn)
