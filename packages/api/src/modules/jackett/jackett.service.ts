@@ -274,7 +274,7 @@ export class JackettService {
       link: result.Guid,
       // we filter out results wihtout link or magnet uri before
       // there will always be a download link
-      downloadLink: (result.Link || result.MagnetUri) as string,
+      downloadLink: (result.MagnetUri || result.Link) as string,
       tag: this.parseTag(normalizedTitle, preferredTags),
       publishDate: result.PublishDate,
     };
