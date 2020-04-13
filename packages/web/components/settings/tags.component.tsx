@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Card, Popover, Button, Input, notification } from 'antd';
 import { FaQuestionCircle, FaPlus } from 'react-icons/fa';
+import { DeleteOutlined } from '@ant-design/icons';
 import { orderBy } from 'lodash';
 
 import {
@@ -11,10 +12,13 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 
-import { useGetTagsQuery, useSaveTagsMutation } from '../../utils/graphql';
+import {
+  useGetTagsQuery,
+  useSaveTagsMutation,
+  GetTagsDocument,
+} from '../../utils/graphql';
 
 import { reorder } from './settings.helpers';
-import { DeleteOutlined } from '@ant-design/icons';
 
 export const TagsComponentStyles = styled.div`
   .add-input {
@@ -40,6 +44,8 @@ export function TagsComponent() {
 
   const { data, loading } = useGetTagsQuery();
   const [saveTags, { loading: saveLoading }] = useSaveTagsMutation({
+    awaitRefetchQueries: true,
+    refetchQueries: [{ query: GetTagsDocument }],
     onError: ({ message }) =>
       notification.error({
         message: message.replace('GraphQL error: ', ''),
