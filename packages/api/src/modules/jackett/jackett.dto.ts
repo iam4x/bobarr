@@ -38,3 +38,47 @@ export class JackettFormattedResult {
   @Field((_type) => [String]) public normalizedTitle!: string[];
   @Field((_type) => BigInt) public size!: BigInt;
 }
+
+export interface JackettIndexer {
+  id: string;
+  configured: boolean;
+  title: string;
+  description: string;
+  link: string;
+  language: string;
+  type: string;
+  caps: {
+    server: {
+      title: string;
+    };
+    searching: {
+      search: {
+        available: 'yes' | 'no';
+        supportedParams: string;
+      };
+      tv: {
+        available: 'yes' | 'no';
+        supportedParams: string;
+      };
+      movie: {
+        available: 'yes' | 'no';
+        supportedParams: string;
+      };
+      music: {
+        available: 'yes' | 'no';
+        supportedParams: '';
+      };
+      audio: {
+        available: 'yes' | 'no';
+        supportedParams: string;
+      };
+    };
+    categories: {
+      category: Array<{
+        id: string;
+        name: string;
+        subcat?: Array<{ id: string; name: string }>;
+      }>;
+    };
+  };
+}
