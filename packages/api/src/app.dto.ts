@@ -26,7 +26,6 @@ export enum ParameterKey {
   JACKETT_API_KEY = 'jackett_api_key',
   MAX_MOVIE_DOWNLOAD_SIZE = 'max_movie_download_size',
   MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE = 'max_tvshow_episode_download_size',
-  PREFERRED_TAGS = 'preferred_tags',
 }
 
 export enum JobsQueue {

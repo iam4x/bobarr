@@ -1,16 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { map } from 'p-iteration';
+import { map, forEachSeries } from 'p-iteration';
+
+import {
+  Transaction,
+  TransactionManager,
+  EntityManager,
+  Not,
+  In,
+  IsNull,
+} from 'typeorm';
 
 import { ParameterKey } from 'src/app.dto';
 
 import { ParameterDAO } from 'src/entities/dao/parameter.dao';
 import { QualityDAO } from 'src/entities/dao/quality.dao';
+import { TagDAO } from 'src/entities/dao/tag.dao';
+
+import { TagInput } from './params.dto';
 
 @Injectable()
 export class ParamsService {
   public constructor(
     private readonly parameterDAO: ParameterDAO,
-    private readonly qualityDAO: QualityDAO
+    private readonly qualityDAO: QualityDAO,
+    private readonly tagDAO: TagDAO
   ) {
     this.initializeParamsStore();
     this.initializeQuality();
@@ -23,7 +36,6 @@ export class ParamsService {
       [ParameterKey.TMDB_API_KEY, 'c8eeff686ad913601c151cd0bc59c2e6'],
       [ParameterKey.MAX_MOVIE_DOWNLOAD_SIZE, (20e9).toString()], // max file size 20gb
       [ParameterKey.MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE, (5e9).toString()], // max file size 5gb
-      [ParameterKey.PREFERRED_TAGS, 'multi,vost'],
       [ParameterKey.JACKETT_API_KEY, ''],
     ];
 
@@ -68,5 +80,28 @@ export class ParamsService {
 
   public getQualities() {
     return this.qualityDAO.find({ order: { score: 'DESC' } });
+  }
+
+  public getTags() {
+    return this.tagDAO.find({ order: { score: 'DESC' } });
+  }
+
+  @Transaction()
+  public async updateTags(
+    tags: TagInput[],
+    @TransactionManager() manager?: EntityManager
+  ) {
+    const tagDAO = manager!.getCustomRepository(TagDAO);
+    await tagDAO.delete(
+      tags.length > 0
+        ? { name: Not(In(tags.map((tag) => tag.name))) }
+        : { id: Not(IsNull()) }
+    );
+    await forEachSeries(tags, async (tag) => {
+      const match = await tagDAO.findOne({ name: tag.name });
+      return match
+        ? await tagDAO.save({ id: match.id, score: tag.score })
+        : await tagDAO.save(tag);
+    });
   }
 }

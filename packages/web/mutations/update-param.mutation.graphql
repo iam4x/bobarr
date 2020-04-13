@@ -1,6 +1,0 @@
-mutation updateParam($key: ParameterKey!, $value: String!) {
-  result: updateParam(key: $key, value: $value) {
-    success
-    message
-  }
-}

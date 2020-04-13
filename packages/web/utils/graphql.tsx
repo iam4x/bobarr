@@ -115,7 +115,8 @@ export type Movie = {
 export type Mutation = {
    __typename?: 'Mutation';
   saveQualityParams: GraphQlCommonResponse;
-  updateParam: GraphQlCommonResponse;
+  saveTags: GraphQlCommonResponse;
+  updateParams: GraphQlCommonResponse;
   startScanLibraryJob: GraphQlCommonResponse;
   startFindNewEpisodesJob: GraphQlCommonResponse;
   startDownloadMissingJob: GraphQlCommonResponse;
@@ -133,9 +134,13 @@ export type MutationSaveQualityParamsArgs = {
 };
 
 
-export type MutationUpdateParamArgs = {
-  value: Scalars['String'];
-  key: ParameterKey;
+export type MutationSaveTagsArgs = {
+  tags: Array<TagInput>;
+};
+
+
+export type MutationUpdateParamsArgs = {
+  params: Array<UpdateParamsInput>;
 };
 
 
@@ -172,16 +177,6 @@ export type MutationRemoveTvShowArgs = {
   tmdbId: Scalars['Int'];
 };
 
-export enum ParameterKey {
-  Region = 'REGION',
-  Language = 'LANGUAGE',
-  TmdbApiKey = 'TMDB_API_KEY',
-  JackettApiKey = 'JACKETT_API_KEY',
-  MaxMovieDownloadSize = 'MAX_MOVIE_DOWNLOAD_SIZE',
-  MaxTvshowEpisodeDownloadSize = 'MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE',
-  PreferredTags = 'PREFERRED_TAGS'
-}
-
 export type ParamsHash = {
    __typename?: 'ParamsHash';
   region: Scalars['String'];
@@ -211,6 +206,7 @@ export type QualityInput = {
 export type Query = {
    __typename?: 'Query';
   getQualityParams: Array<Quality>;
+  getTags: Array<Tag>;
   getParams: ParamsHash;
   search: TmdbSearchResults;
   getPopular: TmdbSearchResults;
@@ -243,6 +239,20 @@ export type QuerySearchJackettArgs = {
 export type QueryGetTorrentStatusArgs = {
   resourceType: Scalars['String'];
   resourceId: Scalars['Int'];
+};
+
+export type Tag = {
+   __typename?: 'Tag';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  score: Scalars['Float'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type TagInput = {
+  name: Scalars['String'];
+  score: Scalars['Float'];
 };
 
 export type TmdbFormattedTvEpisode = {
@@ -306,6 +316,11 @@ export type TvShow = {
   title: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+};
+
+export type UpdateParamsInput = {
+  key: Scalars['String'];
+  value: Scalars['String'];
 };
 
 export type StartScanLibraryMutationVariables = {};
@@ -408,6 +423,19 @@ export type SaveQualityMutation = (
   ) }
 );
 
+export type SaveTagsMutationVariables = {
+  tags: Array<TagInput>;
+};
+
+
+export type SaveTagsMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
 export type TrackMovieMutationVariables = {
   title: Scalars['String'];
   tmdbId: Scalars['Int'];
@@ -436,13 +464,12 @@ export type TrackTvShowMutation = (
   ) }
 );
 
-export type UpdateParamMutationVariables = {
-  key: ParameterKey;
-  value: Scalars['String'];
+export type UpdateParamsMutationVariables = {
+  params: Array<UpdateParamsInput>;
 };
 
 
-export type UpdateParamMutation = (
+export type UpdateParamsMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
@@ -537,6 +564,17 @@ export type GetQualityQuery = (
   & { qualities: Array<(
     { __typename?: 'Quality' }
     & Pick<Quality, 'id' | 'name' | 'match' | 'score' | 'updatedAt' | 'createdAt'>
+  )> }
+);
+
+export type GetTagsQueryVariables = {};
+
+
+export type GetTagsQuery = (
+  { __typename?: 'Query' }
+  & { tags: Array<(
+    { __typename?: 'Tag' }
+    & Pick<Tag, 'id' | 'name' | 'score' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -863,6 +901,39 @@ export function useSaveQualityMutation(baseOptions?: ApolloReactHooks.MutationHo
 export type SaveQualityMutationHookResult = ReturnType<typeof useSaveQualityMutation>;
 export type SaveQualityMutationResult = ApolloReactCommon.MutationResult<SaveQualityMutation>;
 export type SaveQualityMutationOptions = ApolloReactCommon.BaseMutationOptions<SaveQualityMutation, SaveQualityMutationVariables>;
+export const SaveTagsDocument = gql`
+    mutation saveTags($tags: [TagInput!]!) {
+  result: saveTags(tags: $tags) {
+    success
+    message
+  }
+}
+    `;
+export type SaveTagsMutationFn = ApolloReactCommon.MutationFunction<SaveTagsMutation, SaveTagsMutationVariables>;
+
+/**
+ * __useSaveTagsMutation__
+ *
+ * To run a mutation, you first call `useSaveTagsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveTagsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveTagsMutation, { data, loading, error }] = useSaveTagsMutation({
+ *   variables: {
+ *      tags: // value for 'tags'
+ *   },
+ * });
+ */
+export function useSaveTagsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SaveTagsMutation, SaveTagsMutationVariables>) {
+        return ApolloReactHooks.useMutation<SaveTagsMutation, SaveTagsMutationVariables>(SaveTagsDocument, baseOptions);
+      }
+export type SaveTagsMutationHookResult = ReturnType<typeof useSaveTagsMutation>;
+export type SaveTagsMutationResult = ApolloReactCommon.MutationResult<SaveTagsMutation>;
+export type SaveTagsMutationOptions = ApolloReactCommon.BaseMutationOptions<SaveTagsMutation, SaveTagsMutationVariables>;
 export const TrackMovieDocument = gql`
     mutation trackMovie($title: String!, $tmdbId: Int!) {
   movie: trackMovie(title: $title, tmdbId: $tmdbId) {
@@ -929,40 +1000,39 @@ export function useTrackTvShowMutation(baseOptions?: ApolloReactHooks.MutationHo
 export type TrackTvShowMutationHookResult = ReturnType<typeof useTrackTvShowMutation>;
 export type TrackTvShowMutationResult = ApolloReactCommon.MutationResult<TrackTvShowMutation>;
 export type TrackTvShowMutationOptions = ApolloReactCommon.BaseMutationOptions<TrackTvShowMutation, TrackTvShowMutationVariables>;
-export const UpdateParamDocument = gql`
-    mutation updateParam($key: ParameterKey!, $value: String!) {
-  result: updateParam(key: $key, value: $value) {
+export const UpdateParamsDocument = gql`
+    mutation updateParams($params: [UpdateParamsInput!]!) {
+  result: updateParams(params: $params) {
     success
     message
   }
 }
     `;
-export type UpdateParamMutationFn = ApolloReactCommon.MutationFunction<UpdateParamMutation, UpdateParamMutationVariables>;
+export type UpdateParamsMutationFn = ApolloReactCommon.MutationFunction<UpdateParamsMutation, UpdateParamsMutationVariables>;
 
 /**
- * __useUpdateParamMutation__
+ * __useUpdateParamsMutation__
  *
- * To run a mutation, you first call `useUpdateParamMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateParamMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useUpdateParamsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateParamsMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [updateParamMutation, { data, loading, error }] = useUpdateParamMutation({
+ * const [updateParamsMutation, { data, loading, error }] = useUpdateParamsMutation({
  *   variables: {
- *      key: // value for 'key'
- *      value: // value for 'value'
+ *      params: // value for 'params'
  *   },
  * });
  */
-export function useUpdateParamMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateParamMutation, UpdateParamMutationVariables>) {
-        return ApolloReactHooks.useMutation<UpdateParamMutation, UpdateParamMutationVariables>(UpdateParamDocument, baseOptions);
+export function useUpdateParamsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateParamsMutation, UpdateParamsMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdateParamsMutation, UpdateParamsMutationVariables>(UpdateParamsDocument, baseOptions);
       }
-export type UpdateParamMutationHookResult = ReturnType<typeof useUpdateParamMutation>;
-export type UpdateParamMutationResult = ApolloReactCommon.MutationResult<UpdateParamMutation>;
-export type UpdateParamMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamMutation, UpdateParamMutationVariables>;
+export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMutation>;
+export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
+export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDownloadingDocument = gql`
     query getDownloading {
   rows: getDownloadingMedias {
@@ -1247,6 +1317,42 @@ export function useGetQualityLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryH
 export type GetQualityQueryHookResult = ReturnType<typeof useGetQualityQuery>;
 export type GetQualityLazyQueryHookResult = ReturnType<typeof useGetQualityLazyQuery>;
 export type GetQualityQueryResult = ApolloReactCommon.QueryResult<GetQualityQuery, GetQualityQueryVariables>;
+export const GetTagsDocument = gql`
+    query getTags {
+  tags: getTags {
+    id
+    name
+    score
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetTagsQuery__
+ *
+ * To run a query within a React component, call `useGetTagsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTagsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTagsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetTagsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetTagsQuery, GetTagsQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetTagsQuery, GetTagsQueryVariables>(GetTagsDocument, baseOptions);
+      }
+export function useGetTagsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetTagsQuery, GetTagsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetTagsQuery, GetTagsQueryVariables>(GetTagsDocument, baseOptions);
+        }
+export type GetTagsQueryHookResult = ReturnType<typeof useGetTagsQuery>;
+export type GetTagsLazyQueryHookResult = ReturnType<typeof useGetTagsLazyQuery>;
+export type GetTagsQueryResult = ApolloReactCommon.QueryResult<GetTagsQuery, GetTagsQueryVariables>;
 export const GetTorrentStatusDocument = gql`
     query getTorrentStatus($resourceId: Int!, $resourceType: String!) {
   torrent: getTorrentStatus(resourceId: $resourceId, resourceType: $resourceType) {

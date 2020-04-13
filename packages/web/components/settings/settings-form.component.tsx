@@ -3,43 +3,42 @@ import { Form, notification, Card, Input, Button } from 'antd';
 
 import {
   useGetParamsQuery,
-  useUpdateParamMutation,
-  ParameterKey,
+  useUpdateParamsMutation,
+  GetParamsDocument,
 } from '../../utils/graphql';
 
 export function SettingsFormComponent() {
   const [form] = Form.useForm();
 
-  const { data, loading, refetch } = useGetParamsQuery();
-  const [updateParam] = useUpdateParamMutation();
+  const { data, loading } = useGetParamsQuery();
+  const [updateParams] = useUpdateParamsMutation({
+    awaitRefetchQueries: true,
+    refetchQueries: [{ query: GetParamsDocument }],
+    onCompleted: () =>
+      notification.success({
+        message: 'Settings updated',
+        placement: 'bottomRight',
+      }),
+    onError: ({ message }) =>
+      notification.error({
+        message: message.replace('GraphQL error: ', ''),
+        placement: 'bottomRight',
+      }),
+  });
 
   const fields = Object.keys(data?.params || {}).filter(
     (key) => key !== '__typename'
   );
 
   const onFinish = async (values: any) => {
-    try {
-      await Promise.all(
-        Object.entries(values).map(([key, value]) =>
-          updateParam({
-            variables: {
-              key: key.toUpperCase() as ParameterKey,
-              value: value as string,
-            },
-          })
-        )
-      );
-      await refetch();
-      notification.success({
-        message: 'Settings updated',
-        placement: 'bottomRight',
-      });
-    } catch (error) {
-      notification.error({
-        message: error?.message.replace('GraphQL error: ', ''),
-        placement: 'bottomRight',
-      });
-    }
+    await updateParams({
+      variables: {
+        params: Object.entries(values).map(([key, value]) => ({
+          key: key.toUpperCase(),
+          value: value as string,
+        })),
+      },
+    });
   };
 
   return (

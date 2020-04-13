@@ -3,15 +3,23 @@ import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { map } from 'p-iteration';
 
 import { GraphQLCommonResponse, ParameterKey } from 'src/app.dto';
 
 import { ParameterDAO } from 'src/entities/dao/parameter.dao';
 import { QualityDAO } from 'src/entities/dao/quality.dao';
+import { Tag } from 'src/entities/tag.entity';
 import { Quality } from 'src/entities/quality.entity';
 
-import { ParamsHash, QualityInput } from './params.dto';
 import { ParamsService } from './params.service';
+
+import {
+  ParamsHash,
+  UpdateParamsInput,
+  TagInput,
+  QualityInput,
+} from './params.dto';
 
 @Resolver()
 export class ParamsResolver {
@@ -31,10 +39,25 @@ export class ParamsResolver {
 
   @Mutation((_returns) => GraphQLCommonResponse)
   public async saveQualityParams(
-    @Args('qualities', { type: () => [QualityInput] }) qualities: QualityInput[]
+    @Args('qualities', { type: () => [QualityInput] })
+    qualities: QualityInput[]
   ) {
     await this.qualityDAO.save(qualities);
     return { success: true, message: 'QUALITY_PARAMS_UPDATED' };
+  }
+
+  @Query((_returns) => [Tag])
+  public getTags() {
+    return this.paramsService.getTags();
+  }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
+  public async saveTags(
+    @Args('tags', { type: () => [TagInput] })
+    tags: TagInput[]
+  ) {
+    await this.paramsService.updateTags(tags);
+    return { success: true, message: 'TAGS_UPDATED' };
   }
 
   @Query((_returns) => ParamsHash)
@@ -44,13 +67,21 @@ export class ParamsResolver {
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)
-  public async updateParam(
-    @Args('key', { type: () => ParameterKey }) key: ParameterKey,
-    @Args('value') value: string
+  public async updateParams(
+    @Args('params', { type: () => [UpdateParamsInput] })
+    params: UpdateParamsInput[]
   ) {
-    const param = await this.parameterDAO.findOrCreate({ key, value });
-    await this.parameterDAO.save({ id: param.id, value });
-    this.logger.info('param updated', { key, value });
-    return { success: true, message: `PARAM_${key}_CORRECTLY_UPDATED` };
+    await map(params, async ({ key, value }) => {
+      const param = await this.parameterDAO.findOrCreate({
+        key: key as ParameterKey,
+        value,
+      });
+      await this.parameterDAO.save({
+        id: param.id,
+        value,
+      });
+      this.logger.info('param updated', { key, value });
+    });
+    return { success: true, message: `PARAMS_CORRECTLY_UPDATED` };
   }
 }

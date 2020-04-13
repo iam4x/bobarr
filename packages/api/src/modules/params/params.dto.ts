@@ -12,7 +12,19 @@ export class ParamsHash {
 }
 
 @InputType()
+export class UpdateParamsInput {
+  @Field() public key!: string;
+  @Field() public value!: string;
+}
+
+@InputType()
 export class QualityInput {
   @Field() public id!: number;
+  @Field() public score!: number;
+}
+
+@InputType()
+export class TagInput {
+  @Field() public name!: string;
   @Field() public score!: number;
 }
