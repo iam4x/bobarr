@@ -1,4 +1,5 @@
 import axios from 'axios';
+import getRedirects from 'lib-get-redirects';
 import { Inject, Injectable } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
@@ -40,19 +41,35 @@ export class TransmissionService {
     torrentAttributes: DeepPartial<Torrent>
   ) {
     this.logger.info('start download torrent from url', torrentAttributes);
-
-    const transmissionTorrent = url.startsWith('magnet')
-      ? await this.client.addMagnet(url, {})
-      : await this.handleTorrentFile(url);
+    const transmissionTorrent = await this.addURL(url);
 
     this.logger.info('torrent download started', torrentAttributes);
-
     const torrent = await this.torrentDAO.save({
       ...torrentAttributes,
       torrentHash: transmissionTorrent.hashString,
     });
 
     return torrent;
+  }
+
+  private async addURL(url: string) {
+    if (url.startsWith('magnet')) {
+      return this.client.addMagnet(url, {});
+    }
+
+    try {
+      // we try to follow redirects from jackett before
+      // it might end up to a magnet or a .torrent file
+      await getRedirects(url);
+      return this.handleTorrentFile(url);
+    } catch (error) {
+      // redirected to a magnet uri, start it as magnet
+      if (error?.options?.uri?.startsWith('magnet')) {
+        return this.client.addMagnet(error.options.uri, {});
+      }
+      // not handled error, throw
+      throw error;
+    }
   }
 
   private async handleTorrentFile(url: string) {
