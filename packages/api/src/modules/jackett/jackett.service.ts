@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import axios from 'axios';
+import xmlParser from 'xml2json-light';
 import { orderBy, uniq, uniqBy } from 'lodash';
 import { mapSeries } from 'p-iteration';
 import { Injectable, Inject } from '@nestjs/common';
@@ -9,6 +10,7 @@ import { Logger } from 'winston';
 import { ParameterKey } from 'src/app.dto';
 import { formatNumber } from 'src/utils/format-number';
 import { sanitize } from 'src/utils/sanitize';
+import { firstOf } from 'src/utils/first-promise-resolve';
 
 import { ParamsService } from 'src/modules/params/params.service';
 import { LibraryService } from 'src/modules/library/library.service';
@@ -17,7 +19,7 @@ import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 import { Quality } from 'src/entities/quality.entity';
 
-import { JackettResult } from './jackett.dto';
+import { JackettResult, JackettIndexer } from './jackett.dto';
 
 @Injectable()
 export class JackettService {
@@ -42,6 +44,20 @@ export class JackettService {
     });
 
     return client.get<TData>(path, { params });
+  }
+
+  private async xmlRequest<TData>(path: string, params: Record<string, any>) {
+    const { data: xml } = await this.request(path, params);
+    return xmlParser.xml2json(xml) as TData;
+  }
+
+  public async getConfiguredIndexers() {
+    const { indexers } = await this.xmlRequest<{
+      indexers: {
+        indexer: JackettIndexer[];
+      };
+    }>('/results/torznab', { t: 'indexers', configured: true });
+    return indexers.indexer;
   }
 
   public async searchMovie(movieId: number) {
@@ -144,12 +160,40 @@ export class JackettService {
     queries: string[],
     opts: { maxSize?: number; isSeason?: boolean; withoutFilter?: boolean }
   ) {
-    const {
-      maxSize = Infinity,
-      isSeason = false,
-      withoutFilter = false,
-    } = opts;
+    const indexers = await this.getConfiguredIndexers();
+    const noResultsError = new Error();
+    try {
+      const results = await firstOf(
+        indexers.map((indexer) =>
+          this.searchIndexer({ ...opts, queries, indexer }).then((rows) =>
+            rows.length > 0
+              ? Promise.resolve(rows)
+              : Promise.reject(noResultsError)
+          )
+        )
+      );
+      return results;
+    } catch (error) {
+      // return empty results array, let application continue it's lifecycle
+      if (error === noResultsError) return [];
+      // its a non handled error, throw
+      throw error;
+    }
+  }
 
+  public async searchIndexer({
+    queries,
+    indexer,
+    maxSize = Infinity,
+    isSeason = false,
+    withoutFilter = false,
+  }: {
+    queries: string[];
+    indexer?: JackettIndexer;
+    maxSize?: number;
+    isSeason?: boolean;
+    withoutFilter?: boolean;
+  }) {
     const qualityParams = await this.paramsService.getQualities();
     const preferredTags = await this.paramsService.getList(
       ParameterKey.PREFERRED_TAGS
@@ -158,6 +202,7 @@ export class JackettService {
     const rawResults = await mapSeries(uniq(queries), async (query) => {
       const normalizedQuery = sanitize(query);
       this.logger.info('search torrents with query', {
+        indexer: indexer?.title || 'all',
         query: normalizedQuery,
       });
 
@@ -166,6 +211,7 @@ export class JackettService {
         {
           Query: normalizedQuery,
           Category: [2000, 5000, 5070],
+          Tracker: indexer ? [indexer.id] : undefined,
           _: Number(new Date()),
         }
       );

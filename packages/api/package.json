@@ -42,7 +42,8 @@
     "scandirectory": "^5.3.0",
     "transmission-client": "^1.0.0",
     "typeorm": "^0.2.24",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "xml2json-light": "^1.0.6"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.0.0",

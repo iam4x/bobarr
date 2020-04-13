@@ -6568,6 +6568,11 @@ xml2js@^0.4.17:
     sax ">=0.6.0"
     xmlbuilder "~11.0.0"
 
+xml2json-light@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/xml2json-light/-/xml2json-light-1.0.6.tgz#111687710a2b01fbd2fe18f418adf511de547f34"
+  integrity sha1-ERaHcQorAfvS/hj0GK31Ed5UfzQ=
+
 xmlbuilder@~11.0.0:
   version "11.0.1"
   resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-11.0.1.tgz#be9bae1c8a046e76b31127726347d0ad7002beb3"
