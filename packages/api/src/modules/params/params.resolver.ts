@@ -10,8 +10,9 @@ import { ParameterDAO } from 'src/entities/dao/parameter.dao';
 import { QualityDAO } from 'src/entities/dao/quality.dao';
 import { Quality } from 'src/entities/quality.entity';
 
-import { ParamsHash, QualityInput } from './params.dto';
+import { ParamsHash, QualityInput, UpdateParamsInput } from './params.dto';
 import { ParamsService } from './params.service';
+import { map } from 'p-iteration';
 
 @Resolver()
 export class ParamsResolver {
@@ -44,13 +45,21 @@ export class ParamsResolver {
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)
-  public async updateParam(
-    @Args('key', { type: () => ParameterKey }) key: ParameterKey,
-    @Args('value') value: string
+  public async updateParams(
+    @Args('params', { type: () => [UpdateParamsInput] })
+    params: UpdateParamsInput[]
   ) {
-    const param = await this.parameterDAO.findOrCreate({ key, value });
-    await this.parameterDAO.save({ id: param.id, value });
-    this.logger.info('param updated', { key, value });
-    return { success: true, message: `PARAM_${key}_CORRECTLY_UPDATED` };
+    await map(params, async ({ key, value }) => {
+      const param = await this.parameterDAO.findOrCreate({
+        key: key as ParameterKey,
+        value,
+      });
+      await this.parameterDAO.save({
+        id: param.id,
+        value,
+      });
+      this.logger.info('param updated', { key, value });
+    });
+    return { success: true, message: `PARAMS_CORRECTLY_UPDATED` };
   }
 }

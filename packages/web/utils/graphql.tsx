@@ -115,7 +115,7 @@ export type Movie = {
 export type Mutation = {
    __typename?: 'Mutation';
   saveQualityParams: GraphQlCommonResponse;
-  updateParam: GraphQlCommonResponse;
+  updateParams: GraphQlCommonResponse;
   startScanLibraryJob: GraphQlCommonResponse;
   startFindNewEpisodesJob: GraphQlCommonResponse;
   startDownloadMissingJob: GraphQlCommonResponse;
@@ -133,9 +133,8 @@ export type MutationSaveQualityParamsArgs = {
 };
 
 
-export type MutationUpdateParamArgs = {
-  value: Scalars['String'];
-  key: ParameterKey;
+export type MutationUpdateParamsArgs = {
+  params: Array<UpdateParamsInput>;
 };
 
 
@@ -171,16 +170,6 @@ export type MutationTrackTvShowArgs = {
 export type MutationRemoveTvShowArgs = {
   tmdbId: Scalars['Int'];
 };
-
-export enum ParameterKey {
-  Region = 'REGION',
-  Language = 'LANGUAGE',
-  TmdbApiKey = 'TMDB_API_KEY',
-  JackettApiKey = 'JACKETT_API_KEY',
-  MaxMovieDownloadSize = 'MAX_MOVIE_DOWNLOAD_SIZE',
-  MaxTvshowEpisodeDownloadSize = 'MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE',
-  PreferredTags = 'PREFERRED_TAGS'
-}
 
 export type ParamsHash = {
    __typename?: 'ParamsHash';
@@ -306,6 +295,11 @@ export type TvShow = {
   title: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+};
+
+export type UpdateParamsInput = {
+  key: Scalars['String'];
+  value: Scalars['String'];
 };
 
 export type StartScanLibraryMutationVariables = {};
@@ -436,13 +430,12 @@ export type TrackTvShowMutation = (
   ) }
 );
 
-export type UpdateParamMutationVariables = {
-  key: ParameterKey;
-  value: Scalars['String'];
+export type UpdateParamsMutationVariables = {
+  params: Array<UpdateParamsInput>;
 };
 
 
-export type UpdateParamMutation = (
+export type UpdateParamsMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
@@ -929,40 +922,39 @@ export function useTrackTvShowMutation(baseOptions?: ApolloReactHooks.MutationHo
 export type TrackTvShowMutationHookResult = ReturnType<typeof useTrackTvShowMutation>;
 export type TrackTvShowMutationResult = ApolloReactCommon.MutationResult<TrackTvShowMutation>;
 export type TrackTvShowMutationOptions = ApolloReactCommon.BaseMutationOptions<TrackTvShowMutation, TrackTvShowMutationVariables>;
-export const UpdateParamDocument = gql`
-    mutation updateParam($key: ParameterKey!, $value: String!) {
-  result: updateParam(key: $key, value: $value) {
+export const UpdateParamsDocument = gql`
+    mutation updateParams($params: [UpdateParamsInput!]!) {
+  result: updateParams(params: $params) {
     success
     message
   }
 }
     `;
-export type UpdateParamMutationFn = ApolloReactCommon.MutationFunction<UpdateParamMutation, UpdateParamMutationVariables>;
+export type UpdateParamsMutationFn = ApolloReactCommon.MutationFunction<UpdateParamsMutation, UpdateParamsMutationVariables>;
 
 /**
- * __useUpdateParamMutation__
+ * __useUpdateParamsMutation__
  *
- * To run a mutation, you first call `useUpdateParamMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateParamMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useUpdateParamsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateParamsMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [updateParamMutation, { data, loading, error }] = useUpdateParamMutation({
+ * const [updateParamsMutation, { data, loading, error }] = useUpdateParamsMutation({
  *   variables: {
- *      key: // value for 'key'
- *      value: // value for 'value'
+ *      params: // value for 'params'
  *   },
  * });
  */
-export function useUpdateParamMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateParamMutation, UpdateParamMutationVariables>) {
-        return ApolloReactHooks.useMutation<UpdateParamMutation, UpdateParamMutationVariables>(UpdateParamDocument, baseOptions);
+export function useUpdateParamsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateParamsMutation, UpdateParamsMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdateParamsMutation, UpdateParamsMutationVariables>(UpdateParamsDocument, baseOptions);
       }
-export type UpdateParamMutationHookResult = ReturnType<typeof useUpdateParamMutation>;
-export type UpdateParamMutationResult = ApolloReactCommon.MutationResult<UpdateParamMutation>;
-export type UpdateParamMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamMutation, UpdateParamMutationVariables>;
+export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMutation>;
+export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
+export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDownloadingDocument = gql`
     query getDownloading {
   rows: getDownloadingMedias {

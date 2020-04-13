@@ -105,7 +105,7 @@ type Movie {
 
 type Mutation {
   saveQualityParams(qualities: [QualityInput!]!): GraphQLCommonResponse!
-  updateParam(value: String!, key: ParameterKey!): GraphQLCommonResponse!
+  updateParams(params: [UpdateParamsInput!]!): GraphQLCommonResponse!
   startScanLibraryJob: GraphQLCommonResponse!
   startFindNewEpisodesJob: GraphQLCommonResponse!
   startDownloadMissingJob: GraphQLCommonResponse!
@@ -115,16 +115,6 @@ type Mutation {
   removeMovie(tmdbId: Int!): GraphQLCommonResponse!
   trackTVShow(seasonNumbers: [Int!]!, tmdbId: Int!): TVShow!
   removeTVShow(tmdbId: Int!): GraphQLCommonResponse!
-}
-
-enum ParameterKey {
-  REGION
-  LANGUAGE
-  TMDB_API_KEY
-  JACKETT_API_KEY
-  MAX_MOVIE_DOWNLOAD_SIZE
-  MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE
-  PREFERRED_TAGS
 }
 
 type ParamsHash {
@@ -221,4 +211,9 @@ type TVShow {
   title: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+input UpdateParamsInput {
+  key: String!
+  value: String!
 }
