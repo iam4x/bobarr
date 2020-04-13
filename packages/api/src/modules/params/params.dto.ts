@@ -22,3 +22,9 @@ export class QualityInput {
   @Field() public id!: number;
   @Field() public score!: number;
 }
+
+@InputType()
+export class TagInput {
+  @Field() public name!: string;
+  @Field() public score!: number;
+}

@@ -105,6 +105,7 @@ type Movie {
 
 type Mutation {
   saveQualityParams(qualities: [QualityInput!]!): GraphQLCommonResponse!
+  saveTags(tags: [TagInput!]!): GraphQLCommonResponse!
   updateParams(params: [UpdateParamsInput!]!): GraphQLCommonResponse!
   startScanLibraryJob: GraphQLCommonResponse!
   startFindNewEpisodesJob: GraphQLCommonResponse!
@@ -143,6 +144,7 @@ input QualityInput {
 
 type Query {
   getQualityParams: [Quality!]!
+  getTags: [Tag!]!
   getParams: ParamsHash!
   search(query: String!): TMDBSearchResults!
   getPopular: TMDBSearchResults!
@@ -154,6 +156,19 @@ type Query {
   getTVShows: [EnrichedTVShow!]!
   getMissingTVEpisodes: [EnrichedTVEpisode!]!
   getMissingMovies: [EnrichedMovie!]!
+}
+
+type Tag {
+  id: Float!
+  name: String!
+  score: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input TagInput {
+  name: String!
+  score: Float!
 }
 
 type TMDBFormattedTVEpisode {
