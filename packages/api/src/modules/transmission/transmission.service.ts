@@ -40,10 +40,11 @@ export class TransmissionService {
     torrentAttributes: DeepPartial<Torrent>
   ) {
     this.logger.info('start download torrent from url', torrentAttributes);
-    const response = await axios.get(url, { responseType: 'arraybuffer' });
-    const base64 = Buffer.from(response.data, 'binary').toString('base64');
 
-    const transmissionTorrent = await this.client.addBase64(base64);
+    const transmissionTorrent = url.startsWith('magnet')
+      ? await this.client.addMagnet(url, {})
+      : await this.handleTorrentFile(url);
+
     this.logger.info('torrent download started', torrentAttributes);
 
     const torrent = await this.torrentDAO.save({
@@ -52,5 +53,11 @@ export class TransmissionService {
     });
 
     return torrent;
+  }
+
+  private async handleTorrentFile(url: string) {
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+    const base64 = Buffer.from(response.data, 'binary').toString('base64');
+    return this.client.addBase64(base64);
   }
 }

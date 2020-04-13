@@ -8,7 +8,7 @@ export interface JackettResult {
   CategoryDesc: string;
   Title: string;
   Guid: string;
-  Link: string;
+  Link?: string;
   Comments: string;
   PublishDate: string;
   Category: number[];
@@ -16,6 +16,7 @@ export interface JackettResult {
   Grabs: number;
   Seeders: number;
   Peers: number;
+  MagnetUri?: string;
   MinimumRatio: number;
   MinimumSeedTime: number;
   DownloadVolumeFactor: number;
