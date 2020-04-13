@@ -55,10 +55,12 @@ export class JackettService {
   public async getConfiguredIndexers() {
     const { indexers } = await this.xmlRequest<{
       indexers: {
-        indexer: JackettIndexer[];
+        indexer: JackettIndexer[] | JackettIndexer;
       };
     }>('/results/torznab', { t: 'indexers', configured: true });
-    return indexers.indexer;
+    return Array.isArray(indexers.indexer)
+      ? indexers.indexer
+      : [indexers.indexer];
   }
 
   public async searchMovie(movieId: number) {
