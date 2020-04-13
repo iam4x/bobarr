@@ -18,6 +18,7 @@ import { LibraryService } from 'src/modules/library/library.service';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 import { Quality } from 'src/entities/quality.entity';
+import { Tag } from 'src/entities/tag.entity';
 
 import { JackettResult, JackettIndexer } from './jackett.dto';
 
@@ -195,9 +196,7 @@ export class JackettService {
     withoutFilter?: boolean;
   }) {
     const qualityParams = await this.paramsService.getQualities();
-    const preferredTags = await this.paramsService.getList(
-      ParameterKey.PREFERRED_TAGS
-    );
+    const preferredTags = await this.paramsService.getTags();
 
     const rawResults = await mapSeries(uniq(queries), async (query) => {
       const normalizedQuery = sanitize(query);
@@ -222,12 +221,15 @@ export class JackettService {
     this.logger.info(`found ${rawResults.flat().length} potential results`);
     const results = uniqBy(rawResults.flat(), 'Guid')
       .filter((result) => result.Link || result.MagnetUri)
-      .map((result) => this.formatSearchResult(result, qualityParams))
+      .map((result) =>
+        this.formatSearchResult({ result, qualityParams, preferredTags })
+      )
       .filter((result) => {
         if (withoutFilter) return true;
 
         const hasAcceptableSize = result.size < maxSize;
         const hasSeeders = result.seeders >= 5 && result.seeders > result.peers;
+        const hasTag = result.tag.score > 0;
 
         if (isSeason) {
           const isEpisode = result.normalizedTitle.some((titlePart) =>
@@ -236,31 +238,27 @@ export class JackettService {
           return hasAcceptableSize && hasSeeders && !isEpisode;
         }
 
-        return hasAcceptableSize && hasSeeders;
+        return hasAcceptableSize && hasSeeders && hasTag;
       });
 
     this.logger.info(`found ${results.length} downloadable results`);
-    const withPreferredTags = results.filter(
-      (result) =>
-        preferredTags.includes(result.tag.label) &&
-        !result.normalizedTitle.some((titlePart) => titlePart === '3d')
+
+    return orderBy(
+      results,
+      ['tag.score', 'quality.score', 'seeders'],
+      ['desc', 'desc', 'desc']
     );
-
-    if (withPreferredTags.length > 0) {
-      return orderBy(
-        withPreferredTags,
-        ['tag.score', 'quality.score', 'seeders'],
-        ['desc', 'desc', 'desc']
-      );
-    }
-
-    return orderBy(results, ['quality.score', 'seeders'], ['desc', 'desc']);
   }
 
-  private formatSearchResult = (
-    result: JackettResult,
-    qualityParams: Quality[]
-  ) => {
+  private formatSearchResult = ({
+    result,
+    qualityParams,
+    preferredTags,
+  }: {
+    result: JackettResult;
+    qualityParams: Quality[];
+    preferredTags: Tag[];
+  }) => {
     const normalizedTitle = sanitize(result.Title)
       .split(' ')
       .filter((str) => str && str.trim());
@@ -277,23 +275,19 @@ export class JackettService {
       // we filter out results wihtout link or magnet uri before
       // there will always be a download link
       downloadLink: (result.Link || result.MagnetUri) as string,
-      tag: this.parseTag(normalizedTitle),
+      tag: this.parseTag(normalizedTitle, preferredTags),
       publishDate: result.PublishDate,
     };
   };
 
-  private parseTag(normalizedTitle: string[]) {
-    const match = (keywords: string[]) =>
-      keywords.some((keyword) =>
-        normalizedTitle.find((part) => part === keyword)
-      );
+  private parseTag(normalizedTitle: string[], preferredTags: Tag[]) {
+    const tagMatch = preferredTags.find((tag) =>
+      normalizedTitle.find((part) => part === tag.name)
+    );
 
-    if (match(['multi'])) return { label: 'multi', score: 2 };
-    if (match(['vost', 'subfrench', 'vostfr'])) {
-      return { label: 'vost', score: 1 };
-    }
-
-    return { label: 'unknown', score: 0 };
+    return tagMatch
+      ? { label: tagMatch.name, score: tagMatch.score }
+      : { label: 'unknown', score: 0 };
   }
 
   private parseQuality(normalizedTitle: string[], qualityParams: Quality[]) {
