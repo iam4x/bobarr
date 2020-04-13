@@ -285,9 +285,13 @@ export class JackettService {
       normalizedTitle.find((part) => part === tag.name)
     );
 
+    // we set score to 1 when there's not tag set
+    // like this all results will be treated as potential result
+    const unknownScore = preferredTags.length > 0 ? 0 : 1;
+
     return tagMatch
       ? { label: tagMatch.name, score: tagMatch.score }
-      : { label: 'unknown', score: 0 };
+      : { label: 'unknown', score: unknownScore };
   }
 
   private parseQuality(normalizedTitle: string[], qualityParams: Quality[]) {

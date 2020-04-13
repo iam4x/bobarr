@@ -1,19 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { map, forEachSeries } from 'p-iteration';
 
-import { ParameterKey } from 'src/app.dto';
-
-import { ParameterDAO } from 'src/entities/dao/parameter.dao';
-import { QualityDAO } from 'src/entities/dao/quality.dao';
-import { TagDAO } from 'src/entities/dao/tag.dao';
-import { TagInput } from './params.dto';
 import {
   Transaction,
   TransactionManager,
   EntityManager,
   Not,
   In,
+  IsNull,
 } from 'typeorm';
+
+import { ParameterKey } from 'src/app.dto';
+
+import { ParameterDAO } from 'src/entities/dao/parameter.dao';
+import { QualityDAO } from 'src/entities/dao/quality.dao';
+import { TagDAO } from 'src/entities/dao/tag.dao';
+
+import { TagInput } from './params.dto';
 
 @Injectable()
 export class ParamsService {
@@ -24,7 +27,6 @@ export class ParamsService {
   ) {
     this.initializeParamsStore();
     this.initializeQuality();
-    this.initializeTags();
   }
 
   private async initializeParamsStore() {
@@ -61,15 +63,6 @@ export class ParamsService {
     });
   }
 
-  private async initializeTags() {
-    if ((await this.tagDAO.count()) === 0) {
-      await this.tagDAO.save([
-        { name: 'multi', score: 2 },
-        { name: 'vost', score: 1 },
-      ]);
-    }
-  }
-
   public async get(key: ParameterKey) {
     const param = await this.parameterDAO.findOne({ key });
     return param?.value || '';
@@ -99,7 +92,11 @@ export class ParamsService {
     @TransactionManager() manager?: EntityManager
   ) {
     const tagDAO = manager!.getCustomRepository(TagDAO);
-    await tagDAO.delete({ name: Not(In(tags.map((tag) => tag.name))) });
+    await tagDAO.delete(
+      tags.length > 0
+        ? { name: Not(In(tags.map((tag) => tag.name))) }
+        : { id: Not(IsNull()) }
+    );
     await forEachSeries(tags, async (tag) => {
       const match = await tagDAO.findOne({ name: tag.name });
       return match
