@@ -221,6 +221,7 @@ export class JackettService {
 
     this.logger.info(`found ${rawResults.flat().length} potential results`);
     const results = uniqBy(rawResults.flat(), 'Guid')
+      .filter((result) => result.Link || result.MagnetUri)
       .map((result) => this.formatSearchResult(result, qualityParams))
       .filter((result) => {
         if (withoutFilter) return true;
@@ -273,7 +274,9 @@ export class JackettService {
       seeders: result.Seeders,
       peers: result.Peers,
       link: result.Guid,
-      downloadLink: result.Link,
+      // we filter out results wihtout link or magnet uri before
+      // there will always be a download link
+      downloadLink: (result.Link || result.MagnetUri) as string,
       tag: this.parseTag(normalizedTitle),
       publishDate: result.PublishDate,
     };
