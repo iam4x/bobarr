@@ -83,7 +83,8 @@ type JackettFormattedResult {
   tag: String!
   tagScore: Float!
   publishDate: String!
-  normalizedTitle: [String!]!
+  normalizedTitle: String!
+  normalizedTitleParts: [String!]!
   size: BigInt!
 }
 

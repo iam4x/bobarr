@@ -91,7 +91,8 @@ export type JackettFormattedResult = {
   tag: Scalars['String'];
   tagScore: Scalars['Float'];
   publishDate: Scalars['String'];
-  normalizedTitle: Array<Scalars['String']>;
+  normalizedTitle: Scalars['String'];
+  normalizedTitleParts: Array<Scalars['String']>;
   size: Scalars['BigInt'];
 };
 
@@ -614,7 +615,7 @@ export type SearchTorrentQuery = (
   { __typename?: 'Query' }
   & { results: Array<(
     { __typename?: 'JackettFormattedResult' }
-    & Pick<JackettFormattedResult, 'id' | 'title' | 'quality' | 'qualityScore' | 'seeders' | 'peers' | 'link' | 'downloadLink' | 'tag' | 'tagScore' | 'normalizedTitle' | 'size' | 'publishDate'>
+    & Pick<JackettFormattedResult, 'id' | 'title' | 'quality' | 'qualityScore' | 'seeders' | 'peers' | 'link' | 'downloadLink' | 'tag' | 'tagScore' | 'normalizedTitle' | 'normalizedTitleParts' | 'size' | 'publishDate'>
   )> }
 );
 
@@ -1448,6 +1449,7 @@ export const SearchTorrentDocument = gql`
     tag
     tagScore
     normalizedTitle
+    normalizedTitleParts
     size
     publishDate
   }

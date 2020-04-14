@@ -36,7 +36,8 @@ export class JackettFormattedResult {
   @Field() public tag!: string;
   @Field() public tagScore!: number;
   @Field() public publishDate!: string;
-  @Field((_type) => [String]) public normalizedTitle!: string[];
+  @Field() public normalizedTitle!: string;
+  @Field((_type) => [String]) public normalizedTitleParts!: string[];
   @Field((_type) => BigInt) public size!: BigInt;
 }
 

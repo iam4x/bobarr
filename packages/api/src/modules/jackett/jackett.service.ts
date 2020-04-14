@@ -242,7 +242,7 @@ export class JackettService {
         const hasTag = result.tag.score > 0;
 
         if (isSeason) {
-          const isEpisode = result.nromalizedTitleParts.some((titlePart) =>
+          const isEpisode = result.normalizedTitleParts.some((titlePart) =>
             titlePart.match(/e\d+|episode|episode\d+|ep|ep\d+/)
           );
           return hasAcceptableSize && hasSeeders && !isEpisode;
@@ -270,16 +270,16 @@ export class JackettService {
     preferredTags: Tag[];
   }) => {
     const normalizedTitle = sanitize(result.Title);
-    const nromalizedTitleParts = normalizedTitle
+    const normalizedTitleParts = normalizedTitle
       .split(' ')
       .filter((str) => str && str.trim());
 
     return {
       normalizedTitle,
-      nromalizedTitleParts,
+      normalizedTitleParts,
       id: result.Guid,
       title: result.Title,
-      quality: this.parseQuality(nromalizedTitleParts, qualityParams),
+      quality: this.parseQuality(normalizedTitleParts, qualityParams),
       size: result.Size,
       seeders: result.Seeders,
       peers: result.Peers,
@@ -287,7 +287,7 @@ export class JackettService {
       // we filter out results wihtout link or magnet uri before
       // there will always be a download link
       downloadLink: (result.MagnetUri || result.Link) as string,
-      tag: this.parseTag(nromalizedTitleParts, preferredTags),
+      tag: this.parseTag(normalizedTitleParts, preferredTags),
       publishDate: result.PublishDate,
     };
   };

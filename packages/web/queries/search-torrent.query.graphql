@@ -11,6 +11,7 @@ query searchTorrent($query: String!) {
     tag
     tagScore
     normalizedTitle
+    normalizedTitleParts
     size
     publishDate
   }
