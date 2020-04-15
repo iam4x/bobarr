@@ -30,7 +30,7 @@ And to have something with a better ui, less configuration and faster 🚀
 
 * Set `PUID` and `PGID` in `.env` (see .env for explanation)
 * Start the bobarr minimal stack `$ docker-compose up --build -d` (see below to add vpn)
-* Go to http://localhost:9117 and copy the API Key in top right corner
+* Go to http://localhost:9117, add your torrent account and copy the API Key in top right corner
 * Go to http://localhost:3000/settings and update the jackett API key
 
 ## Configuration
