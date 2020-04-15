@@ -17,24 +17,33 @@ export const DownloadingComponentStyles = styled.div`
     width: 100%;
 
     .speed {
+      flex-shrink: 0;
       font-size: 0.7em;
       margin-left: auto;
       margin-right: 12px;
     }
 
     .progress {
+      flex-shrink: 0;
       width: 250px;
     }
 
     .name {
       text-transform: uppercase;
       font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
 
     .torrent-name {
       font-size: 0.7em;
       margin-left: 4px;
+      margin-right: 12px;
       text-transform: uppercase;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
   }
 `;
