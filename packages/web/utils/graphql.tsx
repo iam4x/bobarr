@@ -536,7 +536,7 @@ export type GetParamsQuery = (
   { __typename?: 'Query' }
   & { params: (
     { __typename?: 'ParamsHash' }
-    & Pick<ParamsHash, 'region' | 'language' | 'tmdb_api_key' | 'jackett_api_key' | 'max_movie_download_size' | 'max_tvshow_episode_download_size' | 'preferred_tags'>
+    & Pick<ParamsHash, 'region' | 'language' | 'tmdb_api_key' | 'jackett_api_key' | 'max_movie_download_size' | 'max_tvshow_episode_download_size'>
   ) }
 );
 
@@ -1205,7 +1205,6 @@ export const GetParamsDocument = gql`
     jackett_api_key
     max_movie_download_size
     max_tvshow_episode_download_size
-    preferred_tags
   }
 }
     `;

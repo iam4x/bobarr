@@ -8,7 +8,6 @@ export class ParamsHash {
   @Field() public jackett_api_key!: string;
   @Field() public max_movie_download_size!: string;
   @Field() public max_tvshow_episode_download_size!: string;
-  @Field() public preferred_tags!: string;
 }
 
 @InputType()

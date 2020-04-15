@@ -126,7 +126,6 @@ type ParamsHash {
   jackett_api_key: String!
   max_movie_download_size: String!
   max_tvshow_episode_download_size: String!
-  preferred_tags: String!
 }
 
 type Quality {
