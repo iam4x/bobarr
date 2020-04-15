@@ -12,6 +12,7 @@ import { TMDBModule } from 'src/modules/tmdb/tmdb.module';
 import { JackettModule } from 'src/modules/jackett/jackett.module';
 import { JobsModule } from 'src/modules/jobs/jobs.module';
 import { TransmissionModule } from 'src/modules/transmission/transmission.module';
+import { RedisModule } from 'src/modules/redis/redis.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { TransmissionModule } from 'src/modules/transmission/transmission.module
     JackettModule,
     JobsModule,
     TransmissionModule,
+    RedisModule,
   ],
   controllers: [],
   providers: [],
