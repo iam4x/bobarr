@@ -52,7 +52,7 @@ export function DiscoverComponent() {
                     Recommended TV Shows
                   </div>
                   <CarouselComponent
-                    type="movie"
+                    type="tvshow"
                     results={data?.tvShows || []}
                   />
                 </>
