@@ -1,6 +1,11 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { UseInterceptors } from '@nestjs/common';
 
 import { GraphQLCommonResponse } from 'src/app.dto';
+
+import { makeInvalidateCacheInterceptor } from 'src/modules/redis/invalidate-cache.interceptor';
+import { CacheKeys } from 'src/modules/redis/cache.dto';
+
 import { Movie } from 'src/entities/movie.entity';
 import { TVShow } from 'src/entities/tvshow.entity';
 
@@ -63,6 +68,9 @@ export class LibraryResolver {
     return { success: true, message: 'TV_EPISODE_DOWNLOAD_STARTED' };
   }
 
+  @UseInterceptors(
+    makeInvalidateCacheInterceptor([CacheKeys.RECOMMENDED_MOVIES])
+  )
   @Mutation((_returns) => Movie, { name: 'trackMovie' })
   public trackMovie(
     @Args('title') title: string,
@@ -71,6 +79,9 @@ export class LibraryResolver {
     return this.libraryService.trackMovie({ title, tmdbId });
   }
 
+  @UseInterceptors(
+    makeInvalidateCacheInterceptor([CacheKeys.RECOMMENDED_MOVIES])
+  )
   @Mutation((_returns) => GraphQLCommonResponse)
   public async removeMovie(
     @Args('tmdbId', { type: () => Int }) tmdbId: number
@@ -79,6 +90,9 @@ export class LibraryResolver {
     return { success: true, message: 'MOVIE_REMOVED_FROM_LIBRARY' };
   }
 
+  @UseInterceptors(
+    makeInvalidateCacheInterceptor([CacheKeys.RECOMMENDED_TV_SHOWS])
+  )
   @Mutation((_returns) => TVShow)
   public trackTVShow(
     @Args('tmdbId', { type: () => Int }) tmdbId: number,
@@ -87,6 +101,9 @@ export class LibraryResolver {
     return this.libraryService.trackTVShow({ tmdbId, seasonNumbers });
   }
 
+  @UseInterceptors(
+    makeInvalidateCacheInterceptor([CacheKeys.RECOMMENDED_TV_SHOWS])
+  )
   @Mutation((_returns) => GraphQLCommonResponse)
   public async removeTVShow(
     @Args('tmdbId', { type: () => Int }) tmdbId: number
