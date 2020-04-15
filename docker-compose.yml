@@ -54,8 +54,18 @@ services:
     volumes:
       - ./packages/jackett/config:/config
       - ./packages/jackett/downloads:/downloads
+
+  jackett-web:
+    image: dperson/nginx
+    container_name: bobarr-jackett-web
+    depends_on:
+      - jackett
+    environment:
+      - TZ=Europe/Paris
     ports:
-      - 9117:9117
+      - "9117:80"
+    command: -w "http://jackett:9117;/"
+    restart: unless-stopped
 
   vpn:
     image: dperson/openvpn-client
