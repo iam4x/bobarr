@@ -9,7 +9,7 @@ import {
 import { tap } from 'rxjs/operators';
 
 import { RedisService } from './redis.service';
-import { CacheKeys } from './cache.interceptor';
+import { CacheKeys } from './cache.dto';
 
 @Injectable()
 export abstract class CacheInterceptor implements NestInterceptor {

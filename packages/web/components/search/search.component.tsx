@@ -1,29 +1,11 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Skeleton, Empty } from 'antd';
-import { useTheme } from 'styled-components';
 import { LoadingOutlined, SearchOutlined } from '@ant-design/icons';
 import { debounce, throttle } from 'throttle-debounce';
 
-import { FaChevronCircleLeft, FaChevronCircleRight } from 'react-icons/fa';
+import { useGetPopularQuery, useSearchLazyQuery } from '../../utils/graphql';
 
-import {
-  CarouselProvider,
-  Slider,
-  Slide,
-  ButtonBack,
-  ButtonNext,
-  CarouselContext,
-} from 'pure-react-carousel';
-
-import {
-  useGetPopularQuery,
-  useSearchLazyQuery,
-  TmdbSearchResult,
-  useGetLibraryMoviesQuery,
-  useGetLibraryTvShowsQuery,
-} from '../../utils/graphql';
-
-import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
+import { CarouselComponent } from './carousel.component';
 import { SearchStyles, Wrapper } from './search.styles';
 
 export function SearchComponent() {
@@ -98,7 +80,7 @@ export function SearchComponent() {
                     <div className="search-results--category">
                       {displaySearchResults ? 'Found Movies' : 'Popular Movies'}
                     </div>
-                    <ResultsCarousel
+                    <CarouselComponent
                       type="movie"
                       results={
                         displaySearchResults
@@ -117,7 +99,7 @@ export function SearchComponent() {
                         ? 'Found TV Shows'
                         : 'Popular TV Shows'}
                     </div>
-                    <ResultsCarousel
+                    <CarouselComponent
                       type="tvshow"
                       results={
                         displaySearchResults
@@ -133,89 +115,5 @@ export function SearchComponent() {
         </div>
       </Wrapper>
     </SearchStyles>
-  );
-}
-
-function ResultsCarousel({
-  results,
-  type,
-}: {
-  results: TmdbSearchResult[];
-  type: 'movie' | 'tvshow';
-}) {
-  const theme = useTheme();
-  const { data: moviesLibrary } = useGetLibraryMoviesQuery();
-  const { data: tvShowsLibrary } = useGetLibraryTvShowsQuery();
-
-  const tmdbIds = [
-    ...(moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || []),
-    ...(tvShowsLibrary?.tvShows?.map(({ tmdbId }) => tmdbId) || []),
-  ];
-
-  return (
-    <div className="carrousel--container">
-      <CarouselProvider
-        naturalSlideHeight={theme.tmdbCardHeight}
-        naturalSlideWidth={220}
-        totalSlides={results.length}
-        dragEnabled={false}
-        visibleSlides={5}
-        step={5}
-      >
-        <ResetCarouselSlideAndGoBack watch={results} />
-        <Slider>
-          {results.map((result, index) => (
-            <Slide
-              key={result.id}
-              index={index}
-              innerClassName="carrousel--slide"
-            >
-              <TMDBCardComponent
-                key={result.id}
-                type={type}
-                result={result}
-                inLibrary={tmdbIds.includes(result.tmdbId)}
-              />
-            </Slide>
-          ))}
-        </Slider>
-        {results.length > 5 && (
-          <ButtonNext className="arrow-right">
-            <FaChevronCircleRight size={16} />
-          </ButtonNext>
-        )}
-      </CarouselProvider>
-    </div>
-  );
-}
-
-function ResetCarouselSlideAndGoBack({ watch }: { watch: any }) {
-  const carouselContext = useContext(CarouselContext);
-  const [currentSlide, setCurrentSlide] = useState(
-    carouselContext.state.currentSlide
-  );
-
-  useEffect(() => {
-    function onChange() {
-      setCurrentSlide(carouselContext.state.currentSlide);
-    }
-    carouselContext.subscribe(onChange);
-    return () => carouselContext.unsubscribe(onChange);
-  }, [carouselContext]);
-
-  useEffect(() => {
-    if (carouselContext.state.currentSlide !== 0) {
-      carouselContext.setStoreState({ currentSlide: 0 });
-    }
-  }, [carouselContext, watch]);
-
-  if (currentSlide === 0) {
-    return <noscript />;
-  }
-
-  return (
-    <ButtonBack className="arrow-left">
-      <FaChevronCircleLeft size={16} />
-    </ButtonBack>
   );
 }

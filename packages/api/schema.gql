@@ -149,6 +149,8 @@ type Query {
   search(query: String!): TMDBSearchResults!
   getPopular: TMDBSearchResults!
   getTVShowSeasons(tvShowTMDBId: Int!): [TMDBFormattedTVSeason!]!
+  getRecommendedTVShows: [TMDBSearchResult!]!
+  getRecommendedMovies: [TMDBSearchResult!]!
   searchJackett(query: String!): [JackettFormattedResult!]!
   getTorrentStatus(resourceType: String!, resourceId: Int!): TorrentStatus!
   getDownloadingMedias: [DownloadingMedia!]!

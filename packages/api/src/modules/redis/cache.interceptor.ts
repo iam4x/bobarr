@@ -10,10 +10,7 @@ import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { RedisService } from './redis.service';
-
-export enum CacheKeys {
-  RECOMMENDED_TV_SHOWS = 'recommended_tv_shows',
-}
+import { CacheKeys } from './cache.dto';
 
 @Injectable()
 export abstract class CacheInterceptor implements NestInterceptor {

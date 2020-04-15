@@ -2,14 +2,17 @@
 
 import axios from 'axios';
 import { Injectable, Inject } from '@nestjs/common';
-import { map } from 'p-iteration';
+import { map, reduce } from 'p-iteration';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { orderBy } from 'lodash';
 
 import { ParameterKey } from 'src/app.dto';
 import { recursiveCamelCase } from 'src/utils/recursive-camel-case';
 import { ParamsService } from 'src/modules/params/params.service';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
+import { TVShowDAO } from 'src/entities/dao/tvshow.dao';
+import { MovieDAO } from 'src/entities/dao/movie.dao';
 
 import {
   TMDBMovie,
@@ -23,7 +26,9 @@ export class TMDBService {
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private readonly paramsService: ParamsService,
-    private readonly tvSeasonDAO: TVSeasonDAO
+    private readonly tvSeasonDAO: TVSeasonDAO,
+    private readonly tvShowDAO: TVShowDAO,
+    private readonly movieDAO: MovieDAO
   ) {
     this.logger = logger.child({ context: 'TMDBService' });
   }
@@ -138,6 +143,60 @@ export class TMDBService {
     this.logger.info('finish get popular');
 
     return { movies, tvShows };
+  }
+
+  public async getRecommended(type: 'tvshow' | 'movie') {
+    this.logger.info(`start get recommended ${type}s`);
+
+    const url =
+      type === 'tvshow'
+        ? (id: number) => `/tv/${id}/recommendations`
+        : (id: number) => `/movie/${id}/recommendations`;
+
+    const entities =
+      type === 'tvshow'
+        ? await this.tvShowDAO.find()
+        : await this.movieDAO.find();
+
+    const allSimilars = await reduce<any, any[]>(
+      entities,
+      async (results, entity) => {
+        const data = await this.request<{
+          results: Array<TMDBTVShow | TMDBMovie>;
+        }>(url(entity.tmdbId));
+
+        const similarsWithoutAlreadyInLibrary = data.results.filter(
+          (a) => !entities.some((b: any) => a.id === b.tmdbId)
+        );
+
+        const mergedResults = [...results, ...similarsWithoutAlreadyInLibrary];
+        const mergedResultsWithCount = mergedResults.reduce(
+          (merged: Array<Record<string, any>>, curr) => {
+            // if already found as recommendation increment count
+            if (merged.some((m) => m.id === curr.id)) {
+              return merged.map((m) => {
+                const count = m.id === curr.id ? m.count + 1 : m.count;
+                return { ...m, count };
+              });
+            }
+
+            // new recommendation
+            return [...merged, { ...curr, count: 1 }];
+          },
+          []
+        );
+
+        return mergedResultsWithCount;
+      },
+      []
+    );
+
+    this.logger.info(`found ${allSimilars.length} recommendations`);
+    this.logger.info(`finish get recommended ${type}s`);
+
+    return orderBy(allSimilars, ['count', 'popularity'], ['desc', 'desc'])
+      .filter((_row, index) => index <= 50)
+      .map(type === 'movie' ? this.mapMovie : this.mapTVShow);
   }
 
   private mapMovie(result: TMDBMovie) {

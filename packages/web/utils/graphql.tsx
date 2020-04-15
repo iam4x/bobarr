@@ -186,7 +186,6 @@ export type ParamsHash = {
   jackett_api_key: Scalars['String'];
   max_movie_download_size: Scalars['String'];
   max_tvshow_episode_download_size: Scalars['String'];
-  preferred_tags: Scalars['String'];
 };
 
 export type Quality = {
@@ -212,6 +211,8 @@ export type Query = {
   search: TmdbSearchResults;
   getPopular: TmdbSearchResults;
   getTVShowSeasons: Array<TmdbFormattedTvSeason>;
+  getRecommendedTVShows: Array<TmdbSearchResult>;
+  getRecommendedMovies: Array<TmdbSearchResult>;
   searchJackett: Array<JackettFormattedResult>;
   getTorrentStatus: TorrentStatus;
   getDownloadingMedias: Array<DownloadingMedia>;
@@ -565,6 +566,20 @@ export type GetQualityQuery = (
   & { qualities: Array<(
     { __typename?: 'Quality' }
     & Pick<Quality, 'id' | 'name' | 'match' | 'score' | 'updatedAt' | 'createdAt'>
+  )> }
+);
+
+export type GetRecommendedQueryVariables = {};
+
+
+export type GetRecommendedQuery = (
+  { __typename?: 'Query' }
+  & { tvShows: Array<(
+    { __typename?: 'TMDBSearchResult' }
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+  )>, movies: Array<(
+    { __typename?: 'TMDBSearchResult' }
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
   )> }
 );
 
@@ -1317,6 +1332,51 @@ export function useGetQualityLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryH
 export type GetQualityQueryHookResult = ReturnType<typeof useGetQualityQuery>;
 export type GetQualityLazyQueryHookResult = ReturnType<typeof useGetQualityLazyQuery>;
 export type GetQualityQueryResult = ApolloReactCommon.QueryResult<GetQualityQuery, GetQualityQueryVariables>;
+export const GetRecommendedDocument = gql`
+    query getRecommended {
+  tvShows: getRecommendedTVShows {
+    id
+    tmdbId
+    title
+    releaseDate
+    posterPath
+    voteAverage
+  }
+  movies: getRecommendedMovies {
+    id
+    tmdbId
+    title
+    releaseDate
+    posterPath
+    voteAverage
+  }
+}
+    `;
+
+/**
+ * __useGetRecommendedQuery__
+ *
+ * To run a query within a React component, call `useGetRecommendedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetRecommendedQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetRecommendedQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetRecommendedQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetRecommendedQuery, GetRecommendedQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetRecommendedQuery, GetRecommendedQueryVariables>(GetRecommendedDocument, baseOptions);
+      }
+export function useGetRecommendedLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetRecommendedQuery, GetRecommendedQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetRecommendedQuery, GetRecommendedQueryVariables>(GetRecommendedDocument, baseOptions);
+        }
+export type GetRecommendedQueryHookResult = ReturnType<typeof useGetRecommendedQuery>;
+export type GetRecommendedLazyQueryHookResult = ReturnType<typeof useGetRecommendedLazyQuery>;
+export type GetRecommendedQueryResult = ApolloReactCommon.QueryResult<GetRecommendedQuery, GetRecommendedQueryVariables>;
 export const GetTagsDocument = gql`
     query getTags {
   tags: getTags {
