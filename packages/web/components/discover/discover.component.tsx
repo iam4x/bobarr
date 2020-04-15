@@ -29,29 +29,37 @@ export function DiscoverComponent() {
       </div>
 
       <Wrapper>
-        {isLoading && <Skeleton active={true} loading={true} />}
-        {!hasRecommendations && !isLoading && <Empty />}
-        {hasRecommendations && !isLoading && (
-          <>
-            {Boolean(data?.movies?.length) && (
-              <div className="search-results--container">
-                <div className="search-results--category">
-                  Recommended Movies
-                </div>
-                {data?.movies && data.movies.length === 0 && <Empty />}
-                <CarouselComponent type="movie" results={data?.movies || []} />
-              </div>
-            )}
-            {Boolean(data?.tvShows?.length) && (
-              <div className="search-results--container">
-                <div className="search-results--category">
-                  Recommended TV Shows
-                </div>
-                <CarouselComponent type="movie" results={data?.tvShows || []} />
-              </div>
-            )}
-          </>
-        )}
+        <div className="search-results--container">
+          {isLoading && <Skeleton active={true} loading={true} />}
+          {!hasRecommendations && !isLoading && <Empty />}
+          {hasRecommendations && !isLoading && (
+            <>
+              {Boolean(data?.movies?.length) && (
+                <>
+                  <div className="search-results--category">
+                    Recommended Movies
+                  </div>
+                  {data?.movies && data.movies.length === 0 && <Empty />}
+                  <CarouselComponent
+                    type="movie"
+                    results={data?.movies || []}
+                  />
+                </>
+              )}
+              {Boolean(data?.tvShows?.length) && (
+                <>
+                  <div className="search-results--category">
+                    Recommended TV Shows
+                  </div>
+                  <CarouselComponent
+                    type="movie"
+                    results={data?.tvShows || []}
+                  />
+                </>
+              )}
+            </>
+          )}
+        </div>
       </Wrapper>
     </SearchStyles>
   );
