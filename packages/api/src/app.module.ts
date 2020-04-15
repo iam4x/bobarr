@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { WinstonModule } from 'nest-winston';
+import { TerminusModule } from '@nestjs/terminus';
 
 import { DB_CONFIG } from './config';
 import { winstonOptions } from './utils/winston-options';
@@ -13,6 +14,7 @@ import { JackettModule } from 'src/modules/jackett/jackett.module';
 import { JobsModule } from 'src/modules/jobs/jobs.module';
 import { TransmissionModule } from 'src/modules/transmission/transmission.module';
 import { RedisModule } from 'src/modules/redis/redis.module';
+import { HealthController } from 'src/modules/health/health.controller';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { RedisModule } from 'src/modules/redis/redis.module';
       introspection: true,
       playground: true,
     }),
+    TerminusModule,
     ParamsModule,
     LibraryModule,
     TMDBModule,
@@ -31,7 +34,7 @@ import { RedisModule } from 'src/modules/redis/redis.module';
     TransmissionModule,
     RedisModule,
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [],
 })
 export class AppModule {}
