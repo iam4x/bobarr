@@ -52,6 +52,7 @@ export class LibraryService {
 
   public async getDownloading() {
     const downloading = await this.mediaViewDAO.find({
+      order: { id: 'ASC' },
       where: { state: DownloadableMediaState.DOWNLOADING },
     });
 

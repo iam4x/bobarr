@@ -74,6 +74,11 @@ enum FileType {
   MOVIE
 }
 
+input GetTorrentStatusInput {
+  resourceId: Int!
+  resourceType: FileType!
+}
+
 type GraphQLCommonResponse {
   success: Boolean!
   message: String
@@ -160,7 +165,7 @@ type Query {
   getRecommendedTVShows: [TMDBSearchResult!]!
   getRecommendedMovies: [TMDBSearchResult!]!
   searchJackett(query: String!): [JackettFormattedResult!]!
-  getTorrentStatus(resourceType: FileType!, resourceId: Int!): TorrentStatus!
+  getTorrentStatus(torrents: [GetTorrentStatusInput!]!): [TorrentStatus!]!
   getDownloadingMedias: [DownloadingMedia!]!
   getSearchingMedias: [SearchingMedia!]!
   getMovies: [EnrichedMovie!]!
@@ -229,6 +234,8 @@ type TMDBSearchResults {
 
 type TorrentStatus {
   id: Int!
+  resourceId: Int!
+  resourceType: FileType!
   percentDone: Float!
   rateDownload: Int!
   rateUpload: Int!

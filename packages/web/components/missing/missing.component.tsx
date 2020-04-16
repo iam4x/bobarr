@@ -20,7 +20,7 @@ export function MissingComponent() {
   const { pathname } = useRouter();
   const { data } = useGetMissingQuery({
     fetchPolicy: 'cache-and-network',
-    pollInterval: 30 * 1000,
+    pollInterval: 5000,
   });
 
   const [manualSearch, setManualSearch] = useState<

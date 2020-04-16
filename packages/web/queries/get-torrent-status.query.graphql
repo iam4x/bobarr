@@ -1,9 +1,8 @@
-query getTorrentStatus($resourceId: Int!, $resourceType: FileType!) {
-  torrent: getTorrentStatus(
-    resourceId: $resourceId
-    resourceType: $resourceType
-  ) {
+query getTorrentStatus($torrents: [GetTorrentStatusInput!]!) {
+  torrents: getTorrentStatus(torrents: $torrents) {
     id
+    resourceId
+    resourceType
     percentDone
     rateDownload
     rateUpload
