@@ -7,7 +7,6 @@ import { Logger } from 'winston';
 
 import {
   JobsQueue,
-  FileType,
   DownloadableMediaState,
   DownloadQueueProcessors,
 } from 'src/app.dto';
@@ -17,7 +16,6 @@ import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 
 import { JackettService } from 'src/modules/jackett/jackett.service';
-import { TransmissionService } from 'src/modules/transmission/transmission.service';
 import { LibraryService } from 'src/modules/library/library.service';
 
 @Processor(JobsQueue.DOWNLOAD)
@@ -30,7 +28,6 @@ export class DownloadProcessor {
     private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tvEpisodeDAO: TVEpisodeDAO,
     private readonly jackettService: JackettService,
-    private readonly transmissionService: TransmissionService,
     private readonly libraryService: LibraryService
   ) {
     this.logger = logger.child({ context: 'DownloadProcessor' });
@@ -106,35 +103,24 @@ export class DownloadProcessor {
         relations: ['episodes'],
       });
 
-      return forEachSeries(season.episodes, (episode) =>
+      await forEachSeries(season.episodes, (episode) =>
         this.downloadQueue.add(
           DownloadQueueProcessors.DOWNLOAD_EPISODE,
           episode.id
         )
       );
+
+      return;
     }
 
-    this.logger.info('found season torrent to download');
-    this.logger.info(bestResult.title);
-
-    const torrent = await this.transmissionService.addTorrentURL(
-      bestResult.downloadLink,
-      {
-        resourceType: FileType.SEASON,
-        resourceId: seasonId,
-        quality: bestResult.quality.label,
-        tag: bestResult.tag.label,
-      }
-    );
-
-    await this.tvSeasonDAO.save({
-      id: seasonId,
-      state: DownloadableMediaState.DOWNLOADING,
+    this.libraryService.downloadTVSeason(seasonId, {
+      title: bestResult.title,
+      downloadLink: bestResult.downloadLink,
+      tag: bestResult.tag.label,
+      quality: bestResult.quality.label,
     });
 
-    this.logger.info('download season started', { seasonId });
-
-    return torrent;
+    return;
   }
 
   @Process(DownloadQueueProcessors.DOWNLOAD_EPISODE)

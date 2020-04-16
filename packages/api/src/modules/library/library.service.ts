@@ -43,7 +43,6 @@ export class LibraryService {
     private readonly tvEpisodeDAO: TVEpisodeDAO,
     private readonly tmdbService: TMDBService,
     private readonly jobsService: JobsService,
-    private readonly torrentDAO: TorrentDAO,
     private readonly transmissionService: TransmissionService
   ) {
     this.logger = logger.child({ context: 'LibraryService' });
@@ -234,9 +233,19 @@ export class LibraryService {
     this.logger.info('finish remove tv show', { tmdbId });
   }
 
-  public async downloadMovie(movieId: number, jackettResult: JackettInput) {
+  @Transaction()
+  public async downloadMovie(
+    movieId: number,
+    jackettResult: JackettInput,
+    @TransactionManager() manager?: EntityManager
+  ) {
     this.logger.info('start download movie', { movieId });
     this.logger.info(jackettResult.title);
+
+    await manager!.getCustomRepository(MovieDAO).save({
+      id: movieId,
+      state: DownloadableMediaState.DOWNLOADING,
+    });
 
     const torrent = await this.transmissionService.addTorrentURL(
       jackettResult.downloadLink,
@@ -248,23 +257,55 @@ export class LibraryService {
       }
     );
 
-    await this.movieDAO.save({
-      id: movieId,
-      state: DownloadableMediaState.DOWNLOADING,
-    });
-
     this.logger.info('download movie started', {
       movieId,
       torrent: torrent.id,
     });
   }
 
+  @Transaction()
+  public async downloadTVSeason(
+    seasonId: number,
+    jackettResult: JackettInput,
+    @TransactionManager() manager?: EntityManager
+  ) {
+    this.logger.info('start download tv season', { seasonId });
+    this.logger.info(jackettResult.title);
+
+    await manager!.getCustomRepository(TVSeasonDAO).save({
+      id: seasonId,
+      state: DownloadableMediaState.DOWNLOADING,
+    });
+
+    const torrent = await this.transmissionService.addTorrentURL(
+      jackettResult.downloadLink,
+      {
+        resourceType: FileType.SEASON,
+        resourceId: seasonId,
+        quality: jackettResult.quality,
+        tag: jackettResult.tag,
+      }
+    );
+
+    this.logger.info('download tv season started', {
+      seasonId,
+      torrentId: torrent.id,
+    });
+  }
+
+  @Transaction()
   public async downloadTVEpisode(
     episodeId: number,
-    jackettResult: JackettInput
+    jackettResult: JackettInput,
+    @TransactionManager() manager?: EntityManager
   ) {
     this.logger.info('start download tv episode', { episodeId });
     this.logger.info(jackettResult.title);
+
+    await manager!.getCustomRepository(TVEpisodeDAO).save({
+      id: episodeId,
+      state: DownloadableMediaState.DOWNLOADING,
+    });
 
     const torrent = await this.transmissionService.addTorrentURL(
       jackettResult.downloadLink,
@@ -275,11 +316,6 @@ export class LibraryService {
         tag: jackettResult.tag,
       }
     );
-
-    await this.tvEpisodeDAO.save({
-      id: episodeId,
-      state: DownloadableMediaState.DOWNLOADING,
-    });
 
     this.logger.info('download episode started', {
       episodeId,
