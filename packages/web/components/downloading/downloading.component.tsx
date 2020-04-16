@@ -26,7 +26,7 @@ export function DownloadingComponent({ types }: { types: string[] }) {
         <SearchingRowsComponent rows={searching || []} />
         {/* dont mount downloading rows when it's not needed */}
         {/* this component does request polling */}
-        {downloading && downloading.length && (
+        {downloading && downloading.length > 0 && (
           <DownloadingRowsComponent rows={downloading || []} />
         )}
       </div>
