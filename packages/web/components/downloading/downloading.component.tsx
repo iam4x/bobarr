@@ -24,7 +24,11 @@ export function DownloadingComponent({ types }: { types: string[] }) {
     <DownloadingComponentStyles>
       <div className="wrapper">
         <SearchingRowsComponent rows={searching || []} />
-        <DownloadingRowsComponent rows={downloading || []} />
+        {/* dont mount downloading rows when it's not needed */}
+        {/* this component does request polling */}
+        {downloading && downloading.length && (
+          <DownloadingRowsComponent rows={downloading || []} />
+        )}
       </div>
     </DownloadingComponentStyles>
   );

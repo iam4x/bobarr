@@ -21,6 +21,7 @@ export function DownloadingRowsComponent({
   rows: DownloadingMedia[];
 }) {
   const { data } = useGetTorrentStatusQuery({
+    pollInterval: 2000,
     variables: {
       torrents: rows.map(({ resourceId, resourceType }) => ({
         resourceId,
@@ -106,7 +107,7 @@ export function DownloadingRowsComponent({
             )}
           </div>
           <div className="name">{row.title}</div>
-          {/* <div className="torrent-name">({media.torrent})</div> */}
+          <div className="torrent-name">({row.torrent})</div>
           <div className="speed">
             ({row.torrentStatus.percent}%
             {row.torrentStatus.downloadSpeed ? (
