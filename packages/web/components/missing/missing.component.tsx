@@ -125,5 +125,10 @@ function AvailableIn({ date }: { date: dayjs.Dayjs }) {
   if (days === 0) label = `On air today`;
   if (days > 14) label = `Avaible on ${date.format('DD/MM')}`;
 
+  // next year release
+  if (date.format('YYYY') !== dayjs(new Date()).format('YYYY')) {
+    label = `Available in ${date.format('YYYY')}`;
+  }
+
   return <Tag>{label}</Tag>;
 }
