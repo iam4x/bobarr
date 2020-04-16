@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 import { ParameterKey } from 'src/app.dto';
@@ -13,6 +14,7 @@ export class Parameter {
   @PrimaryGeneratedColumn()
   public id!: number;
 
+  @Index({ unique: true })
   @Column('varchar', { unique: true })
   public key!: ParameterKey;
 

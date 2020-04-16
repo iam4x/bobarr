@@ -97,11 +97,7 @@ export class JackettService {
     });
 
     const titles = [tvShow.title, enTVShow.title];
-    const canSearchOriginalTitle = !['JP', 'CH'].some((country) =>
-      tvShow.originCountry.includes(country)
-    );
-
-    if (canSearchOriginalTitle) {
+    if (this.canSearchOriginalTitle(tvShow.originCountry)) {
       titles.push(tvShow.originalTitle);
     }
 
@@ -140,11 +136,7 @@ export class JackettService {
     const e = formatNumber(tvEpisode.episodeNumber);
 
     const titles = [tvShow.title, enTVShow.title];
-    const canSearchOriginalTitle = !['JP', 'CH'].some((country) =>
-      tvShow.originCountry.includes(country)
-    );
-
-    if (canSearchOriginalTitle) {
+    if (this.canSearchOriginalTitle(tvShow.originCountry)) {
       titles.push(tvShow.originalTitle);
     }
 
@@ -316,5 +308,13 @@ export class JackettService {
     return qualityMatch
       ? { label: qualityMatch.name, score: qualityMatch.score }
       : { label: 'unknown', score: 0 };
+  }
+
+  private canSearchOriginalTitle(originalCountries: string[]) {
+    // original titles may be hard to search on occidental trackers
+    // they may return incorrect torrent to download
+    return !originalCountries.some((country) =>
+      ['CN', 'CH', 'JP'].includes(country)
+    );
   }
 }

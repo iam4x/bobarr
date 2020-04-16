@@ -16,6 +16,7 @@ export type Scalars = {
 
 
 export enum DownloadableMediaState {
+  Searching = 'SEARCHING',
   Missing = 'MISSING',
   Downloading = 'DOWNLOADING',
   Downloaded = 'DOWNLOADED',
@@ -24,12 +25,13 @@ export enum DownloadableMediaState {
 
 export type DownloadingMedia = {
    __typename?: 'DownloadingMedia';
+  id: Scalars['String'];
   title: Scalars['String'];
   tag: Scalars['String'];
+  resourceId: Scalars['Float'];
+  resourceType: FileType;
   quality: Scalars['String'];
   torrent: Scalars['String'];
-  resourceId: Scalars['Float'];
-  resourceType: Scalars['String'];
 };
 
 export type EnrichedMovie = {
@@ -70,6 +72,17 @@ export type EnrichedTvShow = {
   posterPath?: Maybe<Scalars['String']>;
   voteAverage: Scalars['Float'];
   releaseDate: Scalars['String'];
+};
+
+export enum FileType {
+  Episode = 'EPISODE',
+  Season = 'SEASON',
+  Movie = 'MOVIE'
+}
+
+export type GetTorrentStatusInput = {
+  resourceId: Scalars['Int'];
+  resourceType: FileType;
 };
 
 export type GraphQlCommonResponse = {
@@ -214,8 +227,9 @@ export type Query = {
   getRecommendedTVShows: Array<TmdbSearchResult>;
   getRecommendedMovies: Array<TmdbSearchResult>;
   searchJackett: Array<JackettFormattedResult>;
-  getTorrentStatus: TorrentStatus;
+  getTorrentStatus: Array<TorrentStatus>;
   getDownloadingMedias: Array<DownloadingMedia>;
+  getSearchingMedias: Array<SearchingMedia>;
   getMovies: Array<EnrichedMovie>;
   getTVShows: Array<EnrichedTvShow>;
   getMissingTVEpisodes: Array<EnrichedTvEpisode>;
@@ -239,8 +253,15 @@ export type QuerySearchJackettArgs = {
 
 
 export type QueryGetTorrentStatusArgs = {
-  resourceType: Scalars['String'];
-  resourceId: Scalars['Int'];
+  torrents: Array<GetTorrentStatusInput>;
+};
+
+export type SearchingMedia = {
+   __typename?: 'SearchingMedia';
+  id: Scalars['String'];
+  title: Scalars['String'];
+  resourceId: Scalars['Float'];
+  resourceType: FileType;
 };
 
 export type Tag = {
@@ -302,6 +323,8 @@ export type TmdbSearchResults = {
 export type TorrentStatus = {
    __typename?: 'TorrentStatus';
   id: Scalars['Int'];
+  resourceId: Scalars['Int'];
+  resourceType: FileType;
   percentDone: Scalars['Float'];
   rateDownload: Scalars['Int'];
   rateUpload: Scalars['Int'];
@@ -484,9 +507,12 @@ export type GetDownloadingQueryVariables = {};
 
 export type GetDownloadingQuery = (
   { __typename?: 'Query' }
-  & { rows: Array<(
+  & { searching: Array<(
+    { __typename?: 'SearchingMedia' }
+    & Pick<SearchingMedia, 'id' | 'title' | 'resourceId' | 'resourceType'>
+  )>, downloading: Array<(
     { __typename?: 'DownloadingMedia' }
-    & Pick<DownloadingMedia, 'title' | 'tag' | 'quality' | 'torrent' | 'resourceId' | 'resourceType'>
+    & Pick<DownloadingMedia, 'id' | 'title' | 'tag' | 'quality' | 'torrent' | 'resourceId' | 'resourceType'>
   )> }
 );
 
@@ -595,17 +621,16 @@ export type GetTagsQuery = (
 );
 
 export type GetTorrentStatusQueryVariables = {
-  resourceId: Scalars['Int'];
-  resourceType: Scalars['String'];
+  torrents: Array<GetTorrentStatusInput>;
 };
 
 
 export type GetTorrentStatusQuery = (
   { __typename?: 'Query' }
-  & { torrent: (
+  & { torrents: Array<(
     { __typename?: 'TorrentStatus' }
-    & Pick<TorrentStatus, 'id' | 'percentDone' | 'rateDownload' | 'rateUpload' | 'uploadRatio' | 'uploadedEver' | 'totalSize' | 'status'>
-  ) }
+    & Pick<TorrentStatus, 'id' | 'resourceId' | 'resourceType' | 'percentDone' | 'rateDownload' | 'rateUpload' | 'uploadRatio' | 'uploadedEver' | 'totalSize' | 'status'>
+  )> }
 );
 
 export type GetTvShowSeasonsQueryVariables = {
@@ -1051,7 +1076,14 @@ export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<Update
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDownloadingDocument = gql`
     query getDownloading {
-  rows: getDownloadingMedias {
+  searching: getSearchingMedias {
+    id
+    title
+    resourceId
+    resourceType
+  }
+  downloading: getDownloadingMedias {
+    id
     title
     tag
     quality
@@ -1414,9 +1446,11 @@ export type GetTagsQueryHookResult = ReturnType<typeof useGetTagsQuery>;
 export type GetTagsLazyQueryHookResult = ReturnType<typeof useGetTagsLazyQuery>;
 export type GetTagsQueryResult = ApolloReactCommon.QueryResult<GetTagsQuery, GetTagsQueryVariables>;
 export const GetTorrentStatusDocument = gql`
-    query getTorrentStatus($resourceId: Int!, $resourceType: String!) {
-  torrent: getTorrentStatus(resourceId: $resourceId, resourceType: $resourceType) {
+    query getTorrentStatus($torrents: [GetTorrentStatusInput!]!) {
+  torrents: getTorrentStatus(torrents: $torrents) {
     id
+    resourceId
+    resourceType
     percentDone
     rateDownload
     rateUpload
@@ -1440,8 +1474,7 @@ export const GetTorrentStatusDocument = gql`
  * @example
  * const { data, loading, error } = useGetTorrentStatusQuery({
  *   variables: {
- *      resourceId: // value for 'resourceId'
- *      resourceType: // value for 'resourceType'
+ *      torrents: // value for 'torrents'
  *   },
  * });
  */

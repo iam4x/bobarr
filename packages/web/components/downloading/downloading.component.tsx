@@ -1,15 +1,10 @@
 import React from 'react';
-import prettySize from 'prettysize';
-import { Progress, Tag } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
 
-import {
-  DownloadingMedia,
-  useGetTorrentStatusQuery,
-  useGetDownloadingQuery,
-} from '../../utils/graphql';
+import { useGetDownloadingQuery } from '../../utils/graphql';
 
 import { DownloadingComponentStyles } from './downloading.styles';
+import { SearchingRowsComponent } from './searching-rows.component';
+import { DownloadingRowsComponent } from './downloading-rows.component';
 
 export function DownloadingComponent({ types }: { types: string[] }) {
   const { data } = useGetDownloadingQuery({
@@ -17,67 +12,24 @@ export function DownloadingComponent({ types }: { types: string[] }) {
     pollInterval: 2500,
   });
 
-  const rows = data?.rows?.filter((row) => types.includes(row.resourceType));
+  const searching = data?.searching?.filter((row) =>
+    types.includes(row.resourceType.toLowerCase())
+  );
 
-  if (rows && rows.length > 0) {
-    return (
-      <DownloadingComponentStyles>
-        <div className="wrapper">
-          {rows.map((row) => (
-            <DownloadRow key={row.resourceType + row.resourceId} {...row} />
-          ))}
-        </div>
-      </DownloadingComponentStyles>
-    );
-  }
-
-  return <noscript />;
-}
-
-function DownloadRow(props: DownloadingMedia) {
-  const { data } = useGetTorrentStatusQuery({
-    pollInterval: 5000,
-    variables: {
-      resourceId: props.resourceId,
-      resourceType: props.resourceType,
-    },
-  });
-
-  const downloadSpeed = data?.torrent?.rateDownload || null;
-  const percent = data?.torrent?.percentDone
-    ? Math.round(data?.torrent?.percentDone * 10000) / 100
-    : 0;
-
-  const isStopped =
-    typeof data?.torrent?.status === 'number' && data?.torrent.status === 0;
+  const downloading = data?.downloading?.filter((row) =>
+    types.includes(row.resourceType.toLowerCase())
+  );
 
   return (
-    <>
-      <div className="download-row">
-        <div className="status">
-          {isStopped ? (
-            <Tag color="orange">Download paused</Tag>
-          ) : (
-            <Tag color="blue">
-              Downloading <LoadingOutlined style={{ marginLeft: 10 }} />
-            </Tag>
-          )}
-        </div>
-        <div className="name">{props.title}</div>
-        <div className="torrent-name">({props.torrent})</div>
-        <div className="speed">
-          ({percent}%
-          {downloadSpeed ? <> - {prettySize(downloadSpeed)}/s</> : null})
-        </div>
-        <div className="progress">
-          <Progress
-            size="small"
-            percent={percent}
-            status={isStopped ? 'exception' : 'active'}
-            showInfo={false}
-          />
-        </div>
+    <DownloadingComponentStyles>
+      <div className="wrapper">
+        <SearchingRowsComponent rows={searching || []} />
+        {/* dont mount downloading rows when it's not needed */}
+        {/* this component does request polling */}
+        {downloading && downloading.length > 0 && (
+          <DownloadingRowsComponent rows={downloading || []} />
+        )}
       </div>
-    </>
+    </DownloadingComponentStyles>
   );
 }

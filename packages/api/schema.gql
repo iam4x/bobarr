@@ -14,6 +14,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 enum DownloadableMediaState {
+  SEARCHING
   MISSING
   DOWNLOADING
   DOWNLOADED
@@ -21,12 +22,13 @@ enum DownloadableMediaState {
 }
 
 type DownloadingMedia {
+  id: String!
   title: String!
   tag: String!
+  resourceId: Float!
+  resourceType: FileType!
   quality: String!
   torrent: String!
-  resourceId: Float!
-  resourceType: String!
 }
 
 type EnrichedMovie {
@@ -64,6 +66,17 @@ type EnrichedTVShow {
   posterPath: String
   voteAverage: Float!
   releaseDate: String!
+}
+
+enum FileType {
+  EPISODE
+  SEASON
+  MOVIE
+}
+
+input GetTorrentStatusInput {
+  resourceId: Int!
+  resourceType: FileType!
 }
 
 type GraphQLCommonResponse {
@@ -152,12 +165,20 @@ type Query {
   getRecommendedTVShows: [TMDBSearchResult!]!
   getRecommendedMovies: [TMDBSearchResult!]!
   searchJackett(query: String!): [JackettFormattedResult!]!
-  getTorrentStatus(resourceType: String!, resourceId: Int!): TorrentStatus!
+  getTorrentStatus(torrents: [GetTorrentStatusInput!]!): [TorrentStatus!]!
   getDownloadingMedias: [DownloadingMedia!]!
+  getSearchingMedias: [SearchingMedia!]!
   getMovies: [EnrichedMovie!]!
   getTVShows: [EnrichedTVShow!]!
   getMissingTVEpisodes: [EnrichedTVEpisode!]!
   getMissingMovies: [EnrichedMovie!]!
+}
+
+type SearchingMedia {
+  id: String!
+  title: String!
+  resourceId: Float!
+  resourceType: FileType!
 }
 
 type Tag {
@@ -213,6 +234,8 @@ type TMDBSearchResults {
 
 type TorrentStatus {
   id: Int!
+  resourceId: Int!
+  resourceType: FileType!
   percentDone: Float!
   rateDownload: Int!
   rateUpload: Int!

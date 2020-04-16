@@ -17,6 +17,7 @@ import {
   DownloadingMedia,
   EnrichedTVEpisode,
   JackettInput,
+  SearchingMedia,
 } from './library.dto';
 
 @Resolver()
@@ -25,7 +26,12 @@ export class LibraryResolver {
 
   @Query((_returns) => [DownloadingMedia])
   public getDownloadingMedias() {
-    return this.libraryService.getDownloadingMedias();
+    return this.libraryService.getDownloading();
+  }
+
+  @Query((_returns) => [SearchingMedia])
+  public getSearchingMedias() {
+    return this.libraryService.getSearching();
   }
 
   @Query((_returns) => [EnrichedMovie])

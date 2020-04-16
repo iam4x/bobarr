@@ -1,5 +1,13 @@
 query getDownloading {
-  rows: getDownloadingMedias {
+  searching: getSearchingMedias {
+    id
+    title
+    resourceId
+    resourceType
+  }
+
+  downloading: getDownloadingMedias {
+    id
     title
     tag
     quality

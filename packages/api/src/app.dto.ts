@@ -13,6 +13,7 @@ export enum JobName {
 }
 
 export enum DownloadableMediaState {
+  SEARCHING = 'searching',
   MISSING = 'missing',
   DOWNLOADING = 'downloading',
   DOWNLOADED = 'downloaded',
