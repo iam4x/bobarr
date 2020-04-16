@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 import { FileType } from 'src/app.dto';
@@ -13,9 +14,11 @@ export class Torrent {
   @PrimaryGeneratedColumn()
   public id!: number;
 
-  @Column('varchar')
+  @Index({ unique: true })
+  @Column('varchar', { unique: true })
   public torrentHash!: string;
 
+  @Index()
   @Column('varchar')
   public resourceType!: FileType;
 
@@ -25,6 +28,7 @@ export class Torrent {
   @Column('varchar', { default: 'unknown' })
   public tag!: string;
 
+  @Index()
   @Column('int')
   public resourceId!: number;
 

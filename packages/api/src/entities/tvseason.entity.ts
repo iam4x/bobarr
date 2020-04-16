@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   Unique,
+  Index,
 } from 'typeorm';
 
 import { DownloadableMediaState } from 'src/app.dto';
@@ -24,6 +25,7 @@ export class TVSeason {
   @Column('int')
   public seasonNumber!: number;
 
+  @Index()
   @Column('varchar', { default: DownloadableMediaState.SEARCHING })
   public state: DownloadableMediaState = DownloadableMediaState.SEARCHING;
 

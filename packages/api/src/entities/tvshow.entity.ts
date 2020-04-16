@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 
 import { TVSeason } from './tvseason.entity';
@@ -20,6 +21,7 @@ export class TVShow {
   public id!: number;
 
   @Field()
+  @Index()
   @Column('int', { unique: true })
   public tmdbId!: number;
 

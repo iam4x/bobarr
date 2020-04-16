@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   Unique,
+  Index,
 } from 'typeorm';
 
 import { DownloadableMediaState } from 'src/app.dto';
@@ -33,6 +34,7 @@ export class TVEpisode {
   public seasonNumber!: number;
 
   @Field((_type) => DownloadableMediaState)
+  @Index()
   @Column('varchar', { default: DownloadableMediaState.SEARCHING })
   public state: DownloadableMediaState = DownloadableMediaState.SEARCHING;
 

@@ -6,6 +6,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 import { DownloadableMediaState } from 'src/app.dto';
@@ -18,6 +19,7 @@ export class Movie {
   public id!: number;
 
   @Field()
+  @Index()
   @Column('int', { unique: true })
   public tmdbId!: number;
 
@@ -26,6 +28,7 @@ export class Movie {
   public title!: string;
 
   @Field((_type) => DownloadableMediaState)
+  @Index()
   @Column('varchar', { default: DownloadableMediaState.SEARCHING })
   public state: DownloadableMediaState = DownloadableMediaState.SEARCHING;
 
