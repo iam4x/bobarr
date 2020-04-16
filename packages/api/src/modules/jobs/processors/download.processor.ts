@@ -70,6 +70,10 @@ export class DownloadProcessor {
 
     if (bestResult === undefined) {
       this.logger.error('movie torrent not found');
+      await this.movieDAO.save({
+        id: movieId,
+        state: DownloadableMediaState.MISSING,
+      });
       return;
     }
 
@@ -90,6 +94,13 @@ export class DownloadProcessor {
 
     if (bestResult === undefined) {
       this.logger.error('season not found, will split download into episodes');
+
+      // set season as processed we wont rety a full episodes pack download
+      await this.tvSeasonDAO.save({
+        id: seasonId,
+        state: DownloadableMediaState.PROCESSED,
+      });
+
       const season = await this.tvSeasonDAO.findOneOrFail({
         where: { id: seasonId },
         relations: ['episodes'],
@@ -133,6 +144,10 @@ export class DownloadProcessor {
 
     if (bestResult === undefined) {
       this.logger.error('episode torrent not found');
+      await this.tvEpisodeDAO.save({
+        id: episodeId,
+        state: DownloadableMediaState.MISSING,
+      });
       return;
     }
 

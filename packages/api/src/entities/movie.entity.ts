@@ -26,8 +26,8 @@ export class Movie {
   public title!: string;
 
   @Field((_type) => DownloadableMediaState)
-  @Column('varchar', { default: DownloadableMediaState.MISSING })
-  public state: DownloadableMediaState = DownloadableMediaState.MISSING;
+  @Column('varchar', { default: DownloadableMediaState.SEARCHING })
+  public state: DownloadableMediaState = DownloadableMediaState.SEARCHING;
 
   @Field()
   @CreateDateColumn()
