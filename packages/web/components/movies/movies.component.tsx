@@ -31,7 +31,7 @@ export function MoviesComponent() {
       <MoviesComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>
-            {results.length === 0 ? (
+            {data?.movies.length === 0 ? (
               <Empty />
             ) : (
               <>

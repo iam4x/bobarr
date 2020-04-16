@@ -34,7 +34,7 @@ export function TVShowsComponent() {
       <TVShowsComponentStyles>
         <div className="wrapper">
           <Skeleton active={true} loading={loading}>
-            {results.length === 0 ? (
+            {data?.tvShows.length === 0 ? (
               <Empty />
             ) : (
               <>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Input } from 'antd';
+import { Button, Input, Empty } from 'antd';
 import { orderBy } from 'lodash';
 
 import {
@@ -46,30 +46,38 @@ export function useSortable<TEntity>(props: UseSortableProps<TEntity>) {
   }, [rows, searchQuery, orderByAttribute]);
 
   const renderSortable = () => (
-    <div className="sortable">
-      <div className="sort-buttons">
-        {sortAttributes.map((sortAttr) => (
-          <Button
-            key={sortAttr.key}
-            type={sortAttr.key === key ? 'default' : 'dashed'}
-            onClick={() => handleSort(sortAttr)}
-            icon={getSortIcon({
-              forKey: sortAttr.key,
-              activeKey: key,
-              activeOrder: order,
-            })}
-          >
-            {sortAttr.label}
-          </Button>
-        ))}
+    <>
+      <div className="sortable">
+        <div className="sort-buttons">
+          {sortAttributes.map((sortAttr) => (
+            <Button
+              key={sortAttr.key}
+              type={sortAttr.key === key ? 'default' : 'dashed'}
+              onClick={() => handleSort(sortAttr)}
+              icon={getSortIcon({
+                forKey: sortAttr.key,
+                activeKey: key,
+                activeOrder: order,
+              })}
+            >
+              {sortAttr.label}
+            </Button>
+          ))}
+        </div>
+        <div className="search-input">
+          <Input.Search
+            value={searchQuery}
+            onChange={({ target }) => setSearchQuery(target.value)}
+          />
+        </div>
       </div>
-      <div className="search-input">
-        <Input.Search
-          value={searchQuery}
-          onChange={({ target }) => setSearchQuery(target.value)}
+      {searchQuery && results.length === 0 && (
+        <Empty
+          style={{ marginTop: 64 }}
+          description={`No search results for "${searchQuery}"`}
         />
-      </div>
-    </div>
+      )}
+    </>
   );
 
   return { renderSortable, results };
