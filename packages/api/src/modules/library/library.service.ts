@@ -12,6 +12,7 @@ import {
   TransactionManager,
   Transaction,
   EntityManager,
+  Any,
 } from 'typeorm';
 
 import { FileType, DownloadableMediaState } from 'src/app.dto';
@@ -72,6 +73,30 @@ export class LibraryService {
     });
 
     return withTorrentQuality.filter(Boolean);
+  }
+
+  public async getSearching() {
+    const searching = await this.mediaViewDAO.find({
+      where: { state: DownloadableMediaState.SEARCHING },
+    });
+
+    const downloadingSeasons = await this.mediaViewDAO.find({
+      where: {
+        state: Any([
+          DownloadableMediaState.DOWNLOADING,
+          DownloadableMediaState.SEARCHING,
+        ]),
+        resourceType: FileType.SEASON,
+      },
+    });
+
+    const withoutEpisodesDownloadingAsSeason = searching.filter((row) =>
+      row.resourceType === FileType.EPISODE
+        ? !downloadingSeasons.some((season) => row.title.includes(season.title))
+        : true
+    );
+
+    return withoutEpisodesDownloadingAsSeason;
   }
 
   public async trackMovie(movieAttributes: DeepPartial<Movie>) {

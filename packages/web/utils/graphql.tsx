@@ -224,6 +224,7 @@ export type Query = {
   searchJackett: Array<JackettFormattedResult>;
   getTorrentStatus: TorrentStatus;
   getDownloadingMedias: Array<DownloadingMedia>;
+  getSearchingMedias: Array<SearchingMedia>;
   getMovies: Array<EnrichedMovie>;
   getTVShows: Array<EnrichedTvShow>;
   getMissingTVEpisodes: Array<EnrichedTvEpisode>;
@@ -249,6 +250,14 @@ export type QuerySearchJackettArgs = {
 export type QueryGetTorrentStatusArgs = {
   resourceType: FileType;
   resourceId: Scalars['Int'];
+};
+
+export type SearchingMedia = {
+   __typename?: 'SearchingMedia';
+  id: Scalars['String'];
+  title: Scalars['String'];
+  resourceId: Scalars['Float'];
+  resourceType: FileType;
 };
 
 export type Tag = {
@@ -492,7 +501,10 @@ export type GetDownloadingQueryVariables = {};
 
 export type GetDownloadingQuery = (
   { __typename?: 'Query' }
-  & { rows: Array<(
+  & { searching: Array<(
+    { __typename?: 'SearchingMedia' }
+    & Pick<SearchingMedia, 'id' | 'title' | 'resourceId' | 'resourceType'>
+  )>, downloading: Array<(
     { __typename?: 'DownloadingMedia' }
     & Pick<DownloadingMedia, 'id' | 'title' | 'tag' | 'quality' | 'torrent' | 'resourceId' | 'resourceType'>
   )> }
@@ -1059,7 +1071,13 @@ export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<Update
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDownloadingDocument = gql`
     query getDownloading {
-  rows: getDownloadingMedias {
+  searching: getSearchingMedias {
+    id
+    title
+    resourceId
+    resourceType
+  }
+  downloading: getDownloadingMedias {
     id
     title
     tag

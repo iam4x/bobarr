@@ -162,10 +162,18 @@ type Query {
   searchJackett(query: String!): [JackettFormattedResult!]!
   getTorrentStatus(resourceType: FileType!, resourceId: Int!): TorrentStatus!
   getDownloadingMedias: [DownloadingMedia!]!
+  getSearchingMedias: [SearchingMedia!]!
   getMovies: [EnrichedMovie!]!
   getTVShows: [EnrichedTVShow!]!
   getMissingTVEpisodes: [EnrichedTVEpisode!]!
   getMissingMovies: [EnrichedMovie!]!
+}
+
+type SearchingMedia {
+  id: String!
+  title: String!
+  resourceId: Float!
+  resourceType: FileType!
 }
 
 type Tag {

@@ -38,6 +38,14 @@ export class DownloadingMedia {
   @Field() public torrent!: string;
 }
 
+@ObjectType()
+export class SearchingMedia {
+  @Field() public id!: string;
+  @Field() public title!: string;
+  @Field() public resourceId!: number;
+  @Field((_type) => FileType) public resourceType!: FileType;
+}
+
 @InputType()
 export class JackettInput {
   @Field() public title!: string;

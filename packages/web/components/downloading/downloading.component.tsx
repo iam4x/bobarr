@@ -7,6 +7,7 @@ import {
   DownloadingMedia,
   useGetTorrentStatusQuery,
   useGetDownloadingQuery,
+  SearchingMedia,
 } from '../../utils/graphql';
 
 import { DownloadingComponentStyles } from './downloading.styles';
@@ -17,31 +18,47 @@ export function DownloadingComponent({ types }: { types: string[] }) {
     pollInterval: 2500,
   });
 
-  const rows = data?.rows?.filter((row) =>
+  const searching = data?.searching?.filter((row) =>
     types.includes(row.resourceType.toLowerCase())
   );
 
-  if (rows && rows.length > 0) {
-    return (
-      <DownloadingComponentStyles>
-        <div className="wrapper">
-          {rows.map((row) => (
-            <DownloadRow key={row.id} {...row} />
-          ))}
-        </div>
-      </DownloadingComponentStyles>
-    );
-  }
+  const downloading = data?.downloading?.filter((row) =>
+    types.includes(row.resourceType.toLowerCase())
+  );
 
-  return <noscript />;
+  return (
+    <DownloadingComponentStyles>
+      <div className="wrapper">
+        {searching?.map((row) => (
+          <SearchingRow key={row.id} media={row} />
+        ))}
+        {downloading?.map((row) => (
+          <DownloadRow key={row.id} media={row} />
+        ))}
+      </div>
+    </DownloadingComponentStyles>
+  );
 }
 
-function DownloadRow(props: DownloadingMedia) {
+function SearchingRow({ media }: { media: SearchingMedia }) {
+  return (
+    <div className="download-row">
+      <div className="status">
+        <Tag color="purple">
+          Searching <LoadingOutlined style={{ marginLeft: 10 }} />
+        </Tag>
+      </div>
+      <div className="name">{media.title}</div>
+    </div>
+  );
+}
+
+function DownloadRow({ media }: { media: DownloadingMedia }) {
   const { data } = useGetTorrentStatusQuery({
     pollInterval: 5000,
     variables: {
-      resourceId: props.resourceId,
-      resourceType: props.resourceType,
+      resourceId: media.resourceId,
+      resourceType: media.resourceType,
     },
   });
 
@@ -54,32 +71,30 @@ function DownloadRow(props: DownloadingMedia) {
     typeof data?.torrent?.status === 'number' && data?.torrent.status === 0;
 
   return (
-    <>
-      <div className="download-row">
-        <div className="status">
-          {isStopped ? (
-            <Tag color="orange">Download paused</Tag>
-          ) : (
-            <Tag color="blue">
-              Downloading <LoadingOutlined style={{ marginLeft: 10 }} />
-            </Tag>
-          )}
-        </div>
-        <div className="name">{props.title}</div>
-        <div className="torrent-name">({props.torrent})</div>
-        <div className="speed">
-          ({percent}%
-          {downloadSpeed ? <> - {prettySize(downloadSpeed)}/s</> : null})
-        </div>
-        <div className="progress">
-          <Progress
-            size="small"
-            percent={percent}
-            status={isStopped ? 'exception' : 'active'}
-            showInfo={false}
-          />
-        </div>
+    <div className="download-row">
+      <div className="status">
+        {isStopped ? (
+          <Tag color="orange">Download paused</Tag>
+        ) : (
+          <Tag color="blue">
+            Downloading <LoadingOutlined style={{ marginLeft: 10 }} />
+          </Tag>
+        )}
       </div>
-    </>
+      <div className="name">{media.title}</div>
+      <div className="torrent-name">({media.torrent})</div>
+      <div className="speed">
+        ({percent}%
+        {downloadSpeed ? <> - {prettySize(downloadSpeed)}/s</> : null})
+      </div>
+      <div className="progress">
+        <Progress
+          size="small"
+          percent={percent}
+          status={isStopped ? 'exception' : 'active'}
+          showInfo={false}
+        />
+      </div>
+    </div>
   );
 }
