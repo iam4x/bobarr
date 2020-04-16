@@ -25,7 +25,7 @@ export class LibraryResolver {
 
   @Query((_returns) => [DownloadingMedia])
   public getDownloadingMedias() {
-    return this.libraryService.getDownloadingMedias();
+    return this.libraryService.getDownloading();
   }
 
   @Query((_returns) => [EnrichedMovie])

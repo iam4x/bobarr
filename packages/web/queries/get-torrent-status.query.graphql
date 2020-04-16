@@ -1,4 +1,4 @@
-query getTorrentStatus($resourceId: Int!, $resourceType: String!) {
+query getTorrentStatus($resourceId: Int!, $resourceType: FileType!) {
   torrent: getTorrentStatus(
     resourceId: $resourceId
     resourceType: $resourceType

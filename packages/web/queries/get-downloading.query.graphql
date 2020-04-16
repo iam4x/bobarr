@@ -1,5 +1,6 @@
 query getDownloading {
   rows: getDownloadingMedias {
+    id
     title
     tag
     quality

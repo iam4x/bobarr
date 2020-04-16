@@ -22,6 +22,7 @@ import { TorrentDAO } from 'src/entities/dao/torrent.dao';
 import { TVShowDAO } from 'src/entities/dao/tvshow.dao';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
+import { MediaViewDAO } from 'src/entities/dao/media-view.dao';
 
 import { TMDBService } from 'src/modules/tmdb/tmdb.service';
 import { JobsService } from 'src/modules/jobs/jobs.service';
@@ -39,61 +40,38 @@ export class LibraryService {
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private readonly movieDAO: MovieDAO,
     private readonly tvShowDAO: TVShowDAO,
-    private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tvEpisodeDAO: TVEpisodeDAO,
     private readonly tmdbService: TMDBService,
     private readonly jobsService: JobsService,
-    private readonly transmissionService: TransmissionService
+    private readonly transmissionService: TransmissionService,
+    private readonly mediaViewDAO: MediaViewDAO
   ) {
     this.logger = logger.child({ context: 'LibraryService' });
   }
 
-  public async getDownloadingMedias() {
-    const movies = await this.movieDAO.find({
+  public async getDownloading() {
+    const downloading = await this.mediaViewDAO.find({
       where: { state: DownloadableMediaState.DOWNLOADING },
     });
 
-    const tvSeasons = await this.tvSeasonDAO.find({
-      where: { state: DownloadableMediaState.DOWNLOADING },
-      relations: ['tvShow'],
-    });
-
-    const tvEpisodes = await this.tvEpisodeDAO.find({
-      where: { state: DownloadableMediaState.DOWNLOADING },
-      relations: ['season', 'season.tvShow'],
-    });
-
-    const mixed = [
-      ...movies.map((movie) => ({
-        title: movie.title,
-        resourceId: movie.id,
-        resourceType: FileType.MOVIE,
-      })),
-      ...tvSeasons.map((season) => ({
-        title: season.title,
-        resourceId: season.id,
-        resourceType: FileType.SEASON,
-      })),
-      ...tvEpisodes.map((episode) => ({
-        title: episode.title,
-        resourceId: episode.id,
-        resourceType: FileType.EPISODE,
-      })),
-    ];
-
-    const withTorrentQuality = await map(mixed, async (resource) => {
+    const withTorrentQuality = await map(downloading, async (resource) => {
       const {
         tag,
         quality,
-        transmissionTorrent: { name: torrent },
+        transmissionTorrent,
       } = await this.transmissionService.getResourceTorrent({
         resourceId: resource.resourceId,
         resourceType: resource.resourceType,
       });
-      return { ...resource, tag, quality, torrent };
+
+      // torrent can be deleted from transmission but not yet deleted from database
+      // refresh downloading happens often this avoid errors when it's deleting
+      return transmissionTorrent
+        ? { ...resource, tag, quality, torrent: transmissionTorrent?.name }
+        : null;
     });
 
-    return withTorrentQuality;
+    return withTorrentQuality.filter(Boolean);
   }
 
   public async trackMovie(movieAttributes: DeepPartial<Movie>) {

@@ -17,14 +17,16 @@ export function DownloadingComponent({ types }: { types: string[] }) {
     pollInterval: 2500,
   });
 
-  const rows = data?.rows?.filter((row) => types.includes(row.resourceType));
+  const rows = data?.rows?.filter((row) =>
+    types.includes(row.resourceType.toLowerCase())
+  );
 
   if (rows && rows.length > 0) {
     return (
       <DownloadingComponentStyles>
         <div className="wrapper">
           {rows.map((row) => (
-            <DownloadRow key={row.resourceType + row.resourceId} {...row} />
+            <DownloadRow key={row.id} {...row} />
           ))}
         </div>
       </DownloadingComponentStyles>

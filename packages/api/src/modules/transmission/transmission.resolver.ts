@@ -1,6 +1,8 @@
 import { Resolver, Query, Args, Int } from '@nestjs/graphql';
 
+import { FileType } from 'src/app.dto';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
+
 import { TorrentStatus } from './transmission.dto';
 import { TransmissionService } from './transmission.service';
 
@@ -14,7 +16,7 @@ export class TransmissionResolver {
   @Query((_returns) => TorrentStatus)
   public async getTorrentStatus(
     @Args('resourceId', { type: () => Int }) resourceId: number,
-    @Args('resourceType') resourceType: string
+    @Args('resourceType', { type: () => FileType }) resourceType: FileType
   ) {
     const torrent = await this.torrentDAO.findOneOrFail({
       where: { resourceId, resourceType },

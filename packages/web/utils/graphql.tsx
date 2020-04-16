@@ -16,6 +16,7 @@ export type Scalars = {
 
 
 export enum DownloadableMediaState {
+  Searching = 'SEARCHING',
   Missing = 'MISSING',
   Downloading = 'DOWNLOADING',
   Downloaded = 'DOWNLOADED',
@@ -24,12 +25,13 @@ export enum DownloadableMediaState {
 
 export type DownloadingMedia = {
    __typename?: 'DownloadingMedia';
+  id: Scalars['String'];
   title: Scalars['String'];
   tag: Scalars['String'];
+  resourceId: Scalars['Float'];
+  resourceType: FileType;
   quality: Scalars['String'];
   torrent: Scalars['String'];
-  resourceId: Scalars['Float'];
-  resourceType: Scalars['String'];
 };
 
 export type EnrichedMovie = {
@@ -71,6 +73,12 @@ export type EnrichedTvShow = {
   voteAverage: Scalars['Float'];
   releaseDate: Scalars['String'];
 };
+
+export enum FileType {
+  Episode = 'EPISODE',
+  Season = 'SEASON',
+  Movie = 'MOVIE'
+}
 
 export type GraphQlCommonResponse = {
    __typename?: 'GraphQLCommonResponse';
@@ -239,7 +247,7 @@ export type QuerySearchJackettArgs = {
 
 
 export type QueryGetTorrentStatusArgs = {
-  resourceType: Scalars['String'];
+  resourceType: FileType;
   resourceId: Scalars['Int'];
 };
 
@@ -486,7 +494,7 @@ export type GetDownloadingQuery = (
   { __typename?: 'Query' }
   & { rows: Array<(
     { __typename?: 'DownloadingMedia' }
-    & Pick<DownloadingMedia, 'title' | 'tag' | 'quality' | 'torrent' | 'resourceId' | 'resourceType'>
+    & Pick<DownloadingMedia, 'id' | 'title' | 'tag' | 'quality' | 'torrent' | 'resourceId' | 'resourceType'>
   )> }
 );
 
@@ -596,7 +604,7 @@ export type GetTagsQuery = (
 
 export type GetTorrentStatusQueryVariables = {
   resourceId: Scalars['Int'];
-  resourceType: Scalars['String'];
+  resourceType: FileType;
 };
 
 
@@ -1052,6 +1060,7 @@ export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<
 export const GetDownloadingDocument = gql`
     query getDownloading {
   rows: getDownloadingMedias {
+    id
     title
     tag
     quality
@@ -1414,7 +1423,7 @@ export type GetTagsQueryHookResult = ReturnType<typeof useGetTagsQuery>;
 export type GetTagsLazyQueryHookResult = ReturnType<typeof useGetTagsLazyQuery>;
 export type GetTagsQueryResult = ApolloReactCommon.QueryResult<GetTagsQuery, GetTagsQueryVariables>;
 export const GetTorrentStatusDocument = gql`
-    query getTorrentStatus($resourceId: Int!, $resourceType: String!) {
+    query getTorrentStatus($resourceId: Int!, $resourceType: FileType!) {
   torrent: getTorrentStatus(resourceId: $resourceId, resourceType: $resourceType) {
     id
     percentDone

@@ -22,12 +22,13 @@ enum DownloadableMediaState {
 }
 
 type DownloadingMedia {
+  id: String!
   title: String!
   tag: String!
+  resourceId: Float!
+  resourceType: FileType!
   quality: String!
   torrent: String!
-  resourceId: Float!
-  resourceType: String!
 }
 
 type EnrichedMovie {
@@ -65,6 +66,12 @@ type EnrichedTVShow {
   posterPath: String
   voteAverage: Float!
   releaseDate: String!
+}
+
+enum FileType {
+  EPISODE
+  SEASON
+  MOVIE
 }
 
 type GraphQLCommonResponse {
@@ -153,7 +160,7 @@ type Query {
   getRecommendedTVShows: [TMDBSearchResult!]!
   getRecommendedMovies: [TMDBSearchResult!]!
   searchJackett(query: String!): [JackettFormattedResult!]!
-  getTorrentStatus(resourceType: String!, resourceId: Int!): TorrentStatus!
+  getTorrentStatus(resourceType: FileType!, resourceId: Int!): TorrentStatus!
   getDownloadingMedias: [DownloadingMedia!]!
   getMovies: [EnrichedMovie!]!
   getTVShows: [EnrichedTVShow!]!
