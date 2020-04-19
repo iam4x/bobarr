@@ -1,0 +1,101 @@
+version: "3.6"
+
+volumes:
+  db_data:
+  redis_data:
+
+networks:
+  default:
+
+services:
+  api:
+    container_name: bobarr-api
+    build:
+      context: ./packages/api
+    env_file: .env
+    volumes:
+      - ./library:/usr/library
+    ports:
+      - 4000:4000
+    command: yarn start:prod
+    restart: unless-stopped
+
+  reverse_proxy:
+    container_name: bobarr-traefik
+    image: traefik:v2.2
+    command: --api.insecure=true --providers.docker # bad for production should be disabled
+    ports:
+      - 80:80 #http
+      - 8080:8080 #webui
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  web:
+    container_name: bobarr-web
+    build:
+      context: ./packages/web
+    env_file: .env
+    labels:
+      - traefik.http.routers.bobarr.rule=Host(`bobarr.localhost`)
+      - traefik.http.services.bobarr.loadbalancer.server.port=3000
+    command: yarn start
+    restart: unless-stopped
+
+  postgres:
+    container_name: bobarr-postgresql
+    image: postgres:12-alpine
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    container_name: bobarr-redis
+    image: bitnami/redis:5.0.6
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - redis_data:/bitnami/redis/data
+
+  jackett:
+    image: linuxserver/jackett
+    container_name: bobarr-jacket
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - ./packages/jackett/config:/config
+      - ./packages/jackett/downloads:/downloads
+    labels:
+      - traefik.http.routers.jackett.rule=Host(`jackett.localhost`)
+      - traefik.http.services.jackett.loadbalancer.server.port=9117
+
+  # vpn:
+  #   image: dperson/openvpn-client
+  #   container_name: bobarr-vpn
+  #   cap_add:
+  #     - net_admin
+  #   security_opt:
+  #     - label:disable
+  #   networks:
+  #     - default
+  #   dns:
+  #     - 1.1.1.1
+  #     - 1.0.0.1
+  #   volumes:
+  #     - /dev/net:/dev/net:z
+  #     - ./packages/vpn:/vpn
+  #   entrypoint: "bash -c"
+  #   command: "exit 0"
+
+  transmission:
+    image: linuxserver/transmission
+    container_name: bobarr-transmission
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - ./library/downloads:/downloads
+      - ./packages/transmission/config:/config
+      - ./packages/transmission/watch:/watch
+    labels:
+      - traefik.http.routers.transmission.rule=Host(`transmission.localhost`)
+      - traefik.http.services.transmission.loadbalancer.server.port=9091
