@@ -7,11 +7,12 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 RUN yarn
+
 COPY . .
 
 RUN yarn build
 
-HEALTHCHECK --start-period=30s \
-  CMD curl -f http://localhost:3000 || exit 1
+HEALTHCHECK --interval=12s --timeout=12s --start-period=30s \  
+ CMD node ./healthcheck.js
 
 CMD yarn start
