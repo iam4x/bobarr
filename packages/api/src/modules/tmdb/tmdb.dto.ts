@@ -1,4 +1,4 @@
-import { ObjectType, Field } from '@nestjs/graphql';
+import { ObjectType, Field, ArgsType } from '@nestjs/graphql';
 
 export interface TMDBMovie {
   id: number;
@@ -91,6 +91,17 @@ export interface TMDBTVEpisode {
   vote_count: number;
 }
 
+export interface TMDBLanguage {
+  iso_639_1: string;
+  english_name: string;
+  name: string;
+}
+
+export interface TMDBGenres {
+  id: number;
+  name: string;
+}
+
 @ObjectType()
 export class TMDBFormattedTVEpisode {
   @Field() public id!: number;
@@ -132,4 +143,32 @@ export class TMDBSearchResult {
 export class TMDBSearchResults {
   @Field((_type) => [TMDBSearchResult]) public movies!: TMDBSearchResult[];
   @Field((_type) => [TMDBSearchResult]) public tvShows!: TMDBSearchResult[];
+}
+
+@ObjectType()
+export class TMDBLanguagesResult {
+  @Field() public code!: string;
+  @Field() public language!: string;
+}
+
+@ObjectType()
+export class TMDBGenresResult {
+  @Field() public id!: number;
+  @Field() public name!: string;
+}
+
+@ObjectType()
+export class TMDBGenresResults {
+  @Field((_type) => [TMDBGenresResult])
+  public movieGenres!: TMDBGenresResult[];
+  @Field((_type) => [TMDBGenresResult])
+  public tvShowGenres!: TMDBGenresResult[];
+}
+
+@ArgsType()
+export class GetDiscoverQueries {
+  @Field({ nullable: true }) public originLanguage?: string;
+  @Field({ nullable: true }) public year?: number;
+  @Field({ nullable: true }) public score?: number;
+  @Field((_type) => [Number], { nullable: true }) public genres?: number[];
 }

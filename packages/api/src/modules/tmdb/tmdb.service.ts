@@ -19,6 +19,9 @@ import {
   TMDBTVShow,
   TMDBFormattedTVSeason,
   TMDBTVEpisode,
+  TMDBGenres,
+  TMDBLanguage,
+  GetDiscoverQueries,
 } from './tmdb.dto';
 
 @Injectable()
@@ -39,6 +42,11 @@ export class TMDBService {
       query?: string;
       language?: string;
       region?: string;
+      year?: number;
+      with_genres?: string;
+      'vote_count.gte'?: number;
+      'vote_average.gte'?: number;
+      with_original_language?: string;
     } = {}
   ) {
     const apiKey = await this.paramsService.get(ParameterKey.TMDB_API_KEY);
@@ -197,6 +205,57 @@ export class TMDBService {
     return orderBy(allSimilars, ['count', 'popularity'], ['desc', 'desc'])
       .filter((_row, index) => index <= 50)
       .map(type === 'movie' ? this.mapMovie : this.mapTVShow);
+  }
+
+  public async discover(args: GetDiscoverQueries) {
+    this.logger.info('start discovery filter ', args);
+
+    const { year, originLanguage, score, genres } = args;
+    const { results } = await this.request<{ results: TMDBMovie[] }>(
+      '/discover/movie',
+      {
+        year,
+        'vote_average.gte': score && score / 10,
+        with_original_language: originLanguage,
+        'vote_count.gte': 50,
+        with_genres: genres?.join(','),
+      }
+    );
+
+    this.logger.info('finish discovery filter ');
+
+    return results.map(this.mapMovie);
+  }
+
+  public async getLanguages() {
+    this.logger.info('start get TMDB languages');
+
+    const results = await this.request<TMDBLanguage[]>(
+      '/configuration/languages'
+    );
+
+    this.logger.info('finish get TMDB languages');
+
+    return results.map(({ iso_639_1: code, english_name: language }) => ({
+      code,
+      language,
+    }));
+  }
+
+  public async getGenres() {
+    this.logger.info('start get TMDB genres');
+
+    const [movieGenres, tvShowGenres] = await Promise.all([
+      this.request<{ genres: TMDBGenres[] }>('/genre/movie/list'),
+      this.request<{ genres: TMDBGenres[] }>('/genre/tv/list'),
+    ]);
+
+    this.logger.info('finish get TMDB genres');
+
+    return {
+      movieGenres: movieGenres.genres,
+      tvShowGenres: tvShowGenres.genres,
+    };
   }
 
   private mapMovie(result: TMDBMovie) {
