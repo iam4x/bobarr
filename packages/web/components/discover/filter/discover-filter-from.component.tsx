@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Form, Select, DatePicker, Slider, Button, Checkbox } from 'antd';
 import { FilterDiscoverySectionComponent } from './discover-filter-section.component';
 import {
@@ -33,18 +33,16 @@ export function DiscoverFilterFormComponent(
     onFinish(values);
   };
 
-  function formatter(score: number) {
-    return `${score}%`;
-  }
+  const formatter = useCallback((score: number) => () => `${score}%`, []);
 
   return (
     <Form form={form} initialValues={props.params} onFinish={onSearch}>
-      <FilterDiscoverySectionComponent title="Countries">
+      <FilterDiscoverySectionComponent title="Language">
         <Form.Item key="originLanguage" name="originLanguage">
           <Select
             showSearch
             style={{ width: '100%' }}
-            placeholder="Select the language"
+            placeholder="Language"
             optionFilterProp="children"
             size="middle"
           >

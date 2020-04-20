@@ -208,7 +208,7 @@ export class TMDBService {
   }
 
   public async discover(args: GetDiscoverQueries) {
-    this.logger.info('start discovery filter ', args);
+    this.logger.info('start discovery filter', args);
 
     const { year, originLanguage, score, genres } = args;
     const { results } = await this.request<{ results: TMDBMovie[] }>(
@@ -222,7 +222,7 @@ export class TMDBService {
       }
     );
 
-    this.logger.info('finish discovery filter ');
+    this.logger.info('finish discovery filter');
 
     return results.map(this.mapMovie);
   }

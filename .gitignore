@@ -14,10 +14,10 @@ packages/jackett/downloads/*
 !packages/jackett/**/.gitkeep
 
 # transmission
-packages/transmission/config/*
+packages/transmission/**
 packages/transmission/watch/*
 !packages/transmission/**/.gitkeep
-!packages/transmission/config/settings.json
+packages/transmission/config/settings.json
 
 # vpn
 packages/vpn/*

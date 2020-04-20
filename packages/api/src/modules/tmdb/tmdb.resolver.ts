@@ -63,23 +63,11 @@ export class TMDBResolver {
     return this.tmdbService.discover(args);
   }
 
-  @UseInterceptors(
-    makeCacheInterceptor({
-      key: CacheKeys.TMDB_LANGUAGES,
-      ttl: 1000 * 60 * 60 * 60 * 24, // cache for 1 month
-    })
-  )
   @Query((_returns) => [TMDBLanguagesResult])
   public getLanguages() {
     return this.tmdbService.getLanguages();
   }
 
-  @UseInterceptors(
-    makeCacheInterceptor({
-      key: CacheKeys.TMDB_GENRES,
-      ttl: 1000 * 60 * 60 * 60 * 24, // cache for 1 month
-    })
-  )
   @Query((_returns) => TMDBGenresResults)
   public getGenres() {
     return this.tmdbService.getGenres();

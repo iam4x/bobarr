@@ -7,33 +7,35 @@ import {
   useGetDiscoverLazyQuery,
   GetDiscoverQueryVariables,
   useGetLibraryMoviesQuery,
+  useGetParamsQuery,
 } from '../../../utils/graphql';
 import { DiscoverFilterFormComponent } from './discover-filter-from.component';
-import { isNumber } from 'util';
+import { isNumber } from 'lodash';
 
 export function DiscoverFilterComponent() {
   const [discover, { data, loading }] = useGetDiscoverLazyQuery();
   const { data: moviesLibrary } = useGetLibraryMoviesQuery();
-  const tmdbIds = moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || [];
-  const [params, setParams] = useState<GetDiscoverQueryVariables>({
-    originLanguage: 'ja',
-    score: 80,
-    genres: [28],
+  const { data: defaultUserParams } = useGetParamsQuery();
+
+  const [filterParams, setFilterParams] = useState<GetDiscoverQueryVariables>({
+    originLanguage: defaultUserParams?.params.language,
+    score: 70,
   });
 
+  const tmdbIds = moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || [];
   const moviesSearchResults = data?.movies || [];
   const hasNoSearchResults = moviesSearchResults.length === 0;
 
   const onFinish = (formParams: GetDiscoverQueryVariables) => {
     const { year, ...rest } = formParams;
-    setParams({ year: isNumber(year) ? year : undefined, ...rest });
+    setFilterParams({ year: isNumber(year) ? year : undefined, ...rest });
   };
 
   useEffect(() => {
     discover({
-      variables: params,
+      variables: filterParams,
     });
-  }, [params, discover]);
+  }, [filterParams, discover]);
 
   return (
     <SearchStyles>
@@ -46,7 +48,7 @@ export function DiscoverFilterComponent() {
                 <div className="discover--filter">
                   <Card title="Filters" size="small">
                     <DiscoverFilterFormComponent
-                      params={params}
+                      params={filterParams}
                       onFinish={onFinish}
                     />
                   </Card>
