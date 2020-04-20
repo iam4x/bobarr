@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Form, Select, DatePicker, Slider, Button, Checkbox } from 'antd';
 import { FilterDiscoverySectionComponent } from './discover-filter-section.component';
 import {
@@ -20,17 +20,19 @@ export function DiscoverFilterFormComponent(
   const TMDBMovieGenres = genresQuery.data?.genres.movieGenres;
 
   const [form] = Form.useForm();
-  const { Option } = Select;
-  const { onFinish } = props;
 
-  const options = TMDBLanguages?.map((l) => (
-    <Option key={l.code} value={l.code}>
-      {l.language}
-    </Option>
-  ));
+  const options = useMemo(
+    () =>
+      TMDBLanguages?.map((l) => (
+        <Select.Option key={l.code} value={l.code}>
+          {l.language}
+        </Select.Option>
+      )),
+    [TMDBLanguages]
+  );
 
   const onSearch = (values: GetDiscoverQueryVariables) => {
-    onFinish(values);
+    props.onFinish(values);
   };
 
   const formatter = useCallback((score: number) => () => `${score}%`, []);
