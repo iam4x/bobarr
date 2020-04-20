@@ -56,7 +56,7 @@ You can easily enforce all downloads through your VPN
 ### Run with WireGuard
 
 WireGuard is currently under heavy development and this configuration has only been tested on Linux
-* Install the [https://www.wireguard.com/install/](WireGuard) package for your operating system/distribution
+* Install the [WireGuard](https://www.wireguard.com/install/) package for your operating system/distribution
 * Run the docker-compose.wireguard.yml file
   * if you have npm -> `$ npm run start:wireguard` or yarn -> `$ yarn start:wireguard`
   * otherwise -> `$ docker-compose -f docker-compose.yml -f docker-compose.wireguard.yml up -d`
