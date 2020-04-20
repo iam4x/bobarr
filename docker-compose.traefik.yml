@@ -75,45 +75,6 @@ services:
       - traefik.http.routers.jackett.rule=Host(`jackett.localhost`)
       - traefik.http.services.jackett.loadbalancer.server.port=9117
 
-  # vpn:
-  #   image: dperson/openvpn-client
-  #   container_name: bobarr-vpn
-  #   cap_add:
-  #     - net_admin
-  #   security_opt:
-  #     - label:disable
-  #   networks:
-  #     - default
-  #   dns:
-  #     - 1.1.1.1
-  #     - 1.0.0.1
-  #   volumes:
-  #     - /dev/net:/dev/net:z
-  #     - ./packages/vpn:/vpn
-  #   entrypoint: "bash -c"
-  #   command: "exit 0"
-
-  vpn:
-    image: linuxserver/wireguard
-    container_name: bobarr-vpn
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    security_opt:
-      - label:disable
-    networks:
-      - default
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
-    volumes:
-      - ./packages/vpn/wg0.conf:/config/wg0.conf
-      - /lib/modules:/lib/modules
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.all.disable_ipv6=0
-    restart: always
-
   transmission:
     image: linuxserver/transmission
     container_name: bobarr-transmission
