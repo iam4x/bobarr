@@ -30,19 +30,19 @@ And to have something with a better ui, less configuration and faster 🚀
 
 * Set `PUID` and `PGID` in `.env` (see .env for explanation)
 * Start the bobarr minimal stack `$ docker-compose up --build -d` (see below to add vpn)
-* Go to http://localhost:9117, add your torrent account and copy the API Key in top right corner
-* Go to http://localhost:3000/settings and update the jackett API key
+* Go to http://jackett.localhost, add your torrent indexers and copy the API Key in top right corner
+* Go to http://bobarr.localhost/settings and update the jackett API key
 
 ## Configuration
 
 ### Torrent account
 
-* Go to http://localhost:9117
+* Go to http://jackett.localhost
 * Add indexer and follow the steps
 
 ### Bobarr configuration
 
-* Go to http://localhost:3000/settings
+* Go to http://bobarr.localhost/settings
 * Set your region and language according to your torrent tracker
 
 ### Run with VPN
@@ -50,12 +50,20 @@ And to have something with a better ui, less configuration and faster 🚀
 You can easily enforce all downloads through your VPN
 * Copy your open vpn config file (.ovpn) into the folder `packages/vpn`
 * Run the docker-compose.vpn.yml file
-  * if you have npm -> `$ npm run start:vpn`
+  * if you have npm -> `$ npm run start:vpn` or yarn -> `$ yarn start:vpn`
   * otherwise -> `$ docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up -d`
+
+### Run with WireGuard
+
+WireGuard is currently under heavy development and this configuration has only been tested on Linux
+* Install the [https://www.wireguard.com/install/](WireGuard) package for your operating system/distribution
+* Run the docker-compose.wireguard.yml file
+  * if you have npm -> `$ npm run start:wireguard` or yarn -> `$ yarn start:wireguard`
+  * otherwise -> `$ docker-compose -f docker-compose.yml -f docker-compose.wireguard.yml up -d`
 
 ## Usage
 
-* After configuration, go to http://localhost:3000 and just start searching!
+* After configuration, go to http://bobarr.localhost and just start searching!
 * The files will be downloaded into `library/downloads`
 * The files will be simlinked and organized into `library/tvshows` or `library/movies`
 
@@ -68,15 +76,15 @@ If you were using radarr or sonarr already you may have a tvshow or movies folde
 
 The only requirement is to have a folder `tvshows` and a folder `movies` then bobarr can catch up and download to your user defined library folder.
 
-You can now head to http://localhost:3000 and hit that "Scan library folder" button.
+You can now head to http://bobarr.localhost and hit that "Scan library folder" button.
 
 ## Services
 
-* Bobarr http://localhost:3000
-* Bobarr GraphQL API http://localhost:4000/graphql
-* Bobarr background jobs http://localhost:4000/jobs
-* Jackett http://localhost:9117
-* Transmission http://localhost:9091
+* Bobarr http://bobarr.localhost
+* Bobarr GraphQL API http://api.bobarr/graphql
+* Bobarr background jobs http://api.bobarr/jobs
+* Jackett http://jackett.localhost
+* Transmission http://transmission.localhost
 
 ## Development
 

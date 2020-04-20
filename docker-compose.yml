@@ -17,16 +17,32 @@ services:
       - ./library:/usr/library
     ports:
       - 4000:4000
+    labels:
+      - traefik.http.routers.api.rule=Host(`${BOBARR_SUBDOMAIN_API}.${BOBARR_DOMAIN}`)
+      - traefik.http.services.api.loadbalancer.server.port=4000
     command: yarn start:prod
     restart: unless-stopped
+
+  reverse_proxy:
+    container_name: bobarr-traefik
+    image: traefik:v2.2
+    command: --api.insecure=true --providers.docker #bad for production should be disabled
+    ports:
+      - 80:80 #http
+    labels:
+      - traefik.http.routers.traefik.rule=Host(`${BOBARR_SUBDOMAIN_TRAEFIK}.${BOBARR_DOMAIN}`)
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   web:
     container_name: bobarr-web
     build:
       context: ./packages/web
     env_file: .env
-    ports:
-      - 3000:3000
+    labels:
+      - traefik.http.routers.bobarr.rule=Host(`${BOBARR_SUBDOMAIN}.${BOBARR_DOMAIN}`)
+      - traefik.http.services.bobarr.loadbalancer.server.port=3000
     command: yarn start
     restart: unless-stopped
 
@@ -54,36 +70,9 @@ services:
     volumes:
       - ./packages/jackett/config:/config
       - ./packages/jackett/downloads:/downloads
-
-  jackett-web:
-    image: dperson/nginx
-    container_name: bobarr-jackett-web
-    depends_on:
-      - jackett
-    environment:
-      - TZ=Europe/Paris
-    ports:
-      - "9117:80"
-    command: -w "http://jackett:9117;/"
-    restart: unless-stopped
-
-  vpn:
-    image: dperson/openvpn-client
-    container_name: bobarr-vpn
-    cap_add:
-      - net_admin
-    security_opt:
-      - label:disable
-    networks:
-      - default
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-    volumes:
-      - /dev/net:/dev/net:z
-      - ./packages/vpn:/vpn
-    entrypoint: "bash -c"
-    command: "exit 0"
+    labels:
+      - traefik.http.routers.jackett.rule=Host(`${BOBARR_SUBDOMAIN_JACKETT}.${BOBARR_DOMAIN}`)
+      - traefik.http.services.jackett.loadbalancer.server.port=9117
 
   transmission:
     image: linuxserver/transmission
@@ -94,15 +83,6 @@ services:
       - ./library/downloads:/downloads
       - ./packages/transmission/config:/config
       - ./packages/transmission/watch:/watch
-
-  transmission-web:
-    image: dperson/nginx
-    container_name: bobarr-transmission-web
-    depends_on:
-      - transmission
-    environment:
-      - TZ=Europe/Paris
-    ports:
-      - "9091:80"
-    command: -w "http://transmission:9091;/"
-    restart: unless-stopped
+    labels:
+      - traefik.http.routers.transmission.rule=Host(`${BOBARR_SUBDOMAIN_TRANSMISSION}.${BOBARR_DOMAIN}`)
+      - traefik.http.services.transmission.loadbalancer.server.port=9091
