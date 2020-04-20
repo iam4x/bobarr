@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const FilterDiscoveryStyles = styled.div`
+export const DiscoverStyles = styled.div`
   .wrapper {
     max-width: 1200px;
     margin: 0 auto;
@@ -41,6 +41,11 @@ export const FilterDiscoveryStyles = styled.div`
       > div {
         display: inline-block;
         padding-bottom: 20px;
+      }
+
+      .percent {
+        top: 12px;
+        left: 12px;
       }
     }
   }

@@ -1,11 +1,12 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Form, Select, DatePicker, Slider, Button, Checkbox } from 'antd';
-import { FilterDiscoverySectionComponent } from './discover-filter-section.component';
+import { DiscoverFilterSectionComponent } from './discover-filter-section.component';
 import {
   GetDiscoverQueryVariables,
   useGetLanguagesQuery,
   useGetGenresQuery,
-} from '../../../utils/graphql';
+} from '../../utils/graphql';
+
 interface DiscoverFilterFormComponentProps {
   params: GetDiscoverQueryVariables;
   onFinish: (formParams: GetDiscoverQueryVariables) => void;
@@ -18,7 +19,7 @@ export function DiscoverFilterFormComponent(
 
   const TMDBLanguages = languagesQuery.data?.languages;
   const TMDBMovieGenres = genresQuery.data?.genres.movieGenres;
-
+  const [year, setYear] = useState<number>(); // with adding Moment library this state can be moved inside of forms
   const [form] = Form.useForm();
 
   const options = useMemo(
@@ -31,15 +32,19 @@ export function DiscoverFilterFormComponent(
     [TMDBLanguages]
   );
 
+  const onYearChange = useCallback((_, value: string) => {
+    setYear(Number(value));
+  }, []);
+
   const onSearch = (values: GetDiscoverQueryVariables) => {
-    props.onFinish(values);
+    props.onFinish({ ...values, year: Number(year) });
   };
 
   const formatter = useCallback((score: number) => () => `${score}%`, []);
 
   return (
     <Form form={form} initialValues={props.params} onFinish={onSearch}>
-      <FilterDiscoverySectionComponent title="Language">
+      <DiscoverFilterSectionComponent title="Language">
         <Form.Item key="originLanguage" name="originLanguage">
           <Select
             showSearch
@@ -51,13 +56,13 @@ export function DiscoverFilterFormComponent(
             {options}
           </Select>
         </Form.Item>
-      </FilterDiscoverySectionComponent>
-      <FilterDiscoverySectionComponent title="Year">
+      </DiscoverFilterSectionComponent>
+      <DiscoverFilterSectionComponent title="Year">
         <Form.Item key="year" name="year">
-          <DatePicker picker="year" size="middle" />
+          <DatePicker picker="year" size="middle" onChange={onYearChange} />
         </Form.Item>
-      </FilterDiscoverySectionComponent>
-      <FilterDiscoverySectionComponent title="Genres">
+      </DiscoverFilterSectionComponent>
+      <DiscoverFilterSectionComponent title="Genres">
         <Form.Item key="genres" name="genres">
           <Checkbox.Group
             className="discover--filter-genres"
@@ -67,12 +72,12 @@ export function DiscoverFilterFormComponent(
             }))}
           />
         </Form.Item>
-      </FilterDiscoverySectionComponent>
-      <FilterDiscoverySectionComponent title="Minimum Score">
+      </DiscoverFilterSectionComponent>
+      <DiscoverFilterSectionComponent title="Minimum Score">
         <Form.Item key="score" name="score">
           <Slider tooltipVisible tipFormatter={formatter} />
         </Form.Item>
-      </FilterDiscoverySectionComponent>
+      </DiscoverFilterSectionComponent>
       <Button type="default" htmlType="submit">
         Search
       </Button>

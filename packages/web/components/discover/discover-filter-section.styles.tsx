@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const FilterDiscoverySectionStyles = styled.div`
+export const DiscoverFilterSectionStyles = styled.div`
   width: 100%;
 
   h6 {
