@@ -63,7 +63,9 @@ export class DownloadProcessor {
   @Process(DownloadQueueProcessors.DOWNLOAD_MOVIE)
   public async downloadMovie({ data: movieId }: Job<number>) {
     this.logger.info('start download movie', { movieId });
+
     const [bestResult] = await this.jackettService.searchMovie(movieId);
+    if (!(await this.canRun({ movieId }))) return;
 
     if (bestResult === undefined) {
       this.logger.error('movie torrent not found');
@@ -87,7 +89,9 @@ export class DownloadProcessor {
   @Process(DownloadQueueProcessors.DOWNLOAD_SEASON)
   public async downloadSeason({ data: seasonId }: Job<number>) {
     this.logger.info('start download season', { seasonId });
+
     const [bestResult] = await this.jackettService.searchSeason(seasonId);
+    if (!(await this.canRun({ seasonId }))) return;
 
     if (bestResult === undefined) {
       this.logger.error('season not found, will split download into episodes');
@@ -98,22 +102,25 @@ export class DownloadProcessor {
         state: DownloadableMediaState.PROCESSED,
       });
 
-      const season = await this.tvSeasonDAO.findOneOrFail({
+      const season = await this.tvSeasonDAO.findOne({
         where: { id: seasonId },
         relations: ['episodes'],
       });
 
-      await forEachSeries(season.episodes, (episode) =>
-        this.downloadQueue.add(
-          DownloadQueueProcessors.DOWNLOAD_EPISODE,
-          episode.id
-        )
-      );
+      // season can already be removed from library
+      if (season) {
+        await forEachSeries(season.episodes, (episode) =>
+          this.downloadQueue.add(
+            DownloadQueueProcessors.DOWNLOAD_EPISODE,
+            episode.id
+          )
+        );
+      }
 
       return;
     }
 
-    this.libraryService.downloadTVSeason(seasonId, {
+    await this.libraryService.downloadTVSeason(seasonId, {
       title: bestResult.title,
       downloadLink: bestResult.downloadLink,
       tag: bestResult.tag.label,
@@ -126,7 +133,9 @@ export class DownloadProcessor {
   @Process(DownloadQueueProcessors.DOWNLOAD_EPISODE)
   public async downloadEpisode({ data: episodeId }: Job<number>) {
     this.logger.info('start download episode', { episodeId });
+
     const [bestResult] = await this.jackettService.searchEpisode(episodeId);
+    if (!(await this.canRun({ episodeId }))) return;
 
     if (bestResult === undefined) {
       this.logger.error('episode torrent not found');
@@ -145,5 +154,28 @@ export class DownloadProcessor {
     });
 
     return;
+  }
+
+  // check if job should continue
+  // media can be already removed from database
+  // when results are found from jackett
+  private async canRun(media: {
+    movieId?: number;
+    seasonId?: number;
+    episodeId?: number;
+  }) {
+    if (
+      (media.movieId && !(await this.movieDAO.findOne(media.movieId))) ||
+      (media.seasonId && !(await this.tvSeasonDAO.findOne(media.seasonId))) ||
+      (media.episodeId && !(await this.tvEpisodeDAO.findOne(media.episodeId)))
+    ) {
+      this.logger.warn(
+        'media already removed from database, this job will stop',
+        media
+      );
+      return false;
+    }
+
+    return true;
   }
 }
