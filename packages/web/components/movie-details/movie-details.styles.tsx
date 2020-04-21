@@ -20,6 +20,8 @@ export const MovieDetailsStyles = styled.div`
   }
 
   .btn {
+    display: inline-flex;
+    align-items: center;
     border: 1px solid transparent;
     border-radius: 4px;
     cursor: pointer;
@@ -30,21 +32,29 @@ export const MovieDetailsStyles = styled.div`
     &:hover {
       border: 1px solid #fff;
     }
+
+    svg {
+      margin-right: 8px;
+    }
   }
 
   .header-container {
     border-radius: 4px;
     overflow: hidden;
     position: relative;
-    height: 348px;
+    height: 100%;
     width: 100%;
   }
 
   .header-background {
+    position: absolute;
+    top: 0;
+    left: 0;
     background-size: cover;
     background-repeat: no-repeat;
     height: 100%;
     width: 100%;
+    z-index: 1;
   }
 
   .header-background-overlay {
@@ -58,28 +68,26 @@ export const MovieDetailsStyles = styled.div`
     top: 0;
     left: 0;
     width: 100%;
+    z-index: 2;
   }
 
   .header-content {
     display: flex;
-    position: absolute;
-    top: 0;
-    left: 0;
     padding-top: 24px;
     padding-bottom: 24px;
     padding-left: 36px;
     padding-right: 36px;
-    height: 100%;
     width: 100%;
+    position: relative;
+    z-index: 3;
   }
 
   .poster-container {
-    overflow: hidden;
-    border-radius: 4px;
-    height: auto;
+    height: 100%;
     width: 200px;
 
     .poster-image {
+      border-radius: 4px;
       height: auto;
       width: 200px;
     }
@@ -92,6 +100,8 @@ export const MovieDetailsStyles = styled.div`
   }
 
   .title {
+    display: flex;
+    align-items: center;
     font-size: 2.2em;
     font-weight: 700;
 
@@ -129,13 +139,12 @@ export const MovieDetailsStyles = styled.div`
     max-width: 780px;
   }
 
-  .action-button {
-    display: inline-flex;
-    align-items: center;
+  .buttons {
     margin-top: 24px;
+    display: flex;
 
-    svg {
-      margin-right: 8px;
+    .btn {
+      margin-right: 12px;
     }
   }
 `;
