@@ -5,6 +5,8 @@ query getLibraryTVShows {
     title
     originalTitle
     posterPath
+    runtime
+    overview
     voteAverage
     releaseDate
     createdAt

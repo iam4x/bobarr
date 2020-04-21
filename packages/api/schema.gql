@@ -38,10 +38,12 @@ type EnrichedMovie {
   state: DownloadableMediaState!
   createdAt: DateTime!
   updatedAt: DateTime!
-  originalTitle: String
-  posterPath: String
+  overview: String!
   voteAverage: Float!
   releaseDate: String!
+  originalTitle: String
+  posterPath: String
+  runtime: Float
 }
 
 type EnrichedTVEpisode {
@@ -62,10 +64,12 @@ type EnrichedTVShow {
   title: String!
   createdAt: DateTime!
   updatedAt: DateTime!
-  originalTitle: String
-  posterPath: String
+  overview: String!
   voteAverage: Float!
   releaseDate: String!
+  originalTitle: String
+  posterPath: String
+  runtime: Float
 }
 
 enum Entertainment {

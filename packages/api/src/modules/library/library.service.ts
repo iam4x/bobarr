@@ -422,32 +422,20 @@ export class LibraryService {
   }
 
   private enrichMovie = async (movie: Movie) => {
-    const tmdbResult = await this.tmdbService.getMovie(movie.tmdbId);
-    return {
-      ...movie,
-      title: tmdbResult.title,
-      originalTitle: tmdbResult.original_title,
-      originCountry: tmdbResult.original_language,
-      posterPath: tmdbResult.poster_path,
-      voteAverage: tmdbResult.vote_average,
-      releaseDate: tmdbResult.release_date,
-    };
+    const tmdbResult = await this.tmdbService
+      .getMovie(movie.tmdbId)
+      .then(this.tmdbService.mapMovie);
+    return { ...tmdbResult, ...movie, title: tmdbResult.title };
   };
 
   private enrichTVShow = async (
     tvShow: TVShow,
     params?: { language: string }
   ) => {
-    const tmdbResult = await this.tmdbService.getTVShow(tvShow.tmdbId, params);
-    return {
-      ...tvShow,
-      title: tmdbResult.name,
-      originalTitle: tmdbResult.original_name,
-      originCountry: tmdbResult.origin_country,
-      posterPath: tmdbResult.poster_path,
-      voteAverage: tmdbResult.vote_average,
-      releaseDate: tmdbResult.first_air_date,
-    };
+    const tmdbResult = await this.tmdbService
+      .getTVShow(tvShow.tmdbId, params)
+      .then(this.tmdbService.mapTVShow);
+    return { ...tmdbResult, ...tvShow, title: tmdbResult.title };
   };
 
   private enrichTVEpisode = async (tvEpisode: TVEpisode) => {

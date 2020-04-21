@@ -42,10 +42,12 @@ export type EnrichedMovie = {
   state: DownloadableMediaState;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  originalTitle?: Maybe<Scalars['String']>;
-  posterPath?: Maybe<Scalars['String']>;
+  overview: Scalars['String'];
   voteAverage: Scalars['Float'];
   releaseDate: Scalars['String'];
+  originalTitle?: Maybe<Scalars['String']>;
+  posterPath?: Maybe<Scalars['String']>;
+  runtime?: Maybe<Scalars['Float']>;
 };
 
 export type EnrichedTvEpisode = {
@@ -68,10 +70,12 @@ export type EnrichedTvShow = {
   title: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  originalTitle?: Maybe<Scalars['String']>;
-  posterPath?: Maybe<Scalars['String']>;
+  overview: Scalars['String'];
   voteAverage: Scalars['Float'];
   releaseDate: Scalars['String'];
+  originalTitle?: Maybe<Scalars['String']>;
+  posterPath?: Maybe<Scalars['String']>;
+  runtime?: Maybe<Scalars['Float']>;
 };
 
 export enum Entertainment {
@@ -605,7 +609,7 @@ export type GetLibraryMoviesQuery = (
   { __typename?: 'Query' }
   & { movies: Array<(
     { __typename?: 'EnrichedMovie' }
-    & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'state' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
+    & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'state' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -616,7 +620,7 @@ export type GetLibraryTvShowsQuery = (
   { __typename?: 'Query' }
   & { tvShows: Array<(
     { __typename?: 'EnrichedTVShow' }
-    & Pick<EnrichedTvShow, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
+    & Pick<EnrichedTvShow, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'posterPath' | 'runtime' | 'overview' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -1323,6 +1327,8 @@ export const GetLibraryMoviesDocument = gql`
     originalTitle
     state
     posterPath
+    overview
+    runtime
     voteAverage
     releaseDate
     createdAt
@@ -1363,6 +1369,8 @@ export const GetLibraryTvShowsDocument = gql`
     title
     originalTitle
     posterPath
+    runtime
+    overview
     voteAverage
     releaseDate
     createdAt

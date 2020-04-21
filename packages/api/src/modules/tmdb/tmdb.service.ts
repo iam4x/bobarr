@@ -267,7 +267,7 @@ export class TMDBService {
     };
   }
 
-  private mapMovie(result: TMDBMovie) {
+  public mapMovie(result: TMDBMovie) {
     return {
       id: result.id,
       tmdbId: result.id,
@@ -281,7 +281,7 @@ export class TMDBService {
     };
   }
 
-  private mapTVShow(result: TMDBTVShow) {
+  public mapTVShow(result: TMDBTVShow) {
     return {
       id: result.id,
       tmdbId: result.id,
