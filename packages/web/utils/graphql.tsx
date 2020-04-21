@@ -688,10 +688,10 @@ export type GetRecommendedQuery = (
   { __typename?: 'Query' }
   & { tvShows: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
   )>, movies: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
   )> }
 );
 
@@ -1580,6 +1580,8 @@ export const GetRecommendedDocument = gql`
     title
     releaseDate
     posterPath
+    overview
+    runtime
     voteAverage
   }
   movies: getRecommendedMovies {
@@ -1588,6 +1590,8 @@ export const GetRecommendedDocument = gql`
     title
     releaseDate
     posterPath
+    overview
+    runtime
     voteAverage
   }
 }
