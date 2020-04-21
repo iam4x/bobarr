@@ -3,21 +3,13 @@ import { Modal, notification } from 'antd';
 
 import {
   TmdbSearchResult,
-  EnrichedMovie,
   GetLibraryMoviesDocument,
   useRemoveMovieMutation,
   GetDownloadingDocument,
   GetMissingDocument,
-  EnrichedTvShow,
 } from '../../utils/graphql';
 
-export function useRemoveLibrary({
-  type,
-  result,
-}: {
-  type: 'movie' | 'tvshow';
-  result: TmdbSearchResult | EnrichedMovie | EnrichedTvShow;
-}) {
+export function useRemoveLibrary({ result }: { result: TmdbSearchResult }) {
   const [removeMovie] = useRemoveMovieMutation({
     awaitRefetchQueries: true,
     refetchQueries: [
@@ -44,12 +36,7 @@ export function useRemoveLibrary({
       centered: true,
       okText: 'Yes',
       cancelText: 'No',
-      onOk: () => {
-        if (type === 'movie') {
-          return removeMovie({ variables: { tmdbId: result.tmdbId } });
-        }
-        return Promise.resolve();
-      },
+      onOk: () => removeMovie({ variables: { tmdbId: result.tmdbId } }),
     });
 
   return handleClick;

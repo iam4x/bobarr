@@ -1,13 +1,17 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { Modal } from 'antd';
-import { FaPlay } from 'react-icons/fa';
+import { FaPlay, FaPlus, FaMinus } from 'react-icons/fa';
 
-import { TmdbSearchResult } from '../../utils/graphql';
+import { TmdbSearchResult, useGetParamsQuery } from '../../utils/graphql';
 import { getImageURL } from '../../utils/get-cached-image-url';
 
-import { MovieDetailsStyles } from './movie-details.styles';
 import { RatingComponent } from '../rating/rating.component';
+
+import { useAddLibrary } from './use-add-library.hook';
+import { useRemoveLibrary } from './use-remove-library.hook';
+
+import { MovieDetailsStyles } from './movie-details.styles';
 
 interface MovieDetailsProps {
   movie: TmdbSearchResult;
@@ -17,7 +21,14 @@ interface MovieDetailsProps {
 }
 
 export function MovieDetailsComponent(props: MovieDetailsProps) {
-  const { movie, visible, onRequestClose } = props;
+  const { inLibrary, movie, visible, onRequestClose } = props;
+
+  const { data } = useGetParamsQuery();
+
+  const handleAdd = useAddLibrary({ result: movie });
+  const handleRemove = useRemoveLibrary({ result: movie });
+
+  const youtubeSearchURL = `//youtube.com/results?search_query=trailer+${movie.title}+${data?.params?.language}`;
 
   return (
     <Modal
@@ -59,12 +70,27 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
               </div>
               <div className="informations-row">
                 <RatingComponent rating={movie.voteAverage * 10} />
-                <div className="play-trailer">
+                <a
+                  className="play-trailer btn"
+                  href={youtubeSearchURL}
+                  target="_default"
+                >
                   <FaPlay />
-                  <div>Play trailer</div>
-                </div>
+                  <div>Watch trailer on youtube</div>
+                </a>
               </div>
               <div className="overview">{movie.overview}</div>
+              {inLibrary ? (
+                <div className="action-button btn" onClick={handleRemove}>
+                  <FaMinus />
+                  <div>Remove from library</div>
+                </div>
+              ) : (
+                <div className="action-button btn" onClick={handleAdd}>
+                  <FaPlus />
+                  <div>Add to library</div>
+                </div>
+              )}
             </div>
           </div>
         </div>

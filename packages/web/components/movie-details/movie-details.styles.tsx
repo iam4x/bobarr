@@ -5,6 +5,19 @@ export const MovieDetailsStyles = styled.div`
   -webkit-overflow-scrolling: touch;
   max-height: 80vh;
 
+  .btn {
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #fff;
+    padding: 3px 5px;
+    transition: 0.1s linear;
+
+    &:hover {
+      border: 1px solid #fff;
+    }
+  }
+
   .header-container {
     border-radius: 4px;
     overflow: hidden;
@@ -78,7 +91,6 @@ export const MovieDetailsStyles = styled.div`
   .play-trailer {
     display: inline-flex;
     align-items: center;
-    cursor: pointer;
     margin-top: 12px;
     margin-bottom: 12px;
 
@@ -101,5 +113,15 @@ export const MovieDetailsStyles = styled.div`
   .overview {
     font-size: 1.2em;
     max-width: 780px;
+  }
+
+  .action-button {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 24px;
+
+    svg {
+      margin-right: 8px;
+    }
   }
 `;

@@ -4,20 +4,12 @@ import { Modal, notification } from 'antd';
 import {
   useTrackMovieMutation,
   TmdbSearchResult,
-  EnrichedMovie,
   GetLibraryMoviesDocument,
   GetDownloadingDocument,
   GetMissingDocument,
-  EnrichedTvShow,
 } from '../../utils/graphql';
 
-export function useAddLibrary({
-  type,
-  result,
-}: {
-  type: 'movie' | 'tvshow';
-  result: TmdbSearchResult | EnrichedMovie | EnrichedTvShow;
-}) {
+export function useAddLibrary({ result }: { result: TmdbSearchResult }) {
   const [trackMovie] = useTrackMovieMutation({
     awaitRefetchQueries: true,
     refetchQueries: [
@@ -44,14 +36,10 @@ export function useAddLibrary({
       centered: true,
       okText: 'Yes',
       cancelText: 'No',
-      onOk: () => {
-        if (type === 'movie') {
-          return trackMovie({
-            variables: { title: result.title, tmdbId: result.tmdbId },
-          });
-        }
-        return Promise.resolve();
-      },
+      onOk: () =>
+        trackMovie({
+          variables: { title: result.title, tmdbId: result.tmdbId },
+        }),
     });
 
   return handleClick;
