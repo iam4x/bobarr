@@ -24,7 +24,7 @@ interface TMDBCardComponentProps {
 
 export function TMDBCardComponent(props: TMDBCardComponentProps) {
   const { result, type, inLibrary } = props;
-  const [isModalOpen, setIsModalOpen] = useState(result.tmdbId === 419704);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <TMDBCardStyles>
