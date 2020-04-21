@@ -19,7 +19,7 @@ export function DiscoverFilterFormComponent(
 
   const TMDBLanguages = languagesQuery.data?.languages;
   const TMDBMovieGenres = genresQuery.data?.genres.movieGenres;
-  const [year, setYear] = useState<number>(); // with adding Moment library this state can be moved inside of forms
+  const [year, setYear] = useState<number>();
   const [form] = Form.useForm();
 
   const options = useMemo(

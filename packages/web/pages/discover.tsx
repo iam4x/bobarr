@@ -5,7 +5,7 @@ import { LayoutComponent } from '../components/layout/layout.component';
 import { withApollo } from '../components/with-apollo';
 import { DiscoverComponent } from '../components/discover/discover.component';
 
-function SearchPage() {
+function DiscoverPage() {
   return (
     <>
       <Head>
@@ -18,4 +18,4 @@ function SearchPage() {
   );
 }
 
-export default withApollo({ ssr: false })(SearchPage);
+export default withApollo({ ssr: false })(DiscoverPage);
