@@ -168,7 +168,7 @@ export class TMDBGenresResults {
 @ArgsType()
 export class GetDiscoverQueries {
   @Field({ nullable: true }) public originLanguage?: string;
-  @Field({ nullable: true }) public year?: number;
+  @Field({ nullable: true }) public year?: string;
   @Field({ nullable: true }) public score?: number;
   @Field((_type) => [Number], { nullable: true }) public genres?: number[];
 }

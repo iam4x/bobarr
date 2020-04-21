@@ -10,6 +10,7 @@ import {
   useGetParamsQuery,
 } from '../../utils/graphql';
 import { DiscoverFilterFormComponent } from './discover-filter-from.component';
+import dayjs, { Dayjs } from 'dayjs';
 
 export function DiscoverComponent() {
   const [discover, { data, loading }] = useGetDiscoverLazyQuery();
@@ -27,7 +28,11 @@ export function DiscoverComponent() {
 
   const onFinish = (formParams: GetDiscoverQueryVariables) => {
     const { year, ...rest } = formParams;
-    setFilterParams({ year, ...rest });
+
+    setFilterParams({
+      ...(year && { year: dayjs(year).format('YYYY') }),
+      ...rest,
+    });
   };
 
   useEffect(() => {

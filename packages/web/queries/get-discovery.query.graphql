@@ -1,4 +1,4 @@
-query getDiscover( $originLanguage: String, $year: Float, $score: Float, $genres: [Float!]) {
+query getDiscover( $originLanguage: String, $year: String, $score: Float, $genres: [Float!]) {
   movies: discover(originLanguage: $originLanguage, year: $year,score: $score, genres: $genres) {
     id
     tmdbId

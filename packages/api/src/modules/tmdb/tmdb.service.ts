@@ -214,7 +214,7 @@ export class TMDBService {
     const { results } = await this.request<{ results: TMDBMovie[] }>(
       '/discover/movie',
       {
-        year,
+        year: Number(year),
         'vote_average.gte': score && score / 10,
         with_original_language: originLanguage,
         'vote_count.gte': 50,

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Form, Select, DatePicker, Slider, Button, Checkbox } from 'antd';
 import { DiscoverFilterSectionComponent } from './discover-filter-section.component';
 import {
@@ -19,7 +19,6 @@ export function DiscoverFilterFormComponent(
 
   const TMDBLanguages = languagesQuery.data?.languages;
   const TMDBMovieGenres = genresQuery.data?.genres.movieGenres;
-  const [year, setYear] = useState<number>();
   const [form] = Form.useForm();
 
   const options = useMemo(
@@ -32,12 +31,8 @@ export function DiscoverFilterFormComponent(
     [TMDBLanguages]
   );
 
-  const onYearChange = useCallback((_, value: string) => {
-    setYear(Number(value));
-  }, []);
-
   const onSearch = (values: GetDiscoverQueryVariables) => {
-    props.onFinish({ ...values, year: Number(year) });
+    props.onFinish(values);
   };
 
   const formatter = useCallback((score: number) => () => `${score}%`, []);
@@ -59,7 +54,7 @@ export function DiscoverFilterFormComponent(
       </DiscoverFilterSectionComponent>
       <DiscoverFilterSectionComponent title="Year">
         <Form.Item key="year" name="year">
-          <DatePicker picker="year" size="middle" onChange={onYearChange} />
+          <DatePicker picker="year" size="middle" />
         </Form.Item>
       </DiscoverFilterSectionComponent>
       <DiscoverFilterSectionComponent title="Genres">

@@ -164,7 +164,7 @@ type Query {
   getTVShowSeasons(tvShowTMDBId: Int!): [TMDBFormattedTVSeason!]!
   getRecommendedTVShows: [TMDBSearchResult!]!
   getRecommendedMovies: [TMDBSearchResult!]!
-  discover(originLanguage: String, year: Float, score: Float, genres: [Float!]): [TMDBSearchResult!]!
+  discover(originLanguage: String, year: String, score: Float, genres: [Float!]): [TMDBSearchResult!]!
   getLanguages: [TMDBLanguagesResult!]!
   getGenres: TMDBGenresResults!
   searchJackett(query: String!): [JackettFormattedResult!]!

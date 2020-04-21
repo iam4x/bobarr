@@ -252,7 +252,7 @@ export type QueryGetTvShowSeasonsArgs = {
 
 export type QueryDiscoverArgs = {
   originLanguage?: Maybe<Scalars['String']>;
-  year?: Maybe<Scalars['Float']>;
+  year?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
   genres?: Maybe<Array<Scalars['Float']>>;
 };
@@ -533,7 +533,7 @@ export type UpdateParamsMutation = (
 
 export type GetDiscoverQueryVariables = {
   originLanguage?: Maybe<Scalars['String']>;
-  year?: Maybe<Scalars['Float']>;
+  year?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
   genres?: Maybe<Array<Scalars['Float']>>;
 };
@@ -1148,7 +1148,7 @@ export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMu
 export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDiscoverDocument = gql`
-    query getDiscover($originLanguage: String, $year: Float, $score: Float, $genres: [Float!]) {
+    query getDiscover($originLanguage: String, $year: String, $score: Float, $genres: [Float!]) {
   movies: discover(originLanguage: $originLanguage, year: $year, score: $score, genres: $genres) {
     id
     tmdbId
