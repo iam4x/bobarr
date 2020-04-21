@@ -345,6 +345,8 @@ export type TmdbSearchResult = {
   tmdbId: Scalars['Float'];
   title: Scalars['String'];
   voteAverage: Scalars['Float'];
+  overview: Scalars['String'];
+  runtime?: Maybe<Scalars['Float']>;
   posterPath?: Maybe<Scalars['String']>;
   releaseDate?: Maybe<Scalars['String']>;
 };
@@ -656,10 +658,10 @@ export type GetPopularQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )> }
   ) }
 );
@@ -750,10 +752,10 @@ export type SearchQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )> }
   ) }
 );
@@ -1483,6 +1485,8 @@ export const GetPopularDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
     tvShows {
@@ -1491,6 +1495,8 @@ export const GetPopularDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
   }
@@ -1776,6 +1782,8 @@ export const SearchDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
     tvShows {
@@ -1784,6 +1792,8 @@ export const SearchDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
   }
