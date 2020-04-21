@@ -1,7 +1,14 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { Modal } from 'antd';
-import { FaPlay, FaPlus, FaMinus, FaRegWindowClose } from 'react-icons/fa';
+import { Modal, Popover } from 'antd';
+
+import {
+  FaPlay,
+  FaPlus,
+  FaMinus,
+  FaRegWindowClose,
+  FaInfo,
+} from 'react-icons/fa';
 
 import { TmdbSearchResult, useGetParamsQuery } from '../../utils/graphql';
 import { getImageURL } from '../../utils/get-cached-image-url';
@@ -84,17 +91,27 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
                 </a>
               </div>
               <div className="overview">{movie.overview}</div>
-              {inLibrary ? (
-                <div className="action-button btn" onClick={handleRemove}>
-                  <FaMinus />
-                  <div>Remove from library</div>
-                </div>
-              ) : (
-                <div className="action-button btn" onClick={handleAdd}>
-                  <FaPlus />
-                  <div>Add to library</div>
-                </div>
-              )}
+              <div className="buttons">
+                {inLibrary ? (
+                  <>
+                    <div className="action-button btn" onClick={handleRemove}>
+                      <FaMinus />
+                      <div>Remove from library</div>
+                    </div>
+                    <Popover>
+                      <div className="btn">
+                        <FaInfo />
+                        <div>File details</div>
+                      </div>
+                    </Popover>
+                  </>
+                ) : (
+                  <div className="action-button btn" onClick={handleAdd}>
+                    <FaPlus />
+                    <div>Add to library</div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
