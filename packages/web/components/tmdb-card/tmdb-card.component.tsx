@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
+import { FolderOpenOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import {
-  PlusSquareOutlined,
-  CloseSquareOutlined,
-  FolderOpenOutlined,
-} from '@ant-design/icons';
 
 import {
   TmdbSearchResult,
@@ -12,10 +8,10 @@ import {
   EnrichedTvShow,
 } from '../../utils/graphql';
 
-import { TMDBCardStyles } from './tmdb-card.styles';
-import { useAddLibrary } from './use-add-library.hook';
-import { useRemoveLibrary } from './use-remove-library.hook';
 import { TVShowSeasonsModalComponent } from '../tvshow-seasons-modal/tvshow-seasons-modal.component';
+import { MovieDetailsComponent } from '../movie-details/movie-details.component';
+
+import { TMDBCardStyles } from './tmdb-card.styles';
 
 interface TMDBCardComponentProps {
   type: 'tvshow' | 'movie';
@@ -25,31 +21,31 @@ interface TMDBCardComponentProps {
 
 export function TMDBCardComponent(props: TMDBCardComponentProps) {
   const { result, type, inLibrary } = props;
-  const [tvSeasonModalActive, setTVSeasonModalActive] = useState(false);
-
-  const handleMovieAddLibrary = useAddLibrary({ result, type });
-  const handleMovieRemoveLibrary = useRemoveLibrary({ result, type });
-
-  const movieHandler = inLibrary
-    ? handleMovieRemoveLibrary
-    : handleMovieAddLibrary;
-
-  const onPosterClickHandler =
-    type === 'movie' ? movieHandler : () => setTVSeasonModalActive(true);
+  const [isModalOpen, setIsModalOpen] = useState(result.tmdbId === 419704);
 
   return (
     <TMDBCardStyles vote={result.voteAverage * 10}>
       {/* display season picker modal when it's tvshow */}
-      {type === 'tvshow' && tvSeasonModalActive && (
+      {type === 'tvshow' && isModalOpen && (
         <TVShowSeasonsModalComponent
           tvShow={result as TmdbSearchResult}
-          visible={tvSeasonModalActive}
+          visible={isModalOpen}
           inLibrary={inLibrary}
-          onRequestClose={() => setTVSeasonModalActive(false)}
+          onRequestClose={() => setIsModalOpen(false)}
         />
       )}
 
-      <div className="poster--container" onClick={onPosterClickHandler}>
+      {/* display movie details */}
+      {type === 'movie' && isModalOpen && (
+        <MovieDetailsComponent
+          movie={result as TmdbSearchResult}
+          visible={isModalOpen}
+          inLibrary={inLibrary}
+          onRequestClose={() => setIsModalOpen(false)}
+        />
+      )}
+
+      <div className="poster--container" onClick={() => setIsModalOpen(true)}>
         <div
           className="poster"
           style={{
@@ -57,27 +53,10 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
           }}
         />
         <div className="overlay">
-          {type === 'tvshow' && (
-            <>
-              <FolderOpenOutlined />
-              <div className="action-label">manage TVShow</div>
-            </>
-          )}
-          {type === 'movie' && (
-            <>
-              {inLibrary ? (
-                <>
-                  <CloseSquareOutlined />
-                  <div className="action-label">remove from library</div>
-                </>
-              ) : (
-                <>
-                  <PlusSquareOutlined />
-                  <div className="action-label">add to library</div>
-                </>
-              )}
-            </>
-          )}
+          <>
+            <FolderOpenOutlined />
+            <div className="action-label">See details</div>
+          </>
         </div>
       </div>
 
