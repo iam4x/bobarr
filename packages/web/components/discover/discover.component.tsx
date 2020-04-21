@@ -10,7 +10,7 @@ import {
   useGetParamsQuery,
 } from '../../utils/graphql';
 import { DiscoverFilterFormComponent } from './discover-filter-from.component';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 export function DiscoverComponent() {
   const [discover, { data, loading }] = useGetDiscoverLazyQuery();
