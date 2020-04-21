@@ -145,6 +145,8 @@ export class TMDBSearchResult {
   @Field() public tmdbId!: number;
   @Field() public title!: string;
   @Field() public voteAverage!: number;
+  @Field() public overview!: string;
+  @Field({ nullable: true }) public runtime!: number;
   @Field({ nullable: true }) public posterPath?: string;
   @Field({ nullable: true }) public releaseDate?: string;
 }
