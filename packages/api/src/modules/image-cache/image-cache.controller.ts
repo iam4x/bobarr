@@ -35,16 +35,12 @@ export class ImageCacheController {
       await fs.stat(filePath);
       await fs.readFile(filePath);
     } catch (error) {
-      const { data: buffer } = await axios
-        .get(`https://image.tmdb.org/t/p/${imageUrl}`, {
+      const { data: buffer } = await axios.get(
+        `https://image.tmdb.org/t/p/${imageUrl}`,
+        {
           responseType: 'arraybuffer',
-        })
-        .catch((requestErr) => {
-          if (requestErr) {
-            console.error(requestErr);
-          }
-          throw requestErr;
-        });
+        }
+      );
 
       await fs.mkdir(path.dirname(filePath), { recursive: true });
       await fs.writeFile(filePath, buffer);
