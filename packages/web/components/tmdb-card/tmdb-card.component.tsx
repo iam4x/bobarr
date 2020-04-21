@@ -8,6 +8,8 @@ import {
   EnrichedTvShow,
 } from '../../utils/graphql';
 
+import { getImageURL } from '../../utils/get-cached-image-url';
+
 import { TVShowSeasonsModalComponent } from '../tvshow-seasons-modal/tvshow-seasons-modal.component';
 import { MovieDetailsComponent } from '../movie-details/movie-details.component';
 
@@ -49,7 +51,9 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
         <div
           className="poster"
           style={{
-            backgroundImage: `url(https://image.tmdb.org/t/p/w220_and_h330_face${result.posterPath})`,
+            backgroundImage: `url(${getImageURL(
+              `w220_and_h330_face${result.posterPath})`
+            )}`,
           }}
         />
         <div className="overlay">

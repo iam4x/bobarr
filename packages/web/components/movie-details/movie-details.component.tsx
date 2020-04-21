@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { Modal } from 'antd';
 
 import { TmdbSearchResult } from '../../utils/graphql';
+import { getImageURL } from '../../utils/get-cached-image-url';
 
 interface MovieDetailsProps {
   movie: TmdbSearchResult;
@@ -110,13 +111,15 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
           <div
             className="header-background"
             style={{
-              backgroundImage: `url(https://image.tmdb.org/t/p/w1920_and_h800_multi_faces${movie.posterPath})`,
+              backgroundImage: `url(${getImageURL(
+                `w1920_and_h800_multi_faces${movie.posterPath}`
+              )})`,
             }}
           />
           <div className="header-content">
             <div className="poster-container">
               <img
-                src={`https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.posterPath}`}
+                src={getImageURL(`w300_and_h450_bestv2${movie.posterPath}`)}
                 className="poster-image"
               />
             </div>
