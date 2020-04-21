@@ -12,6 +12,7 @@ import { getImageURL } from '../../utils/get-cached-image-url';
 
 import { TVShowSeasonsModalComponent } from '../tvshow-seasons-modal/tvshow-seasons-modal.component';
 import { MovieDetailsComponent } from '../movie-details/movie-details.component';
+import { RatingComponent } from '../rating/rating.component';
 
 import { TMDBCardStyles } from './tmdb-card.styles';
 
@@ -26,7 +27,7 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
   const [isModalOpen, setIsModalOpen] = useState(result.tmdbId === 419704);
 
   return (
-    <TMDBCardStyles vote={result.voteAverage * 10}>
+    <TMDBCardStyles>
       {/* display season picker modal when it's tvshow */}
       {type === 'tvshow' && isModalOpen && (
         <TVShowSeasonsModalComponent
@@ -64,10 +65,7 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
         </div>
       </div>
 
-      <div className="vote--container">
-        <div className="vote" />
-        <div className="percent">{result.voteAverage * 10}%</div>
-      </div>
+      <RatingComponent rating={result.voteAverage * 10} />
 
       <div className="name">{result.title}</div>
       {result.releaseDate && (
