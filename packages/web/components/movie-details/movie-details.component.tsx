@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { Modal } from 'antd';
-import { FaPlay, FaPlus, FaMinus } from 'react-icons/fa';
+import { FaPlay, FaPlus, FaMinus, FaRegWindowClose } from 'react-icons/fa';
 
 import { TmdbSearchResult, useGetParamsQuery } from '../../utils/graphql';
 import { getImageURL } from '../../utils/get-cached-image-url';
@@ -40,8 +40,12 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
       footer={null}
       width="80vw"
       style={{ maxWidth: 1280 }}
+      bodyStyle={{ padding: 3, borderRadius: 4 }}
     >
       <MovieDetailsStyles>
+        <div className="close-icon" onClick={onRequestClose}>
+          <FaRegWindowClose />
+        </div>
         <div className="header-container">
           <div className="header-background-overlay" />
           <div

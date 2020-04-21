@@ -4,6 +4,20 @@ export const MovieDetailsStyles = styled.div`
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
   max-height: 80vh;
+  position: relative;
+
+  .close-icon {
+    position: absolute;
+    color: #fff;
+    cursor: pointer;
+    top: 12px;
+    right: 12px;
+    z-index: 999;
+
+    svg {
+      font-size: 1.2em;
+    }
+  }
 
   .btn {
     border: 1px solid transparent;
