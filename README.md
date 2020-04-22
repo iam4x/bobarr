@@ -27,11 +27,22 @@ And to have something with a better ui, less configuration and faster 🚀
 ## Installation
 
 * Clone the repo `$ git clone https://github.com/iam4x/bobarr.git && cd bobarr`
-
 * Set `PUID` and `PGID` in `.env` (see .env for explanation)
-* Start the bobarr minimal stack `$ docker-compose up --build -d` (see below to add vpn)
+
+## How to start
+
+There are two way to start bobarr stack, first without VPN:
+
+* `$ docker-compose up --build --force-recreate -d`
 * Go to http://jackett.localhost, add your torrent indexers and copy the API Key in top right corner
 * Go to http://bobarr.localhost/settings and update the jackett API key
+
+If you want to enforce all torrent traffic through a VPN:
+
+* Copy your open vpn config file (.ovpn) into the folder `packages/vpn`
+* `$ docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up --build --force-recreate -d`
+
+If you have NPM you can just run `$ npm start` or `$ npm start:vpn`
 
 ## Configuration
 
@@ -45,14 +56,6 @@ And to have something with a better ui, less configuration and faster 🚀
 * Go to http://bobarr.localhost/settings
 * Set your region and language according to your torrent tracker
 
-### Run with VPN
-
-You can easily enforce all downloads through your VPN
-* Copy your open vpn config file (.ovpn) into the folder `packages/vpn`
-* Run the docker-compose.vpn.yml file
-  * if you have npm -> `$ npm run start:vpn` or yarn -> `$ yarn start:vpn`
-  * otherwise -> `$ docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up -d`
-
 ### Run with WireGuard
 
 WireGuard is currently under heavy development and this configuration has only been tested on Linux
@@ -63,7 +66,7 @@ WireGuard is currently under heavy development and this configuration has only b
 
 ## Usage
 
-* After configuration, go to http://bobarr.localhost and just start searching!
+* After configuration, go to http://bobarr.localhost/search and just start searching!
 * The files will be downloaded into `library/downloads`
 * The files will be simlinked and organized into `library/tvshows` or `library/movies`
 
@@ -77,6 +80,21 @@ If you were using radarr or sonarr already you may have a tvshow or movies folde
 The only requirement is to have a folder `tvshows` and a folder `movies` then bobarr can catch up and download to your user defined library folder.
 
 You can now head to http://bobarr.localhost and hit that "Scan library folder" button.
+
+## How to update
+
+Since bobarr is still in early development and hasn't reached a state where an updater is already built-in you have to update from sources.
+You need to pull master to get latest changes, something can break, you are a beta tester 😎
+
+* `$ cd bobarr`
+* `$ git stash` (will keep your changes of docker-compose or transmission config)
+* `$ git pull origin master`
+* `$ git stash apply` (re-apply your custom changes)
+
+You can then re-start bobarr stack:
+
+* `$ docker-compose up --build --force-recreate -d`
+* OR with VPN `$ docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up --build --force-recreate -d`
 
 ## Services
 
