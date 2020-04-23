@@ -148,6 +148,7 @@ type Quality {
   score: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
+  type: String!
 }
 
 input QualityInput {

@@ -209,6 +209,7 @@ export type Quality = {
   score: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  type: Scalars['String'];
 };
 
 export type QualityInput = {
@@ -591,7 +592,7 @@ export type GetQualityQuery = (
   { __typename?: 'Query' }
   & { qualities: Array<(
     { __typename?: 'Quality' }
-    & Pick<Quality, 'id' | 'name' | 'match' | 'score' | 'updatedAt' | 'createdAt'>
+    & Pick<Quality, 'id' | 'name' | 'match' | 'score' | 'updatedAt' | 'createdAt' | 'type'>
   )> }
 );
 
@@ -1336,6 +1337,7 @@ export const GetQualityDocument = gql`
     score
     updatedAt
     createdAt
+    type
   }
 }
     `;

@@ -6,5 +6,6 @@ query getQuality {
     score
     updatedAt
     createdAt
+    type
   }
 }

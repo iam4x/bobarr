@@ -46,15 +46,29 @@ export class ParamsService {
 
   private async initializeQuality() {
     const defaultQualities = [
-      { name: '4K', match: ['uhd', '4k', '2160', '2160p'], score: 4 },
-      { name: '1440p', match: ['1440', '1440p'], score: 3 },
-      { name: '1080p', match: ['1080', '1080p'], score: 2 },
-      { name: '720p', match: ['720', '720p'], score: 1 },
+      {
+        type: 'movie',
+        name: '4K',
+        match: ['uhd', '4k', '2160', '2160p'],
+        score: 4,
+      },
+      { type: 'movie', name: '1440p', match: ['1440', '1440p'], score: 3 },
+      { type: 'movie', name: '1080p', match: ['1080', '1080p'], score: 2 },
+      { type: 'movie', name: '720p', match: ['720', '720p'], score: 1 },
+      {
+        type: 'tvShow',
+        name: '4K',
+        match: ['uhd', '4k', '2160', '2160p'],
+        score: 4,
+      },
+      { type: 'tvShow', name: '1440p', match: ['1440', '1440p'], score: 3 },
+      { type: 'tvShow', name: '1080p', match: ['1080', '1080p'], score: 2 },
+      { type: 'tvShow', name: '720p', match: ['720', '720p'], score: 1 },
     ];
 
     await map(defaultQualities, async (quality) => {
       const match = await this.qualityDAO.findOne({
-        where: { name: quality.name },
+        where: { name: quality.name, type: quality.type },
       });
 
       if (!match) {
@@ -79,7 +93,7 @@ export class ParamsService {
   }
 
   public getQualities() {
-    return this.qualityDAO.find({ order: { score: 'DESC' } });
+    return this.qualityDAO.find({ order: { type: 'ASC', score: 'DESC' } });
   }
 
   public getTags() {

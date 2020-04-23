@@ -76,7 +76,7 @@ export class JackettService {
       `${movie.originalTitle} ${dayjs(movie.releaseDate).format('YYYY')}`,
     ];
 
-    return this.search(queries, { maxSize });
+    return this.search(queries, { maxSize, isMovie: true });
   }
 
   public async searchSeason(seasonId: number) {
@@ -153,7 +153,12 @@ export class JackettService {
 
   public async search(
     queries: string[],
-    opts: { maxSize?: number; isSeason?: boolean; withoutFilter?: boolean }
+    opts: {
+      maxSize?: number;
+      isSeason?: boolean;
+      withoutFilter?: boolean;
+      isMovie?: boolean;
+    }
   ) {
     const indexers = await this.getConfiguredIndexers();
     const noResultsError = 'NO_RESULTS';
@@ -190,15 +195,21 @@ export class JackettService {
     maxSize = Infinity,
     isSeason = false,
     withoutFilter = false,
+    isMovie,
   }: {
     queries: string[];
     indexer?: JackettIndexer;
     maxSize?: number;
     isSeason?: boolean;
     withoutFilter?: boolean;
+    isMovie?: boolean;
   }) {
-    const qualityParams = await this.paramsService.getQualities();
+    const qualityParamsResult = await this.paramsService.getQualities();
     const preferredTags = await this.paramsService.getTags();
+
+    const qualityParams = isMovie
+      ? qualityParamsResult.filter((q) => q.type === 'movie')
+      : qualityParamsResult.filter((q) => q.type === 'tvShow');
 
     const rawResults = await mapSeries(uniq(queries), async (query) => {
       const normalizedQuery = sanitize(query);

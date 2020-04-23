@@ -16,7 +16,7 @@ export class Quality {
   public id!: number;
 
   @Field()
-  @Column('varchar', { unique: true })
+  @Column('varchar')
   public name!: string;
 
   @Field((_type) => [String])
@@ -34,4 +34,8 @@ export class Quality {
   @Field()
   @UpdateDateColumn()
   public updatedAt!: Date;
+
+  @Field()
+  @Column('varchar', { default: 'movie' })
+  public type!: 'tvShow' | 'movie';
 }
