@@ -11,6 +11,7 @@ const links = [
   ['TV Shows', '/library/tvshows'],
   ['Search', '/search'],
   ['Discover', '/discover'],
+  ['Suggestions', '/suggestions'],
   ['Settings', '/settings'],
 ];
 

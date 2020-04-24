@@ -3,19 +3,19 @@ import Head from 'next/head';
 
 import { LayoutComponent } from '../components/layout/layout.component';
 import { withApollo } from '../components/with-apollo';
-import { DiscoverComponent } from '../components/discover/discover.component';
+import { SuggestionsComponent } from '../components/suggestions/suggestions.component';
 
-function DiscoverPage() {
+function SuggestionsPage() {
   return (
     <>
       <Head>
-        <title>Bobarr - Discover</title>
+        <title>Bobarr - Suggestions</title>
       </Head>
       <LayoutComponent>
-        <DiscoverComponent />
+        <SuggestionsComponent />
       </LayoutComponent>
     </>
   );
 }
 
-export default withApollo({ ssr: false })(DiscoverPage);
+export default withApollo({ ssr: false })(SuggestionsPage);

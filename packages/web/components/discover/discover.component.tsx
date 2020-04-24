@@ -1,21 +1,45 @@
-import React from 'react';
-import { Skeleton, Empty } from 'antd';
-
-import { CarouselComponent } from '../search/carousel.component';
+import React, { useEffect, useState } from 'react';
 import { SearchStyles, Wrapper } from '../search/search.styles';
-
-import { useGetRecommendedQuery } from '../../utils/graphql';
+import { Card, Skeleton, Empty } from 'antd';
+import { DiscoverStyles } from './discover.styles';
+import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
+import {
+  useGetDiscoverLazyQuery,
+  GetDiscoverQueryVariables,
+  useGetLibraryMoviesQuery,
+  useGetParamsQuery,
+} from '../../utils/graphql';
+import { DiscoverFilterFormComponent } from './discover-filter-from.component';
+import dayjs from 'dayjs';
 
 export function DiscoverComponent() {
-  const { data, loading } = useGetRecommendedQuery({
-    fetchPolicy: 'cache-and-network',
+  const [discover, { data, loading }] = useGetDiscoverLazyQuery();
+  const { data: moviesLibrary } = useGetLibraryMoviesQuery();
+  const { data: defaultUserParams } = useGetParamsQuery();
+
+  const [filterParams, setFilterParams] = useState<GetDiscoverQueryVariables>({
+    originLanguage: defaultUserParams?.params.language,
+    score: 70,
   });
 
-  const hasRecommendations = Boolean(
-    data?.movies?.length || data?.tvShows?.length
-  );
+  const tmdbIds = moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || [];
+  const moviesSearchResults = data?.movies || [];
+  const hasNoSearchResults = moviesSearchResults.length === 0;
 
-  const isLoading = !hasRecommendations && loading;
+  const onFinish = (formParams: GetDiscoverQueryVariables) => {
+    const { year, ...rest } = formParams;
+
+    setFilterParams({
+      ...(year && { year: dayjs(year).format('YYYY') }),
+      ...rest,
+    });
+  };
+
+  useEffect(() => {
+    discover({
+      variables: filterParams,
+    });
+  }, [filterParams, discover]);
 
   return (
     <SearchStyles>
@@ -23,43 +47,50 @@ export function DiscoverComponent() {
         <Wrapper>
           <div className="search-bar--title">What are we watching next?</div>
           <div className="search-bar--subtitle" style={{ marginBottom: 0 }}>
-            Discover recommendations based on your library...
+            Dive deeper to discover a movie...
           </div>
         </Wrapper>
       </div>
-
       <Wrapper>
-        <div className="search-results--container">
-          {isLoading && <Skeleton active={true} loading={true} />}
-          {!hasRecommendations && !isLoading && <Empty />}
-          {hasRecommendations && !isLoading && (
-            <>
-              {Boolean(data?.movies?.length) && (
-                <>
-                  <div className="search-results--category">
-                    Recommended Movies
-                  </div>
-                  {data?.movies && data.movies.length === 0 && <Empty />}
-                  <CarouselComponent
-                    type="movie"
-                    results={data?.movies || []}
-                  />
-                </>
-              )}
-              {Boolean(data?.tvShows?.length) && (
-                <>
-                  <div className="search-results--category">
-                    Recommended TV Shows
-                  </div>
-                  <CarouselComponent
-                    type="tvshow"
-                    results={data?.tvShows || []}
-                  />
-                </>
-              )}
-            </>
-          )}
-        </div>
+        <DiscoverStyles>
+          <div className="search-results--container">
+            <div className="search-results--category" style={{ marginLeft: 0 }}>
+              Discover by filter
+            </div>
+            <div className="wrapper">
+              <div className="flex">
+                <div className="discover--filter">
+                  <Card title="Filters" size="small">
+                    <DiscoverFilterFormComponent
+                      params={filterParams}
+                      onFinish={onFinish}
+                    />
+                  </Card>
+                </div>
+                <div className="discover--result">
+                  <Card size="small">
+                    <Skeleton active={true} loading={!data || loading}>
+                      {data && hasNoSearchResults && (
+                        <Empty description="No results... 😔" />
+                      )}
+                      <div className="discover--result-cards-container">
+                        {!hasNoSearchResults &&
+                          moviesSearchResults.map((res) => (
+                            <TMDBCardComponent
+                              key={res.id}
+                              type="movie"
+                              result={res}
+                              inLibrary={tmdbIds.includes(res.tmdbId)}
+                            />
+                          ))}
+                      </div>
+                    </Skeleton>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DiscoverStyles>
       </Wrapper>
     </SearchStyles>
   );

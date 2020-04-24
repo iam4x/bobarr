@@ -226,6 +226,9 @@ export type Query = {
   getTVShowSeasons: Array<TmdbFormattedTvSeason>;
   getRecommendedTVShows: Array<TmdbSearchResult>;
   getRecommendedMovies: Array<TmdbSearchResult>;
+  discover: Array<TmdbSearchResult>;
+  getLanguages: Array<TmdbLanguagesResult>;
+  getGenres: TmdbGenresResults;
   searchJackett: Array<JackettFormattedResult>;
   getTorrentStatus: Array<TorrentStatus>;
   getDownloadingMedias: Array<DownloadingMedia>;
@@ -244,6 +247,14 @@ export type QuerySearchArgs = {
 
 export type QueryGetTvShowSeasonsArgs = {
   tvShowTMDBId: Scalars['Int'];
+};
+
+
+export type QueryDiscoverArgs = {
+  originLanguage?: Maybe<Scalars['String']>;
+  year?: Maybe<Scalars['String']>;
+  score?: Maybe<Scalars['Float']>;
+  genres?: Maybe<Array<Scalars['Float']>>;
 };
 
 
@@ -302,6 +313,24 @@ export type TmdbFormattedTvSeason = {
   episodeCount?: Maybe<Scalars['Float']>;
   posterPath?: Maybe<Scalars['String']>;
   episodes?: Maybe<Array<TmdbFormattedTvEpisode>>;
+};
+
+export type TmdbGenresResult = {
+   __typename?: 'TMDBGenresResult';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+};
+
+export type TmdbGenresResults = {
+   __typename?: 'TMDBGenresResults';
+  movieGenres: Array<TmdbGenresResult>;
+  tvShowGenres: Array<TmdbGenresResult>;
+};
+
+export type TmdbLanguagesResult = {
+   __typename?: 'TMDBLanguagesResult';
+  code: Scalars['String'];
+  language: Scalars['String'];
 };
 
 export type TmdbSearchResult = {
@@ -502,6 +531,22 @@ export type UpdateParamsMutation = (
   ) }
 );
 
+export type GetDiscoverQueryVariables = {
+  originLanguage?: Maybe<Scalars['String']>;
+  year?: Maybe<Scalars['String']>;
+  score?: Maybe<Scalars['Float']>;
+  genres?: Maybe<Array<Scalars['Float']>>;
+};
+
+
+export type GetDiscoverQuery = (
+  { __typename?: 'Query' }
+  & { movies: Array<(
+    { __typename?: 'TMDBSearchResult' }
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+  )> }
+);
+
 export type GetDownloadingQueryVariables = {};
 
 
@@ -513,6 +558,34 @@ export type GetDownloadingQuery = (
   )>, downloading: Array<(
     { __typename?: 'DownloadingMedia' }
     & Pick<DownloadingMedia, 'id' | 'title' | 'tag' | 'quality' | 'torrent' | 'resourceId' | 'resourceType'>
+  )> }
+);
+
+export type GetGenresQueryVariables = {};
+
+
+export type GetGenresQuery = (
+  { __typename?: 'Query' }
+  & { genres: (
+    { __typename?: 'TMDBGenresResults' }
+    & { movieGenres: Array<(
+      { __typename?: 'TMDBGenresResult' }
+      & Pick<TmdbGenresResult, 'id' | 'name'>
+    )>, tvShowGenres: Array<(
+      { __typename?: 'TMDBGenresResult' }
+      & Pick<TmdbGenresResult, 'id' | 'name'>
+    )> }
+  ) }
+);
+
+export type GetLanguagesQueryVariables = {};
+
+
+export type GetLanguagesQuery = (
+  { __typename?: 'Query' }
+  & { languages: Array<(
+    { __typename?: 'TMDBLanguagesResult' }
+    & Pick<TmdbLanguagesResult, 'code' | 'language'>
   )> }
 );
 
@@ -1074,6 +1147,47 @@ export function useUpdateParamsMutation(baseOptions?: ApolloReactHooks.MutationH
 export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMutation>;
 export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
+export const GetDiscoverDocument = gql`
+    query getDiscover($originLanguage: String, $year: String, $score: Float, $genres: [Float!]) {
+  movies: discover(originLanguage: $originLanguage, year: $year, score: $score, genres: $genres) {
+    id
+    tmdbId
+    title
+    releaseDate
+    posterPath
+    voteAverage
+  }
+}
+    `;
+
+/**
+ * __useGetDiscoverQuery__
+ *
+ * To run a query within a React component, call `useGetDiscoverQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDiscoverQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDiscoverQuery({
+ *   variables: {
+ *      originLanguage: // value for 'originLanguage'
+ *      year: // value for 'year'
+ *      score: // value for 'score'
+ *      genres: // value for 'genres'
+ *   },
+ * });
+ */
+export function useGetDiscoverQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetDiscoverQuery, GetDiscoverQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetDiscoverQuery, GetDiscoverQueryVariables>(GetDiscoverDocument, baseOptions);
+      }
+export function useGetDiscoverLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetDiscoverQuery, GetDiscoverQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetDiscoverQuery, GetDiscoverQueryVariables>(GetDiscoverDocument, baseOptions);
+        }
+export type GetDiscoverQueryHookResult = ReturnType<typeof useGetDiscoverQuery>;
+export type GetDiscoverLazyQueryHookResult = ReturnType<typeof useGetDiscoverLazyQuery>;
+export type GetDiscoverQueryResult = ApolloReactCommon.QueryResult<GetDiscoverQuery, GetDiscoverQueryVariables>;
 export const GetDownloadingDocument = gql`
     query getDownloading {
   searching: getSearchingMedias {
@@ -1118,6 +1232,78 @@ export function useGetDownloadingLazyQuery(baseOptions?: ApolloReactHooks.LazyQu
 export type GetDownloadingQueryHookResult = ReturnType<typeof useGetDownloadingQuery>;
 export type GetDownloadingLazyQueryHookResult = ReturnType<typeof useGetDownloadingLazyQuery>;
 export type GetDownloadingQueryResult = ApolloReactCommon.QueryResult<GetDownloadingQuery, GetDownloadingQueryVariables>;
+export const GetGenresDocument = gql`
+    query getGenres {
+  genres: getGenres {
+    movieGenres {
+      id
+      name
+    }
+    tvShowGenres {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetGenresQuery__
+ *
+ * To run a query within a React component, call `useGetGenresQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetGenresQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetGenresQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetGenresQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetGenresQuery, GetGenresQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetGenresQuery, GetGenresQueryVariables>(GetGenresDocument, baseOptions);
+      }
+export function useGetGenresLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetGenresQuery, GetGenresQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetGenresQuery, GetGenresQueryVariables>(GetGenresDocument, baseOptions);
+        }
+export type GetGenresQueryHookResult = ReturnType<typeof useGetGenresQuery>;
+export type GetGenresLazyQueryHookResult = ReturnType<typeof useGetGenresLazyQuery>;
+export type GetGenresQueryResult = ApolloReactCommon.QueryResult<GetGenresQuery, GetGenresQueryVariables>;
+export const GetLanguagesDocument = gql`
+    query getLanguages {
+  languages: getLanguages {
+    code
+    language
+  }
+}
+    `;
+
+/**
+ * __useGetLanguagesQuery__
+ *
+ * To run a query within a React component, call `useGetLanguagesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLanguagesQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLanguagesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetLanguagesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetLanguagesQuery, GetLanguagesQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetLanguagesQuery, GetLanguagesQueryVariables>(GetLanguagesDocument, baseOptions);
+      }
+export function useGetLanguagesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetLanguagesQuery, GetLanguagesQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetLanguagesQuery, GetLanguagesQueryVariables>(GetLanguagesDocument, baseOptions);
+        }
+export type GetLanguagesQueryHookResult = ReturnType<typeof useGetLanguagesQuery>;
+export type GetLanguagesLazyQueryHookResult = ReturnType<typeof useGetLanguagesLazyQuery>;
+export type GetLanguagesQueryResult = ApolloReactCommon.QueryResult<GetLanguagesQuery, GetLanguagesQueryVariables>;
 export const GetLibraryMoviesDocument = gql`
     query getLibraryMovies {
   movies: getMovies {
