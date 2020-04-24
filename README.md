@@ -39,8 +39,15 @@ There are two way to start bobarr stack, first without VPN:
 
 If you want to enforce all torrent traffic through a VPN:
 
-* Copy your open vpn config file (.ovpn) into the folder `packages/vpn`
+### OpenVPN
+
+* Copy your open vpn config file (.ovpn) into the folder `packages/vpn` name it `vpn.conf`
 * `$ docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up --build --force-recreate -d`
+
+### WireGuard
+
+* Copy your wireguard config file (wg0.conf) into the folder `packages/vpn`
+* `$ docker-compose -f docker-compose.yml -f docker-compose.wireguard.yml up --build --force-recreate -d`
 
 If you have NPM you can just run `$ npm start` or `$ npm start:vpn`
 
