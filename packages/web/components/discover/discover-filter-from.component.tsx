@@ -23,11 +23,14 @@ export function DiscoverFilterFormComponent(
 
   const options = useMemo(
     () =>
-      TMDBLanguages?.map((l) => (
-        <Select.Option key={l.code} value={l.code}>
-          {l.language}
-        </Select.Option>
-      )),
+      TMDBLanguages?.map(({ language, code }) => {
+        const prePopulatedLanguage = code === 'xx' ? 'Silent movie' : language;
+        return (
+          <Select.Option key={code} value={code}>
+            {prePopulatedLanguage}
+          </Select.Option>
+        );
+      }),
     [TMDBLanguages]
   );
 
@@ -42,6 +45,7 @@ export function DiscoverFilterFormComponent(
       <DiscoverFilterSectionComponent title="Language">
         <Form.Item key="originLanguage" name="originLanguage">
           <Select
+            allowClear
             showSearch
             style={{ width: '100%' }}
             placeholder="Language"
@@ -52,8 +56,8 @@ export function DiscoverFilterFormComponent(
           </Select>
         </Form.Item>
       </DiscoverFilterSectionComponent>
-      <DiscoverFilterSectionComponent title="Year">
-        <Form.Item key="year" name="year">
+      <DiscoverFilterSectionComponent title="Release Year">
+        <Form.Item key="primaryReleaseYear" name="primaryReleaseYear">
           <DatePicker picker="year" size="middle" />
         </Form.Item>
       </DiscoverFilterSectionComponent>

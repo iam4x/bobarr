@@ -42,10 +42,10 @@ export class TMDBService {
       query?: string;
       language?: string;
       region?: string;
-      year?: number;
       with_genres?: string;
       'vote_count.gte'?: number;
       'vote_average.gte'?: number;
+      primary_release_year?: number;
       with_original_language?: string;
     } = {}
   ) {
@@ -210,14 +210,14 @@ export class TMDBService {
   public async discover(args: GetDiscoverQueries) {
     this.logger.info('start discovery filter', args);
 
-    const { year, originLanguage, score, genres } = args;
+    const { primaryReleaseYear, originLanguage, score, genres } = args;
     const { results } = await this.request<{ results: TMDBMovie[] }>(
       '/discover/movie',
       {
-        year: Number(year),
+        primary_release_year: Number(primaryReleaseYear),
         'vote_average.gte': score && score / 10,
         with_original_language: originLanguage,
-        'vote_count.gte': 50,
+        'vote_count.gte': 40,
         with_genres: genres?.join(','),
       }
     );

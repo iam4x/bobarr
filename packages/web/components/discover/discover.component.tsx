@@ -27,10 +27,11 @@ export function DiscoverComponent() {
   const hasNoSearchResults = moviesSearchResults.length === 0;
 
   const onFinish = (formParams: GetDiscoverQueryVariables) => {
-    const { year, ...rest } = formParams;
-
+    const { primaryReleaseYear, ...rest } = formParams;
     setFilterParams({
-      ...(year && { year: dayjs(year).format('YYYY') }),
+      ...(primaryReleaseYear && {
+        primaryReleaseYear: dayjs(primaryReleaseYear).format('YYYY'),
+      }),
       ...rest,
     });
   };
