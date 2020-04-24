@@ -8,6 +8,7 @@ import {
   FaMinus,
   FaRegWindowClose,
   FaInfo,
+  FaRecycle,
 } from 'react-icons/fa';
 
 import { TmdbSearchResult, useGetParamsQuery } from '../../utils/graphql';
@@ -94,7 +95,11 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
               <div className="buttons">
                 {inLibrary ? (
                   <>
-                    <div className="action-button btn" onClick={handleRemove}>
+                    <div className="btn">
+                      <FaRecycle />
+                      <div>Replace</div>
+                    </div>
+                    <div className="btn" onClick={handleRemove}>
                       <FaMinus />
                       <div>Remove from library</div>
                     </div>
@@ -106,7 +111,7 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
                     </Popover>
                   </>
                 ) : (
-                  <div className="action-button btn" onClick={handleAdd}>
+                  <div className="btn" onClick={handleAdd}>
                     <FaPlus />
                     <div>Add to library</div>
                   </div>
