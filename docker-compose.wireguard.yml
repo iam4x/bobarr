@@ -4,6 +4,7 @@ services:
   vpn:
     image: linuxserver/wireguard
     container_name: bobarr-vpn
+    env_file: .env
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -14,12 +15,12 @@ services:
     dns:
       - 1.1.1.1
       - 1.0.0.1
-      - /lib/modules:/lib/modules
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv6.conf.all.disable_ipv6=0
     volumes:
       - ./packages/vpn/wg0.conf:/config/wg0.conf
+      - /lib/modules:/lib/modules
     restart: always
 
   api:
