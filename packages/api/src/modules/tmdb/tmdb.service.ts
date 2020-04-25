@@ -22,6 +22,7 @@ import {
   TMDBGenres,
   TMDBLanguage,
   GetDiscoverQueries,
+  Entertainment,
 } from './tmdb.dto';
 
 @Injectable()
@@ -210,9 +211,9 @@ export class TMDBService {
   public async discover(args: GetDiscoverQueries) {
     this.logger.info('start discovery filter', args);
 
-    const { year, originLanguage, score, genres } = args;
+    const { entertainment, year, originLanguage, score, genres } = args;
     const { results } = await this.request<{ results: TMDBMovie[] }>(
-      '/discover/movie',
+      `/discover/${entertainment}`,
       {
         year: Number(year),
         'vote_average.gte': score && score / 10,
