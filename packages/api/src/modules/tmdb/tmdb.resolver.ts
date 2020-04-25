@@ -10,6 +10,9 @@ import {
   TMDBSearchResults,
   TMDBFormattedTVSeason,
   TMDBSearchResult,
+  TMDBLanguagesResult,
+  TMDBGenresResults,
+  GetDiscoverQueries,
 } from './tmdb.dto';
 
 @Resolver()
@@ -53,5 +56,20 @@ export class TMDBResolver {
   @Query((_returns) => [TMDBSearchResult])
   public getRecommendedMovies() {
     return this.tmdbService.getRecommended('movie');
+  }
+
+  @Query((_returns) => [TMDBSearchResult])
+  public discover(@Args() args: GetDiscoverQueries) {
+    return this.tmdbService.discover(args);
+  }
+
+  @Query((_returns) => [TMDBLanguagesResult])
+  public getLanguages() {
+    return this.tmdbService.getLanguages();
+  }
+
+  @Query((_returns) => TMDBGenresResults)
+  public getGenres() {
+    return this.tmdbService.getGenres();
   }
 }

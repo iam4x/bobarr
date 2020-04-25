@@ -10,18 +10,6 @@ services:
   api:
     links:
       - vpn:transmission
-      - vpn:jackett
-    networks:
-      - default
-
-  jackett:
-    network_mode: "service:vpn"
-    depends_on:
-      - vpn
-
-  jackett-web:
-    links:
-      - vpn:jackett
     networks:
       - default
 
