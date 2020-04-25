@@ -84,8 +84,8 @@ export function DiscoverFilterFormComponent(
             onChange={onEntertainmentChange}
             className="discover--filter-entertainment"
           >
-            <Radio value={Entertainment.Movie}>Movie</Radio>
-            <Radio value={Entertainment.TvShow}>Tv Show</Radio>
+            <Radio value={Entertainment.Movie}>{Entertainment.Movie}</Radio>
+            <Radio value={Entertainment.TvShow}>{Entertainment.TvShow}</Radio>
           </Radio.Group>
         </Form.Item>
       </DiscoverFilterSectionComponent>

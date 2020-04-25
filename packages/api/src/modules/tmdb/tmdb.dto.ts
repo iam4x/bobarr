@@ -176,8 +176,8 @@ export class TMDBGenresResults {
 }
 
 export enum Entertainment {
-  TvShow = 'tvShow',
-  Movie = 'movie',
+  TvShow = 'Tv Show',
+  Movie = 'Movie',
 }
 
 registerEnumType(Entertainment, {
