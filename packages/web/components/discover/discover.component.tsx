@@ -25,7 +25,7 @@ export function DiscoverComponent() {
   });
 
   const tmdbIds = moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || [];
-  const results = data?.reulsts || [];
+  const results = data?.results || [];
   const hasNoSearchResults = results.length === 0;
 
   const onFinish = (formParams: GetDiscoverQueryVariables) => {

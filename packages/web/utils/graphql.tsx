@@ -548,7 +548,7 @@ export type GetDiscoverQueryVariables = {
 
 export type GetDiscoverQuery = (
   { __typename?: 'Query' }
-  & { reulsts: Array<(
+  & { results: Array<(
     { __typename?: 'TMDBSearchResult' }
     & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
   )> }
@@ -1156,7 +1156,7 @@ export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<Update
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDiscoverDocument = gql`
     query getDiscover($entertainment: Entertainment, $originLanguage: String, $year: String, $score: Float, $genres: [Float!]) {
-  reulsts: discover(entertainment: $entertainment, originLanguage: $originLanguage, year: $year, score: $score, genres: $genres) {
+  results: discover(entertainment: $entertainment, originLanguage: $originLanguage, year: $year, score: $score, genres: $genres) {
     id
     tmdbId
     title
