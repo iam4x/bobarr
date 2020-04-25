@@ -1,4 +1,14 @@
 import { ObjectType, Field, ArgsType, registerEnumType } from '@nestjs/graphql';
+export interface TMDBRequestParams {
+  query?: string;
+  language?: string;
+  region?: string;
+  year?: number;
+  with_genres?: string;
+  'vote_count.gte'?: number;
+  'vote_average.gte'?: number;
+  with_original_language?: string;
+}
 
 export interface TMDBMovie {
   id: number;

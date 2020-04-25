@@ -23,6 +23,7 @@ import {
   TMDBLanguage,
   GetDiscoverQueries,
   Entertainment,
+  TMDBRequestParams,
 } from './tmdb.dto';
 
 @Injectable()
@@ -37,19 +38,7 @@ export class TMDBService {
     this.logger = logger.child({ context: 'TMDBService' });
   }
 
-  private async request<TData>(
-    path: string,
-    params: {
-      query?: string;
-      language?: string;
-      region?: string;
-      year?: number;
-      with_genres?: string;
-      'vote_count.gte'?: number;
-      'vote_average.gte'?: number;
-      with_original_language?: string;
-    } = {}
-  ) {
+  private async request<TData>(path: string, params: TMDBRequestParams = {}) {
     const apiKey = await this.paramsService.get(ParameterKey.TMDB_API_KEY);
     const language = await this.paramsService.get(ParameterKey.LANGUAGE);
 
@@ -212,20 +201,39 @@ export class TMDBService {
     this.logger.info('start discovery filter', args);
 
     const { entertainment, year, originLanguage, score, genres } = args;
-    const { results } = await this.request<{ results: TMDBMovie[] }>(
-      `/discover/${entertainment}`,
-      {
-        year: Number(year),
-        'vote_average.gte': score && score / 10,
-        with_original_language: originLanguage,
-        'vote_count.gte': 50,
-        with_genres: genres?.join(','),
-      }
-    );
+
+    const normalizedArgs = {
+      year: Number(year),
+      'vote_count.gte': 50,
+      with_genres: genres?.join(','),
+      with_original_language: originLanguage,
+      'vote_average.gte': score && score / 10,
+    };
 
     this.logger.info('finish discovery filter');
+    if (entertainment === Entertainment.Movie) {
+      return await this.discoverMovie(normalizedArgs);
+    }
+
+    return await this.discoverTvShow(normalizedArgs);
+  }
+
+  private async discoverMovie(args: TMDBRequestParams) {
+    const { results } = await this.request<{ results: TMDBMovie[] }>(
+      `/discover/movie`,
+      args
+    );
 
     return results.map(this.mapMovie);
+  }
+
+  private async discoverTvShow(args: TMDBRequestParams) {
+    const { results } = await this.request<{ results: TMDBTVShow[] }>(
+      `/discover/tv`,
+      args
+    );
+
+    return results.map(this.mapTVShow);
   }
 
   public async getLanguages() {

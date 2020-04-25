@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { DiscoverFilterSectionStyles } from './discover-filter-section.styles';
 
 interface DiscoverFilterSectionComponentProps {
-  title: string;
+  title?: string;
   children: ReactNode;
 }
 export function DiscoverFilterSectionComponent(
