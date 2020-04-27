@@ -85,7 +85,11 @@ export function QualityParamsComponent() {
       loading={loading}
     >
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Radio.Group onChange={onTypeChange} value={type}>
+        <Radio.Group
+          onChange={onTypeChange}
+          value={type}
+          style={{ paddingBottom: '20px' }}
+        >
           <Radio value="movie">Movie</Radio>
           <Radio value="tvShow">Tv Show</Radio>
         </Radio.Group>

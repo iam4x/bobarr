@@ -76,12 +76,12 @@ export class DownloadProcessor {
       return;
     }
 
-    // await this.libraryService.downloadMovie(movieId, {
-    //   title: bestResult.title,
-    //   downloadLink: bestResult.downloadLink,
-    //   tag: bestResult.tag.label,
-    //   quality: bestResult.quality.label,
-    // });
+    await this.libraryService.downloadMovie(movieId, {
+      title: bestResult.title,
+      downloadLink: bestResult.downloadLink,
+      tag: bestResult.tag.label,
+      quality: bestResult.quality.label,
+    });
 
     return;
   }

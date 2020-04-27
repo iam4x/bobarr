@@ -37,5 +37,5 @@ export class Quality {
 
   @Field()
   @Column('varchar', { default: 'movie' })
-  public type!: 'tvShow' | 'movie';
+  public type!: string;
 }
