@@ -7,15 +7,10 @@ import childCommand from 'child-command';
 import dayjs from 'dayjs';
 import path from 'path';
 
-import {
-  DeepPartial,
-  TransactionManager,
-  Transaction,
-  EntityManager,
-  Any,
-} from 'typeorm';
+import { DeepPartial, TransactionManager, EntityManager, Any } from 'typeorm';
 
 import { FileType, DownloadableMediaState } from 'src/app.dto';
+import { LazyTransaction } from 'src/utils/lazy-transaction';
 
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { Movie } from 'src/entities/movie.entity';
@@ -141,9 +136,9 @@ export class LibraryService {
     return rows.map(this.enrichMovie);
   }
 
-  @Transaction()
+  @LazyTransaction()
   public async removeMovie(
-    tmdbId: number,
+    { tmdbId, softDelete = false }: { tmdbId: number; softDelete?: boolean },
     @TransactionManager() manager?: EntityManager
   ) {
     this.logger.info('start remove movie', { tmdbId });
@@ -174,11 +169,19 @@ export class LibraryService {
     await childCommand(`rm -rf "${folderPath}"`);
     this.logger.info('movie files and folder deleted from file system');
 
-    await movieDAO.remove(movie);
+    if (softDelete) {
+      await movieDAO.save({
+        id: movie.id,
+        state: DownloadableMediaState.MISSING,
+      });
+    } else {
+      await movieDAO.remove(movie);
+    }
+
     this.logger.info('finish remove movie', { tmdbId });
   }
 
-  @Transaction()
+  @LazyTransaction()
   public async removeTVShow(
     tmdbId: number,
     @TransactionManager() manager?: EntityManager
@@ -237,7 +240,7 @@ export class LibraryService {
     this.logger.info('finish remove tv show', { tmdbId });
   }
 
-  @Transaction()
+  @LazyTransaction()
   public async downloadMovie(
     movieId: number,
     jackettResult: JackettInput,
@@ -246,7 +249,17 @@ export class LibraryService {
     this.logger.info('start download movie', { movieId });
     this.logger.info(jackettResult.title);
 
-    await manager!.getCustomRepository(MovieDAO).save({
+    const movieDAO = manager!.getCustomRepository(MovieDAO);
+    const movie = await movieDAO.findOneOrFail(movieId);
+
+    if (movie.state !== DownloadableMediaState.MISSING) {
+      await this.removeMovie(
+        { tmdbId: movie.tmdbId, softDelete: true },
+        manager
+      );
+    }
+
+    await movieDAO.save({
       id: movieId,
       state: DownloadableMediaState.DOWNLOADING,
     });
@@ -267,7 +280,7 @@ export class LibraryService {
     });
   }
 
-  @Transaction()
+  @LazyTransaction()
   public async downloadTVSeason(
     seasonId: number,
     jackettResult: JackettInput,
@@ -297,7 +310,7 @@ export class LibraryService {
     });
   }
 
-  @Transaction()
+  @LazyTransaction()
   public async downloadTVEpisode(
     episodeId: number,
     jackettResult: JackettInput,
@@ -349,7 +362,7 @@ export class LibraryService {
     return tvShow;
   }
 
-  @Transaction()
+  @LazyTransaction()
   private async trackMissingSeasons(
     { tmdbId, seasonNumbers }: { tmdbId: number; seasonNumbers: number[] },
     @TransactionManager() manager?: EntityManager

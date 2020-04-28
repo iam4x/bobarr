@@ -34,6 +34,7 @@ export function ManualSearchComponent(props: ManualSearchProps) {
       visible={true}
       destroyOnClose={true}
       onCancel={handleClose}
+      centered={true}
       width={960}
       footer={[
         <Button key="close" onClick={handleClose}>
