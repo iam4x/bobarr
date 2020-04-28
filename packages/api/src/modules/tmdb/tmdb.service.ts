@@ -213,7 +213,12 @@ export class TMDBService {
       with_genres: genres?.join(','),
       with_original_language: originLanguage,
       'vote_average.gte': score && score / 10,
-      primary_release_year: Number(primaryReleaseYear),
+      ...(Entertainment.Movie && {
+        primary_release_year: Number(primaryReleaseYear),
+      }),
+      ...(Entertainment.TvShow && {
+        first_air_date_year: Number(primaryReleaseYear),
+      }),
     };
 
     this.logger.info('finish discovery filter');

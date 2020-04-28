@@ -8,6 +8,8 @@ export interface TMDBRequestParams {
   'vote_count.gte'?: number;
   'vote_average.gte'?: number;
   with_original_language?: string;
+  primary_release_year?: number; // movie
+  first_air_date_year?: number; // tv show
 }
 
 export interface TMDBMovie {
