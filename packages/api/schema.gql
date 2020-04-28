@@ -164,7 +164,7 @@ type Query {
   getTVShowSeasons(tvShowTMDBId: Int!): [TMDBFormattedTVSeason!]!
   getRecommendedTVShows: [TMDBSearchResult!]!
   getRecommendedMovies: [TMDBSearchResult!]!
-  discover(originLanguage: String, year: String, score: Float, genres: [Float!]): [TMDBSearchResult!]!
+  discover(originLanguage: String, year: String, score: Float, genres: [Float!], page: Float): TMDBPaginatedResult!
   getLanguages: [TMDBLanguagesResult!]!
   getGenres: TMDBGenresResults!
   searchJackett(query: String!): [JackettFormattedResult!]!
@@ -234,6 +234,13 @@ type TMDBGenresResults {
 type TMDBLanguagesResult {
   code: String!
   language: String!
+}
+
+type TMDBPaginatedResult {
+  page: Float!
+  totalResults: Float!
+  totalPages: Float!
+  results: [TMDBSearchResult!]!
 }
 
 type TMDBSearchResult {

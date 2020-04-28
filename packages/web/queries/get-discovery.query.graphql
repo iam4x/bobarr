@@ -1,10 +1,15 @@
-query getDiscover( $originLanguage: String, $year: String, $score: Float, $genres: [Float!]) {
-  movies: discover(originLanguage: $originLanguage, year: $year,score: $score, genres: $genres) {
+query getDiscover( $originLanguage: String, $year: String, $score: Float, $genres: [Float!], $page: Float) {
+  movies: discover(originLanguage: $originLanguage, year: $year,score: $score, genres: $genres, page: $page) {
+    page,
+    totalPages,
+    totalResults,
+    results {
     id
     tmdbId
     title
     releaseDate
     posterPath
     voteAverage
+    }
   }
 }

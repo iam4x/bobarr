@@ -102,6 +102,13 @@ export interface TMDBGenres {
   name: string;
 }
 
+export interface TMDBPagination<TPagination> {
+  page: number;
+  total_results: number;
+  total_pages: number;
+  results: TPagination;
+}
+
 @ObjectType()
 export class TMDBFormattedTVEpisode {
   @Field() public id!: number;
@@ -146,6 +153,14 @@ export class TMDBSearchResults {
 }
 
 @ObjectType()
+export class TMDBPaginatedResult {
+  @Field() public page!: number;
+  @Field() public totalResults!: number;
+  @Field() public totalPages!: number;
+  @Field((_type) => [TMDBSearchResult]) public results!: TMDBSearchResult[];
+}
+
+@ObjectType()
 export class TMDBLanguagesResult {
   @Field() public code!: string;
   @Field() public language!: string;
@@ -171,4 +186,5 @@ export class GetDiscoverQueries {
   @Field({ nullable: true }) public year?: string;
   @Field({ nullable: true }) public score?: number;
   @Field((_type) => [Number], { nullable: true }) public genres?: number[];
+  @Field({ nullable: true }) public page?: number;
 }

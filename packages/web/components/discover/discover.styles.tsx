@@ -31,6 +31,11 @@ export const DiscoverStyles = styled.div`
       flex: 8;
     }
 
+    &--pagination {
+      text-align: center;
+      margin: 20px 0;
+    }
+
     &--result-cards-container {
       width: 100%;
       display: flex;

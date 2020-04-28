@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { SearchStyles, Wrapper } from '../search/search.styles';
-import { Card, Skeleton, Empty } from 'antd';
+import { Card, Skeleton, Empty, Pagination, Badge } from 'antd';
 import { DiscoverStyles } from './discover.styles';
 import { TMDBCardComponent } from '../tmdb-card/tmdb-card.component';
 import {
@@ -23,8 +23,8 @@ export function DiscoverComponent() {
   });
 
   const tmdbIds = moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || [];
-  const moviesSearchResults = data?.movies || [];
-  const hasNoSearchResults = moviesSearchResults.length === 0;
+  const moviesSearchResults = data?.movies;
+  const hasNoSearchResults = moviesSearchResults?.totalResults === 0;
 
   const onFinish = (formParams: GetDiscoverQueryVariables) => {
     const { year, ...rest } = formParams;
@@ -41,6 +41,14 @@ export function DiscoverComponent() {
     });
   }, [filterParams, discover]);
 
+  const onPagination = useCallback(
+    (page: number) =>
+      discover({
+        variables: { ...filterParams, page },
+      }),
+    [filterParams, discover]
+  );
+
   return (
     <SearchStyles>
       <div className="search-bar--container">
@@ -56,6 +64,11 @@ export function DiscoverComponent() {
           <div className="search-results--container">
             <div className="search-results--category" style={{ marginLeft: 0 }}>
               Discover by filter
+              <Badge
+                count={moviesSearchResults?.totalResults}
+                overflowCount={9999}
+                style={{ marginLeft: 22 }}
+              />
             </div>
             <div className="wrapper">
               <div className="flex">
@@ -68,14 +81,21 @@ export function DiscoverComponent() {
                   </Card>
                 </div>
                 <div className="discover--result">
-                  <Card size="small">
+                  <Card
+                    size="small"
+                    style={{
+                      minHeight: '794px',
+                      maxHeight: '794px',
+                      overflowY: 'scroll',
+                    }}
+                  >
                     <Skeleton active={true} loading={!data || loading}>
                       {data && hasNoSearchResults && (
                         <Empty description="No results... 😔" />
                       )}
                       <div className="discover--result-cards-container">
                         {!hasNoSearchResults &&
-                          moviesSearchResults.map((res) => (
+                          moviesSearchResults?.results.map((res) => (
                             <TMDBCardComponent
                               key={res.id}
                               type="movie"
@@ -86,6 +106,15 @@ export function DiscoverComponent() {
                       </div>
                     </Skeleton>
                   </Card>
+                  <Pagination
+                    defaultCurrent={6}
+                    total={moviesSearchResults?.totalResults}
+                    onChange={onPagination}
+                    showSizeChanger={false}
+                    pageSize={20}
+                    hideOnSinglePage
+                    className="discover--pagination"
+                  />
                 </div>
               </div>
             </div>

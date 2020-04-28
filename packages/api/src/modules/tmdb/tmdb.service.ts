@@ -22,6 +22,7 @@ import {
   TMDBGenres,
   TMDBLanguage,
   GetDiscoverQueries,
+  TMDBPagination,
 } from './tmdb.dto';
 
 @Injectable()
@@ -47,6 +48,7 @@ export class TMDBService {
       'vote_count.gte'?: number;
       'vote_average.gte'?: number;
       with_original_language?: string;
+      page?: number;
     } = {}
   ) {
     const apiKey = await this.paramsService.get(ParameterKey.TMDB_API_KEY);
@@ -210,10 +212,11 @@ export class TMDBService {
   public async discover(args: GetDiscoverQueries) {
     this.logger.info('start discovery filter', args);
 
-    const { year, originLanguage, score, genres } = args;
-    const { results } = await this.request<{ results: TMDBMovie[] }>(
+    const { year, originLanguage, score, genres, page } = args;
+    const TMDBResults = await this.request<TMDBPagination<TMDBMovie[]>>(
       '/discover/movie',
       {
+        page,
         year: Number(year),
         'vote_average.gte': score && score / 10,
         with_original_language: originLanguage,
@@ -224,7 +227,21 @@ export class TMDBService {
 
     this.logger.info('finish discovery filter');
 
-    return results.map(this.mapMovie);
+    const {
+      page: pageNumber,
+      total_pages,
+      total_results,
+      results,
+    } = TMDBResults;
+
+    return {
+      page: pageNumber,
+      totalResults: total_results,
+      totalPages: total_pages,
+      results: results.map(this.mapMovie),
+    };
+
+    // return results.results.map(this.mapMovie);
   }
 
   public async getLanguages() {

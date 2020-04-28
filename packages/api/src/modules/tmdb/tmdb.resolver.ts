@@ -13,6 +13,7 @@ import {
   TMDBLanguagesResult,
   TMDBGenresResults,
   GetDiscoverQueries,
+  TMDBPaginatedResult,
 } from './tmdb.dto';
 
 @Resolver()
@@ -58,7 +59,7 @@ export class TMDBResolver {
     return this.tmdbService.getRecommended('movie');
   }
 
-  @Query((_returns) => [TMDBSearchResult])
+  @Query((_returns) => TMDBPaginatedResult)
   public discover(@Args() args: GetDiscoverQueries) {
     return this.tmdbService.discover(args);
   }
