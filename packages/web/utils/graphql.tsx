@@ -1161,8 +1161,8 @@ export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMu
 export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDiscoverDocument = gql`
-    query getDiscover($entertainment: Entertainment, $originLanguage: String, $year: String, $score: Float, $genres: [Float!]) {
-  results: discover(entertainment: $entertainment, originLanguage: $originLanguage, year: $year, score: $score, genres: $genres) {
+    query getDiscover($entertainment: Entertainment, $originLanguage: String, $primaryReleaseYear: String, $score: Float, $genres: [Float!]) {
+  results: discover(entertainment: $entertainment, originLanguage: $originLanguage, primaryReleaseYear: $primaryReleaseYear, score: $score, genres: $genres) {
     id
     tmdbId
     title
