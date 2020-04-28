@@ -556,7 +556,7 @@ export type GetDiscoverQuery = (
   { __typename?: 'Query' }
   & { results: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate'>
   )> }
 );
 
@@ -1166,9 +1166,11 @@ export const GetDiscoverDocument = gql`
     id
     tmdbId
     title
-    releaseDate
     posterPath
+    overview
+    runtime
     voteAverage
+    releaseDate
   }
 }
     `;
