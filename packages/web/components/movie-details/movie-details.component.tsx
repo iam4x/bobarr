@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
-import { Modal, Popover } from 'antd';
+import { Modal } from 'antd';
 
 import {
   FaPlay,
   FaPlus,
   FaMinus,
   FaRegWindowClose,
-  FaInfo,
   FaRecycle,
 } from 'react-icons/fa';
 
@@ -124,12 +123,6 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
                         <FaMinus />
                         <div>Remove from library</div>
                       </div>
-                      <Popover>
-                        <div className="btn">
-                          <FaInfo />
-                          <div>File details</div>
-                        </div>
-                      </Popover>
                     </>
                   ) : (
                     <div className="btn" onClick={handleAdd}>
