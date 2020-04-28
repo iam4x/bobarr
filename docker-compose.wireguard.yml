@@ -2,10 +2,12 @@ version: "3.6"
 
 services:
   vpn:
-    image: dperson/openvpn-client
+    image: linuxserver/wireguard
     container_name: bobarr-vpn
+    env_file: .env
     cap_add:
-      - net_admin
+      - NET_ADMIN
+      - SYS_MODULE
     security_opt:
       - label:disable
     networks:
@@ -17,14 +19,9 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv6.conf.all.disable_ipv6=0
     volumes:
-      - /dev/net:/dev/net:z
-      - ./packages/vpn:/vpn
-    entrypoint: "bash -c"
-    command: "exit 0"
+      - ./packages/vpn/wg0.conf:/config/wg0.conf
+      - /lib/modules:/lib/modules
     restart: always
-    entrypoint: ["/sbin/tini", "--", "/usr/bin/openvpn.sh"]
-    command: '-p "49150" -p "49150;udp"'
-    tty: true
 
   api:
     links:

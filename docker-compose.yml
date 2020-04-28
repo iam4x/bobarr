@@ -57,24 +57,6 @@ services:
     ports:
       - 9117:9117
 
-  vpn:
-    image: dperson/openvpn-client
-    container_name: bobarr-vpn
-    cap_add:
-      - net_admin
-    security_opt:
-      - label:disable
-    networks:
-      - default
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-    volumes:
-      - /dev/net:/dev/net:z
-      - ./packages/vpn:/vpn
-    entrypoint: "bash -c"
-    command: "exit 0"
-
   transmission:
     image: linuxserver/transmission
     container_name: bobarr-transmission

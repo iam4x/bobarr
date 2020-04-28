@@ -6,6 +6,8 @@ query getPopular {
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
 
@@ -15,6 +17,8 @@ query getPopular {
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
   }

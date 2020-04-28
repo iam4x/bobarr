@@ -15,6 +15,7 @@ import { JobsModule } from 'src/modules/jobs/jobs.module';
 import { TransmissionModule } from 'src/modules/transmission/transmission.module';
 import { RedisModule } from 'src/modules/redis/redis.module';
 import { HealthController } from 'src/modules/health/health.controller';
+import { ImageCacheModule } from 'src/modules/image-cache/image-cache.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { HealthController } from 'src/modules/health/health.controller';
     JobsModule,
     TransmissionModule,
     RedisModule,
+    ImageCacheModule,
   ],
   controllers: [HealthController],
   providers: [],

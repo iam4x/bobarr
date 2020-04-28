@@ -7,18 +7,22 @@ import { FileType } from 'src/app.dto';
 
 @ObjectType()
 export class EnrichedMovie extends Movie {
-  @Field({ nullable: true }) public originalTitle?: string;
-  @Field({ nullable: true }) public posterPath?: string;
+  @Field() public overview!: string;
   @Field() public voteAverage!: number;
   @Field() public releaseDate!: string;
+  @Field({ nullable: true }) public originalTitle?: string;
+  @Field({ nullable: true }) public posterPath?: string;
+  @Field({ nullable: true }) public runtime!: number;
 }
 
 @ObjectType()
 export class EnrichedTVShow extends TVShow {
-  @Field({ nullable: true }) public originalTitle?: string;
-  @Field({ nullable: true }) public posterPath?: string;
+  @Field() public overview!: string;
   @Field() public voteAverage!: number;
   @Field() public releaseDate!: string;
+  @Field({ nullable: true }) public originalTitle?: string;
+  @Field({ nullable: true }) public posterPath?: string;
+  @Field({ nullable: true }) public runtime!: number;
 }
 
 @ObjectType()
