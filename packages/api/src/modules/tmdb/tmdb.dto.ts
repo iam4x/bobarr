@@ -180,7 +180,7 @@ export class TMDBGenresResults {
 }
 
 export enum Entertainment {
-  TvShow = 'Tv Show',
+  TvShow = 'tvShow',
   Movie = 'Movie',
 }
 
