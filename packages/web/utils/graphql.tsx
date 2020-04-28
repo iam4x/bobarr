@@ -74,6 +74,11 @@ export type EnrichedTvShow = {
   releaseDate: Scalars['String'];
 };
 
+export enum Entertainment {
+  TvShow = 'TvShow',
+  Movie = 'Movie'
+}
+
 export enum FileType {
   Episode = 'EPISODE',
   Season = 'SEASON',
@@ -255,6 +260,7 @@ export type QueryDiscoverArgs = {
   year?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
   genres?: Maybe<Array<Scalars['Float']>>;
+  entertainment?: Maybe<Entertainment>;
 };
 
 
@@ -532,6 +538,7 @@ export type UpdateParamsMutation = (
 );
 
 export type GetDiscoverQueryVariables = {
+  entertainment?: Maybe<Entertainment>;
   originLanguage?: Maybe<Scalars['String']>;
   year?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
@@ -541,7 +548,7 @@ export type GetDiscoverQueryVariables = {
 
 export type GetDiscoverQuery = (
   { __typename?: 'Query' }
-  & { movies: Array<(
+  & { results: Array<(
     { __typename?: 'TMDBSearchResult' }
     & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
   )> }
@@ -1148,8 +1155,8 @@ export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMu
 export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDiscoverDocument = gql`
-    query getDiscover($originLanguage: String, $year: String, $score: Float, $genres: [Float!]) {
-  movies: discover(originLanguage: $originLanguage, year: $year, score: $score, genres: $genres) {
+    query getDiscover($entertainment: Entertainment, $originLanguage: String, $year: String, $score: Float, $genres: [Float!]) {
+  results: discover(entertainment: $entertainment, originLanguage: $originLanguage, year: $year, score: $score, genres: $genres) {
     id
     tmdbId
     title
@@ -1172,6 +1179,7 @@ export const GetDiscoverDocument = gql`
  * @example
  * const { data, loading, error } = useGetDiscoverQuery({
  *   variables: {
+ *      entertainment: // value for 'entertainment'
  *      originLanguage: // value for 'originLanguage'
  *      year: // value for 'year'
  *      score: // value for 'score'
