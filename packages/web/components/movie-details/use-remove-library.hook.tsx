@@ -7,9 +7,14 @@ import {
   useRemoveMovieMutation,
   GetDownloadingDocument,
   GetMissingDocument,
+  EnrichedMovie,
 } from '../../utils/graphql';
 
-export function useRemoveLibrary({ result }: { result: TmdbSearchResult }) {
+export function useRemoveLibrary({
+  result,
+}: {
+  result: TmdbSearchResult | EnrichedMovie;
+}) {
   const [removeMovie] = useRemoveMovieMutation({
     awaitRefetchQueries: true,
     refetchQueries: [

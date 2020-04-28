@@ -28,7 +28,7 @@ import { useRemoveLibrary } from './use-remove-library.hook';
 import { MovieDetailsStyles } from './movie-details.styles';
 
 interface MovieDetailsProps {
-  movie: TmdbSearchResult;
+  movie: TmdbSearchResult | EnrichedMovie;
   visible: boolean;
   inLibrary?: boolean;
   onRequestClose: () => void;
@@ -47,12 +47,14 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
 
   return (
     <>
-      {isSearchModalOpen && (
+      {/* display replace ssearch modal only if we are in library pages */}
+      {isSearchModalOpen && movie.__typename === 'EnrichedMovie' && (
         <ManualSearchComponent
-          media={movie as EnrichedMovie}
+          media={movie}
           onRequestClose={() => setSearchModalOpen(false)}
         />
       )}
+
       <Modal
         centered={true}
         closable={false}
@@ -109,13 +111,15 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
                 <div className="buttons">
                   {inLibrary ? (
                     <>
-                      <div
-                        className="btn"
-                        onClick={() => setSearchModalOpen(true)}
-                      >
-                        <FaRecycle />
-                        <div>Replace</div>
-                      </div>
+                      {movie.__typename === 'EnrichedMovie' && (
+                        <div
+                          className="btn"
+                          onClick={() => setSearchModalOpen(true)}
+                        >
+                          <FaRecycle />
+                          <div>Replace</div>
+                        </div>
+                      )}
                       <div className="btn" onClick={handleRemove}>
                         <FaMinus />
                         <div>Remove from library</div>
