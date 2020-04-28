@@ -6,6 +6,8 @@ query getLibraryMovies {
     originalTitle
     state
     posterPath
+    overview
+    runtime
     voteAverage
     releaseDate
     createdAt

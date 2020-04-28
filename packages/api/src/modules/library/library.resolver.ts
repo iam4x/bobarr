@@ -92,7 +92,7 @@ export class LibraryResolver {
   public async removeMovie(
     @Args('tmdbId', { type: () => Int }) tmdbId: number
   ) {
-    await this.libraryService.removeMovie(tmdbId);
+    await this.libraryService.removeMovie({ tmdbId, softDelete: false });
     return { success: true, message: 'MOVIE_REMOVED_FROM_LIBRARY' };
   }
 

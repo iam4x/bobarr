@@ -9,8 +9,7 @@ import {
 } from 'apollo-cache-inmemory';
 
 import introspectionResult from './introspection-result';
-
-const host = typeof window === 'undefined' ? 'api' : window.location.hostname;
+import { apiURL } from './api-url';
 
 export function createApolloClient(
   initialState: Record<string, any>,
@@ -21,7 +20,7 @@ export function createApolloClient(
   return new ApolloClient({
     ssrMode: Boolean(ctx),
     link: new HttpLink({
-      uri: `http://${host}:4000/graphql`,
+      uri: `${apiURL}/graphql`,
       fetch,
     }),
     cache: new InMemoryCache({

@@ -267,24 +267,29 @@ export class TMDBService {
     };
   }
 
-  private mapMovie(result: TMDBMovie) {
+  public mapMovie(result: TMDBMovie) {
     return {
       id: result.id,
       tmdbId: result.id,
       title: result.title,
+      overview: result.overview,
+      runtime: result.runtime,
       originalTitle: result.original_title,
+      originCountry: result.original_language,
       releaseDate: result.release_date,
       posterPath: result.poster_path,
       voteAverage: result.vote_average,
     };
   }
 
-  private mapTVShow(result: TMDBTVShow) {
+  public mapTVShow(result: TMDBTVShow) {
     return {
       id: result.id,
       tmdbId: result.id,
       title: result.name,
+      overview: result.overview,
       originalTitle: result.original_name,
+      originCountry: result.origin_country,
       releaseDate: result.first_air_date,
       posterPath: result.poster_path,
       voteAverage: result.vote_average,

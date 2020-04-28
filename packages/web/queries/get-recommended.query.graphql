@@ -5,6 +5,8 @@ query getRecommended {
     title
     releaseDate
     posterPath
+    overview
+    runtime
     voteAverage
   }
 
@@ -14,6 +16,8 @@ query getRecommended {
     title
     releaseDate
     posterPath
+    overview
+    runtime
     voteAverage
   }
 }
