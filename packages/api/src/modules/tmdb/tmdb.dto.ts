@@ -8,6 +8,8 @@ export interface TMDBRequestParams {
   'vote_count.gte'?: number;
   'vote_average.gte'?: number;
   with_original_language?: string;
+  primary_release_year?: number; // movie
+  first_air_date_year?: number; // tv show
 }
 
 export interface TMDBMovie {
@@ -178,8 +180,8 @@ export class TMDBGenresResults {
 }
 
 export enum Entertainment {
-  TvShow,
-  Movie,
+  TvShow = 'tvShow',
+  Movie = 'Movie',
 }
 
 registerEnumType(Entertainment, {
@@ -189,7 +191,7 @@ registerEnumType(Entertainment, {
 @ArgsType()
 export class GetDiscoverQueries {
   @Field({ nullable: true }) public originLanguage?: string;
-  @Field({ nullable: true }) public year?: string;
+  @Field({ nullable: true }) public primaryReleaseYear?: string;
   @Field({ nullable: true }) public score?: number;
   @Field((_type) => [Number], { nullable: true }) public genres?: number[];
   @Field((_type) => Entertainment) public entertainment: Entertainment =

@@ -1,14 +1,14 @@
 query getDiscover(
   $entertainment: Entertainment
   $originLanguage: String
-  $year: String
+  $primaryReleaseYear: String
   $score: Float
   $genres: [Float!]
 ) {
   results: discover(
     entertainment: $entertainment
     originLanguage: $originLanguage
-    year: $year
+    primaryReleaseYear: $primaryReleaseYear
     score: $score
     genres: $genres
   ) {
