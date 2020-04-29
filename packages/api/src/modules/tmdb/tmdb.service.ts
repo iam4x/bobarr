@@ -22,6 +22,8 @@ import {
   TMDBGenres,
   TMDBLanguage,
   GetDiscoverQueries,
+  Entertainment,
+  TMDBRequestParams,
 } from './tmdb.dto';
 
 @Injectable()
@@ -36,19 +38,7 @@ export class TMDBService {
     this.logger = logger.child({ context: 'TMDBService' });
   }
 
-  private async request<TData>(
-    path: string,
-    params: {
-      query?: string;
-      language?: string;
-      region?: string;
-      year?: number;
-      with_genres?: string;
-      'vote_count.gte'?: number;
-      'vote_average.gte'?: number;
-      with_original_language?: string;
-    } = {}
-  ) {
+  private async request<TData>(path: string, params: TMDBRequestParams = {}) {
     const apiKey = await this.paramsService.get(ParameterKey.TMDB_API_KEY);
     const language = await this.paramsService.get(ParameterKey.LANGUAGE);
 
@@ -210,21 +200,40 @@ export class TMDBService {
   public async discover(args: GetDiscoverQueries) {
     this.logger.info('start discovery filter', args);
 
-    const { year, originLanguage, score, genres } = args;
-    const { results } = await this.request<{ results: TMDBMovie[] }>(
-      '/discover/movie',
-      {
-        year: Number(year),
-        'vote_average.gte': score && score / 10,
-        with_original_language: originLanguage,
-        'vote_count.gte': 50,
-        with_genres: genres?.join(','),
-      }
-    );
+    const { entertainment, year, originLanguage, score, genres } = args;
+
+    const normalizedArgs = {
+      year: Number(year),
+      'vote_count.gte': 50,
+      with_genres: genres?.join(','),
+      with_original_language: originLanguage,
+      'vote_average.gte': score && score / 10,
+    };
 
     this.logger.info('finish discovery filter');
+    if (entertainment === Entertainment.Movie) {
+      return await this.discoverMovie(normalizedArgs);
+    }
+
+    return await this.discoverTvShow(normalizedArgs);
+  }
+
+  private async discoverMovie(args: TMDBRequestParams) {
+    const { results } = await this.request<{ results: TMDBMovie[] }>(
+      `/discover/movie`,
+      args
+    );
 
     return results.map(this.mapMovie);
+  }
+
+  private async discoverTvShow(args: TMDBRequestParams) {
+    const { results } = await this.request<{ results: TMDBTVShow[] }>(
+      `/discover/tv`,
+      args
+    );
+
+    return results.map(this.mapTVShow);
   }
 
   public async getLanguages() {
@@ -258,24 +267,29 @@ export class TMDBService {
     };
   }
 
-  private mapMovie(result: TMDBMovie) {
+  public mapMovie(result: TMDBMovie) {
     return {
       id: result.id,
       tmdbId: result.id,
       title: result.title,
+      overview: result.overview,
+      runtime: result.runtime,
       originalTitle: result.original_title,
+      originCountry: result.original_language,
       releaseDate: result.release_date,
       posterPath: result.poster_path,
       voteAverage: result.vote_average,
     };
   }
 
-  private mapTVShow(result: TMDBTVShow) {
+  public mapTVShow(result: TMDBTVShow) {
     return {
       id: result.id,
       tmdbId: result.id,
       title: result.name,
+      overview: result.overview,
       originalTitle: result.original_name,
+      originCountry: result.origin_country,
       releaseDate: result.first_air_date,
       posterPath: result.poster_path,
       voteAverage: result.vote_average,

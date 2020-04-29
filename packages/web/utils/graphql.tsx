@@ -42,10 +42,12 @@ export type EnrichedMovie = {
   state: DownloadableMediaState;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  originalTitle?: Maybe<Scalars['String']>;
-  posterPath?: Maybe<Scalars['String']>;
+  overview: Scalars['String'];
   voteAverage: Scalars['Float'];
   releaseDate: Scalars['String'];
+  originalTitle?: Maybe<Scalars['String']>;
+  posterPath?: Maybe<Scalars['String']>;
+  runtime?: Maybe<Scalars['Float']>;
 };
 
 export type EnrichedTvEpisode = {
@@ -68,11 +70,18 @@ export type EnrichedTvShow = {
   title: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  originalTitle?: Maybe<Scalars['String']>;
-  posterPath?: Maybe<Scalars['String']>;
+  overview: Scalars['String'];
   voteAverage: Scalars['Float'];
   releaseDate: Scalars['String'];
+  originalTitle?: Maybe<Scalars['String']>;
+  posterPath?: Maybe<Scalars['String']>;
+  runtime?: Maybe<Scalars['Float']>;
 };
+
+export enum Entertainment {
+  TvShow = 'TvShow',
+  Movie = 'Movie'
+}
 
 export enum FileType {
   Episode = 'EPISODE',
@@ -256,6 +265,7 @@ export type QueryDiscoverArgs = {
   year?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
   genres?: Maybe<Array<Scalars['Float']>>;
+  entertainment?: Maybe<Entertainment>;
 };
 
 
@@ -340,6 +350,8 @@ export type TmdbSearchResult = {
   tmdbId: Scalars['Float'];
   title: Scalars['String'];
   voteAverage: Scalars['Float'];
+  overview: Scalars['String'];
+  runtime?: Maybe<Scalars['Float']>;
   posterPath?: Maybe<Scalars['String']>;
   releaseDate?: Maybe<Scalars['String']>;
 };
@@ -533,6 +545,7 @@ export type UpdateParamsMutation = (
 );
 
 export type GetDiscoverQueryVariables = {
+  entertainment?: Maybe<Entertainment>;
   originLanguage?: Maybe<Scalars['String']>;
   year?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
@@ -542,9 +555,9 @@ export type GetDiscoverQueryVariables = {
 
 export type GetDiscoverQuery = (
   { __typename?: 'Query' }
-  & { movies: Array<(
+  & { results: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate'>
   )> }
 );
 
@@ -597,7 +610,7 @@ export type GetLibraryMoviesQuery = (
   { __typename?: 'Query' }
   & { movies: Array<(
     { __typename?: 'EnrichedMovie' }
-    & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'state' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
+    & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'state' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -608,7 +621,7 @@ export type GetLibraryTvShowsQuery = (
   { __typename?: 'Query' }
   & { tvShows: Array<(
     { __typename?: 'EnrichedTVShow' }
-    & Pick<EnrichedTvShow, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
+    & Pick<EnrichedTvShow, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'posterPath' | 'runtime' | 'overview' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -650,10 +663,10 @@ export type GetPopularQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )> }
   ) }
 );
@@ -676,10 +689,10 @@ export type GetRecommendedQuery = (
   { __typename?: 'Query' }
   & { tvShows: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
   )>, movies: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
   )> }
 );
 
@@ -744,10 +757,10 @@ export type SearchQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )> }
   ) }
 );
@@ -1149,14 +1162,16 @@ export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMu
 export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDiscoverDocument = gql`
-    query getDiscover($originLanguage: String, $year: String, $score: Float, $genres: [Float!]) {
-  movies: discover(originLanguage: $originLanguage, year: $year, score: $score, genres: $genres) {
+    query getDiscover($entertainment: Entertainment, $originLanguage: String, $year: String, $score: Float, $genres: [Float!]) {
+  results: discover(entertainment: $entertainment, originLanguage: $originLanguage, year: $year, score: $score, genres: $genres) {
     id
     tmdbId
     title
-    releaseDate
     posterPath
+    overview
+    runtime
     voteAverage
+    releaseDate
   }
 }
     `;
@@ -1173,6 +1188,7 @@ export const GetDiscoverDocument = gql`
  * @example
  * const { data, loading, error } = useGetDiscoverQuery({
  *   variables: {
+ *      entertainment: // value for 'entertainment'
  *      originLanguage: // value for 'originLanguage'
  *      year: // value for 'year'
  *      score: // value for 'score'
@@ -1314,6 +1330,8 @@ export const GetLibraryMoviesDocument = gql`
     originalTitle
     state
     posterPath
+    overview
+    runtime
     voteAverage
     releaseDate
     createdAt
@@ -1354,6 +1372,8 @@ export const GetLibraryTvShowsDocument = gql`
     title
     originalTitle
     posterPath
+    runtime
+    overview
     voteAverage
     releaseDate
     createdAt
@@ -1476,6 +1496,8 @@ export const GetPopularDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
     tvShows {
@@ -1484,6 +1506,8 @@ export const GetPopularDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
   }
@@ -1560,6 +1584,8 @@ export const GetRecommendedDocument = gql`
     title
     releaseDate
     posterPath
+    overview
+    runtime
     voteAverage
   }
   movies: getRecommendedMovies {
@@ -1568,6 +1594,8 @@ export const GetRecommendedDocument = gql`
     title
     releaseDate
     posterPath
+    overview
+    runtime
     voteAverage
   }
 }
@@ -1770,6 +1798,8 @@ export const SearchDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
     tvShows {
@@ -1778,6 +1808,8 @@ export const SearchDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
   }

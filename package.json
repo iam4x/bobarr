@@ -7,6 +7,7 @@
     "postinstall": "(cd packages/web && yarn) && (cd packages/api && yarn)",
     "start": "docker-compose up --build --force-recreate -d",
     "start:vpn": "docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up --build  --force-recreate -d",
+    "start:wireguard": "docker-compose -f docker-compose.yml -f docker-compose.wireguard.yml up --build  --force-recreate -d",
     "dev": "docker-compose -f docker-compose.yml -f docker-compose.vpn.yml -f docker-compose.dev.yml up --force-recreate -d && docker-compose logs --tail 20 -f api web",
     "lint": "yarn eslint --ext .ts,.tsx packages/api packages/web"
   },

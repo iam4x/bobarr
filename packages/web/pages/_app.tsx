@@ -7,12 +7,17 @@ import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import { Reset } from 'styled-reset';
 
 import { theme } from '../components/theme';
+import { loadFonts } from '../components/fonts';
 
 const GlobalStyles = createGlobalStyle`
   html {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
       Helvetica, Arial, sans-serif, 'Apple Color Emoji',
       'Segoe UI Emoji', 'Segoe UI Symbol';
+
+    &.source-sans-pro {
+      font-family: 'Source Sans Pro', sans-serif;
+    }
   }
 
   *,
@@ -50,6 +55,10 @@ const GlobalStyles = createGlobalStyle`
 `;
 
 export default class MyApp extends App {
+  public componentDidMount() {
+    loadFonts();
+  }
+
   public render() {
     const { Component, pageProps } = this.props;
     return (
