@@ -261,7 +261,7 @@ export type QueryGetTvShowSeasonsArgs = {
 
 export type QueryDiscoverArgs = {
   originLanguage?: Maybe<Scalars['String']>;
-  year?: Maybe<Scalars['String']>;
+  primaryReleaseYear?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
   genres?: Maybe<Array<Scalars['Float']>>;
   entertainment?: Maybe<Entertainment>;
@@ -546,7 +546,7 @@ export type UpdateParamsMutation = (
 export type GetDiscoverQueryVariables = {
   entertainment?: Maybe<Entertainment>;
   originLanguage?: Maybe<Scalars['String']>;
-  year?: Maybe<Scalars['String']>;
+  primaryReleaseYear?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
   genres?: Maybe<Array<Scalars['Float']>>;
 };
@@ -1161,8 +1161,8 @@ export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMu
 export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDiscoverDocument = gql`
-    query getDiscover($entertainment: Entertainment, $originLanguage: String, $year: String, $score: Float, $genres: [Float!]) {
-  results: discover(entertainment: $entertainment, originLanguage: $originLanguage, year: $year, score: $score, genres: $genres) {
+    query getDiscover($entertainment: Entertainment, $originLanguage: String, $primaryReleaseYear: String, $score: Float, $genres: [Float!]) {
+  results: discover(entertainment: $entertainment, originLanguage: $originLanguage, primaryReleaseYear: $primaryReleaseYear, score: $score, genres: $genres) {
     id
     tmdbId
     title
@@ -1189,7 +1189,7 @@ export const GetDiscoverDocument = gql`
  *   variables: {
  *      entertainment: // value for 'entertainment'
  *      originLanguage: // value for 'originLanguage'
- *      year: // value for 'year'
+ *      primaryReleaseYear: // value for 'primaryReleaseYear'
  *      score: // value for 'score'
  *      genres: // value for 'genres'
  *   },

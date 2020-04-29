@@ -48,13 +48,6 @@ export const DiscoverStyles = styled.div`
         display: inline-block;
         padding-bottom: 20px;
       }
-
-      .vote--container {
-        .percent {
-          top: 13px;
-          left: 12px;
-        }
-      }
     }
   }
 `;

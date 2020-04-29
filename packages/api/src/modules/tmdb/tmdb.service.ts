@@ -200,14 +200,25 @@ export class TMDBService {
   public async discover(args: GetDiscoverQueries) {
     this.logger.info('start discovery filter', args);
 
-    const { entertainment, year, originLanguage, score, genres } = args;
+    const {
+      primaryReleaseYear,
+      entertainment,
+      originLanguage,
+      score,
+      genres,
+    } = args;
 
     const normalizedArgs = {
-      year: Number(year),
       'vote_count.gte': 50,
       with_genres: genres?.join(','),
       with_original_language: originLanguage,
       'vote_average.gte': score && score / 10,
+      ...(Entertainment.Movie && {
+        primary_release_year: Number(primaryReleaseYear),
+      }),
+      ...(Entertainment.TvShow && {
+        first_air_date_year: Number(primaryReleaseYear),
+      }),
     };
 
     this.logger.info('finish discovery filter');
