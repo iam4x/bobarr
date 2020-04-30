@@ -10,7 +10,6 @@ import { Logger } from 'winston';
 import { ParameterKey } from 'src/app.dto';
 import { formatNumber } from 'src/utils/format-number';
 import { sanitize } from 'src/utils/sanitize';
-import { firstOf } from 'src/utils/first-promise-resolve';
 
 import { ParamsService } from 'src/modules/params/params.service';
 import { LibraryService } from 'src/modules/library/library.service';
@@ -158,16 +157,19 @@ export class JackettService {
     const indexers = await this.getConfiguredIndexers();
     const noResultsError = 'NO_RESULTS';
     try {
-      const results = await firstOf(
-        indexers.map((indexer) =>
-          this.searchIndexer({ ...opts, queries, indexer }).then((rows) =>
-            rows.length > 0
-              ? Promise.resolve(rows)
-              : Promise.reject(new Error(noResultsError))
-          )
-        )
+      const allIndexers = indexers.map((indexer) =>
+        this.searchIndexer({ ...opts, queries, indexer })
       );
-      return results;
+
+      const resolvedIndexers = await Promise.all(allIndexers);
+      const flattenIndexers = resolvedIndexers.flat();
+      const sortedByBest = orderBy(
+        flattenIndexers,
+        ['tag.score', 'quality.score', 'seeders'],
+        ['desc', 'desc', 'desc']
+      );
+
+      return [sortedByBest[0]];
     } catch (error) {
       // return empty results array, let application continue it's lifecycle
       if (Array.isArray(error) && error[0].message === noResultsError) {
@@ -245,11 +247,7 @@ export class JackettService {
 
     this.logger.info(`found ${results.length} downloadable results`);
 
-    return orderBy(
-      results,
-      ['tag.score', 'quality.score', 'seeders'],
-      ['desc', 'desc', 'desc']
-    );
+    return results;
   }
 
   private formatSearchResult = ({
