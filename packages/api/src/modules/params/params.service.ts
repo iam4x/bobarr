@@ -17,6 +17,8 @@ import { QualityDAO } from 'src/entities/dao/quality.dao';
 import { TagDAO } from 'src/entities/dao/tag.dao';
 
 import { TagInput } from './params.dto';
+import { Quality } from 'src/entities/quality.entity';
+import { Entertainment } from '../tmdb/tmdb.dto';
 
 @Injectable()
 export class ParamsService {
@@ -45,25 +47,58 @@ export class ParamsService {
   }
 
   private async initializeQuality() {
-    const defaultQualities = [
+    const defaultQualities: Array<Omit<
+      Quality,
+      'id' | 'createdAt' | 'updatedAt'
+    >> = [
       {
-        type: 'movie',
+        type: Entertainment.Movie,
         name: '4K',
         match: ['uhd', '4k', '2160', '2160p'],
         score: 4,
       },
-      { type: 'movie', name: '1440p', match: ['1440', '1440p'], score: 3 },
-      { type: 'movie', name: '1080p', match: ['1080', '1080p'], score: 2 },
-      { type: 'movie', name: '720p', match: ['720', '720p'], score: 1 },
       {
-        type: 'tvShow',
+        type: Entertainment.Movie,
+        name: '1440p',
+        match: ['1440', '1440p'],
+        score: 3,
+      },
+      {
+        type: Entertainment.Movie,
+        name: '1080p',
+        match: ['1080', '1080p'],
+        score: 2,
+      },
+      {
+        type: Entertainment.Movie,
+        name: '720p',
+        match: ['720', '720p'],
+        score: 1,
+      },
+      {
+        type: Entertainment.TvShow,
         name: '4K',
         match: ['uhd', '4k', '2160', '2160p'],
         score: 4,
       },
-      { type: 'tvShow', name: '1440p', match: ['1440', '1440p'], score: 3 },
-      { type: 'tvShow', name: '1080p', match: ['1080', '1080p'], score: 2 },
-      { type: 'tvShow', name: '720p', match: ['720', '720p'], score: 1 },
+      {
+        type: Entertainment.TvShow,
+        name: '1440p',
+        match: ['1440', '1440p'],
+        score: 3,
+      },
+      {
+        type: Entertainment.TvShow,
+        name: '1080p',
+        match: ['1080', '1080p'],
+        score: 2,
+      },
+      {
+        type: Entertainment.TvShow,
+        name: '720p',
+        match: ['720', '720p'],
+        score: 1,
+      },
     ];
 
     await map(defaultQualities, async (quality) => {
@@ -92,8 +127,13 @@ export class ParamsService {
     return param?.value ? param.value.split(',') : [];
   }
 
-  public getQualities() {
-    return this.qualityDAO.find({ order: { type: 'ASC', score: 'DESC' } });
+  public async getQualities(type?: Entertainment) {
+    const qualities = await this.qualityDAO.find({
+      order: { type: 'ASC', score: 'DESC' },
+    });
+    return type === Entertainment.Movie
+      ? qualities.filter((q) => q.type === Entertainment.Movie)
+      : qualities.filter((q) => q.type === Entertainment.TvShow);
   }
 
   public getTags() {

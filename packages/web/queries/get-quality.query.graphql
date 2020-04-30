@@ -1,5 +1,5 @@
-query getQuality {
-  qualities: getQualityParams {
+query getQuality($type: Entertainment!) {
+  qualities: getQualityParams(type: $type) {
     id
     name
     match

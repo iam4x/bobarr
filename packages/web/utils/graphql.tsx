@@ -218,7 +218,7 @@ export type Quality = {
   score: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  type: Scalars['String'];
+  type: Entertainment;
 };
 
 export type QualityInput = {
@@ -247,6 +247,11 @@ export type Query = {
   getTVShows: Array<EnrichedTvShow>;
   getMissingTVEpisodes: Array<EnrichedTvEpisode>;
   getMissingMovies: Array<EnrichedMovie>;
+};
+
+
+export type QueryGetQualityParamsArgs = {
+  type: Entertainment;
 };
 
 
@@ -671,7 +676,9 @@ export type GetPopularQuery = (
   ) }
 );
 
-export type GetQualityQueryVariables = {};
+export type GetQualityQueryVariables = {
+  type: Entertainment;
+};
 
 
 export type GetQualityQuery = (
@@ -1539,8 +1546,8 @@ export type GetPopularQueryHookResult = ReturnType<typeof useGetPopularQuery>;
 export type GetPopularLazyQueryHookResult = ReturnType<typeof useGetPopularLazyQuery>;
 export type GetPopularQueryResult = ApolloReactCommon.QueryResult<GetPopularQuery, GetPopularQueryVariables>;
 export const GetQualityDocument = gql`
-    query getQuality {
-  qualities: getQualityParams {
+    query getQuality($type: Entertainment!) {
+  qualities: getQualityParams(type: $type) {
     id
     name
     match
@@ -1564,6 +1571,7 @@ export const GetQualityDocument = gql`
  * @example
  * const { data, loading, error } = useGetQualityQuery({
  *   variables: {
+ *      type: // value for 'type'
  *   },
  * });
  */

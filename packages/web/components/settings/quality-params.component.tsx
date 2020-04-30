@@ -13,7 +13,7 @@ import {
   useGetQualityQuery,
   Quality,
   useSaveQualityMutation,
-  GetQualityDocument,
+  Entertainment,
 } from '../../utils/graphql';
 
 import { reorder } from './settings.helpers';
@@ -21,11 +21,11 @@ import { RadioChangeEvent } from 'antd/lib/radio';
 
 export function QualityParamsComponent() {
   const [qualities, setQualities] = useState<Quality[]>([]);
-  const [type, setType] = useState<'tvShow' | 'movie'>('tvShow');
-  const { data, loading } = useGetQualityQuery();
+  const [type, setType] = useState<Entertainment>(Entertainment.Movie);
+  const { data, loading } = useGetQualityQuery({
+    variables: { type },
+  });
   const [saveQuality, { loading: saveLoading }] = useSaveQualityMutation({
-    awaitRefetchQueries: true,
-    refetchQueries: [{ query: GetQualityDocument }],
     onError: ({ message }) =>
       notification.error({
         message: message.replace('GraphQL error: ', ''),
@@ -42,7 +42,7 @@ export function QualityParamsComponent() {
     if (result.destination) {
       setQualities(
         reorder<Quality>({
-          list: qualities.filter((q) => q.type === type),
+          list: qualities,
           startIndex: result.source.index,
           endIndex: result.destination.index,
         })
@@ -54,14 +54,13 @@ export function QualityParamsComponent() {
     event.preventDefault();
     saveQuality({
       variables: {
-        qualities: qualities
-          .filter((q) => q.type === type)
-          .map((q) => ({ id: q.id, score: q.score })),
+        qualities: qualities.map((q) => ({ id: q.id, score: q.score })),
       },
     });
   };
 
   const onTypeChange = (event: RadioChangeEvent) => {
+    event.preventDefault();
     setType(event.target.value);
   };
 
@@ -82,7 +81,7 @@ export function QualityParamsComponent() {
         </>
       }
       className="quality-preference"
-      loading={loading}
+      loading={loading && !qualities?.length}
     >
       <DragDropContext onDragEnd={handleDragEnd}>
         <Radio.Group
@@ -90,33 +89,31 @@ export function QualityParamsComponent() {
           value={type}
           style={{ paddingBottom: '20px' }}
         >
-          <Radio value="movie">Movie</Radio>
-          <Radio value="tvShow">Tv Show</Radio>
+          <Radio value={Entertainment.Movie}>{Entertainment.Movie}</Radio>
+          <Radio value={Entertainment.TvShow}>TV Show</Radio>
         </Radio.Group>
         <Droppable droppableId="droppable">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
-              {qualities
-                .filter((q) => q.type === type)
-                .map((quality, index) => (
-                  <Draggable
-                    key={quality.id}
-                    index={index}
-                    draggableId={quality.name}
-                  >
-                    {(provided2) => (
-                      <div
-                        ref={provided2.innerRef}
-                        {...provided2.draggableProps}
-                        {...provided2.dragHandleProps}
-                      >
-                        <div className="ant-btn ant-btn-dashed">
-                          {quality.name}
-                        </div>
+              {qualities.map((quality, index) => (
+                <Draggable
+                  key={quality.id}
+                  index={index}
+                  draggableId={quality.name}
+                >
+                  {(provided2) => (
+                    <div
+                      ref={provided2.innerRef}
+                      {...provided2.draggableProps}
+                      {...provided2.dragHandleProps}
+                    >
+                      <div className="ant-btn ant-btn-dashed">
+                        {quality.name}
                       </div>
-                    )}
-                  </Draggable>
-                ))}
+                    </div>
+                  )}
+                </Draggable>
+              ))}
               {provided.placeholder}
             </div>
           )}
