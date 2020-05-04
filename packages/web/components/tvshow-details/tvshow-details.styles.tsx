@@ -5,6 +5,7 @@ export const TVShowSeasonsModalComponentStyles = styled(MovieDetailsStyles)`
   .seasons {
     display: flex;
     flex-wrap: wrap;
+    width: 100%;
   }
 
   .season-row {
@@ -18,7 +19,7 @@ export const TVShowSeasonsModalComponentStyles = styled(MovieDetailsStyles)`
     margin-left: 4px;
     padding: 8px 10px;
     transition: 0.1s linear;
-    width: calc(33% - 8px);
+    max-width: 145px;
 
     &.selected {
       border-color: #fff;
