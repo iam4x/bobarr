@@ -36,6 +36,11 @@ export const MovieDetailsStyles = styled.div`
     svg {
       margin-right: 8px;
     }
+
+    &.disabled {
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
   }
 
   .header-container {

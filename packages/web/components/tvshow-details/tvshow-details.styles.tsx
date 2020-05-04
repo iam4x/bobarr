@@ -1,23 +1,7 @@
 import styled from 'styled-components';
+import { MovieDetailsStyles } from '../movie-details/movie-details.styles';
 
-export const TVShowSeasonsModalComponentStyles = styled.div`
-  color: ${({ theme }) => theme.colors.navbarBackground};
-
-  .tv-show {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-
-    .title {
-      font-size: 1.5em;
-      font-weight: bold;
-    }
-
-    .status {
-      margin-left: auto;
-    }
-  }
-
+export const TVShowSeasonsModalComponentStyles = styled(MovieDetailsStyles)`
   .seasons {
     display: flex;
     flex-wrap: wrap;
@@ -25,7 +9,7 @@ export const TVShowSeasonsModalComponentStyles = styled.div`
 
   .season-row {
     align-items: center;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 4px;
     cursor: pointer;
     display: flex;
@@ -37,16 +21,12 @@ export const TVShowSeasonsModalComponentStyles = styled.div`
     width: calc(33% - 8px);
 
     &.selected {
-      color: #1890ff;
-      background: #e6f7ff;
-      border-color: #91d5ff;
+      border-color: #fff;
     }
 
     &.in-library {
       cursor: not-allowed;
-      color: #52c41a;
-      background-color: #f6ffed;
-      border: 1px solid #b7eb8f;
+      border-color: #fff;
     }
   }
 
