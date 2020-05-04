@@ -188,7 +188,7 @@ type Query {
   getTVShows: [EnrichedTVShow!]!
   getMissingTVEpisodes: [EnrichedTVEpisode!]!
   getMissingMovies: [EnrichedMovie!]!
-  omdbSearch(title: String!, year: String): OMDBInfo!
+  omdbSearch(title: String!): OMDBInfo!
 }
 
 type Ratings {

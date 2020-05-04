@@ -21,7 +21,6 @@ export class OMDBService {
 
   public async search(args: GetOMDBSearchQueries) {
     const result = await this.request<OMDBSearchResult>({
-      y: args.year,
       t: args.title,
     });
 

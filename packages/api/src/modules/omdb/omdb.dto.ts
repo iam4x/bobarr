@@ -2,7 +2,6 @@ import { ArgsType, Field, ObjectType } from '@nestjs/graphql';
 
 export interface OMDBSearchParams {
   t?: string;
-  y?: string;
 }
 
 export interface OMDBSearchResult {
@@ -38,8 +37,7 @@ export interface OMDBSearchResult {
 
 @ArgsType()
 export class GetOMDBSearchQueries {
-  @Field() public title?: string;
-  @Field({ nullable: true }) public year?: string;
+  @Field() public title!: string;
 }
 
 @ObjectType()

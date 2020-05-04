@@ -286,7 +286,6 @@ export type QueryGetTorrentStatusArgs = {
 
 export type QueryOmdbSearchArgs = {
   title: Scalars['String'];
-  year?: Maybe<Scalars['String']>;
 };
 
 export type Ratings = {
@@ -753,7 +752,6 @@ export type GetTvShowSeasonsQuery = (
 
 export type OmdbSearchQueryVariables = {
   title: Scalars['String'];
-  year?: Maybe<Scalars['String']>;
 };
 
 
@@ -1778,8 +1776,8 @@ export type GetTvShowSeasonsQueryHookResult = ReturnType<typeof useGetTvShowSeas
 export type GetTvShowSeasonsLazyQueryHookResult = ReturnType<typeof useGetTvShowSeasonsLazyQuery>;
 export type GetTvShowSeasonsQueryResult = ApolloReactCommon.QueryResult<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>;
 export const OmdbSearchDocument = gql`
-    query omdbSearch($title: String!, $year: String) {
-  result: omdbSearch(title: $title, year: $year) {
+    query omdbSearch($title: String!) {
+  result: omdbSearch(title: $title) {
     ratings {
       IMDB
       rottenTomatoes
@@ -1802,7 +1800,6 @@ export const OmdbSearchDocument = gql`
  * const { data, loading, error } = useOmdbSearchQuery({
  *   variables: {
  *      title: // value for 'title'
- *      year: // value for 'year'
  *   },
  * });
  */

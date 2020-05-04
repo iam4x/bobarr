@@ -1,10 +1,8 @@
 query omdbSearch(
   $title: String!
-  $year: String
 ) {
   result: omdbSearch(
     title: $title
-    year: $year
   ) {
     ratings {
     IMDB
