@@ -200,6 +200,11 @@ export type MutationRemoveTvShowArgs = {
   tmdbId: Scalars['Int'];
 };
 
+export type OmdbInfo = {
+   __typename?: 'OMDBInfo';
+  ratings: Ratings;
+};
+
 export type ParamsHash = {
    __typename?: 'ParamsHash';
   region: Scalars['String'];
@@ -246,6 +251,7 @@ export type Query = {
   getTVShows: Array<EnrichedTvShow>;
   getMissingTVEpisodes: Array<EnrichedTvEpisode>;
   getMissingMovies: Array<EnrichedMovie>;
+  omdbSearch: OmdbInfo;
 };
 
 
@@ -275,6 +281,19 @@ export type QuerySearchJackettArgs = {
 
 export type QueryGetTorrentStatusArgs = {
   torrents: Array<GetTorrentStatusInput>;
+};
+
+
+export type QueryOmdbSearchArgs = {
+  title: Scalars['String'];
+  year?: Maybe<Scalars['String']>;
+};
+
+export type Ratings = {
+   __typename?: 'Ratings';
+  IMDB?: Maybe<Scalars['String']>;
+  rottenTomatoes?: Maybe<Scalars['String']>;
+  metaCritic?: Maybe<Scalars['String']>;
 };
 
 export type SearchingMedia = {
@@ -730,6 +749,23 @@ export type GetTvShowSeasonsQuery = (
     { __typename?: 'TMDBFormattedTVSeason' }
     & Pick<TmdbFormattedTvSeason, 'id' | 'name' | 'seasonNumber' | 'episodeCount' | 'overview' | 'posterPath' | 'airDate' | 'inLibrary'>
   )> }
+);
+
+export type OmdbSearchQueryVariables = {
+  title: Scalars['String'];
+  year?: Maybe<Scalars['String']>;
+};
+
+
+export type OmdbSearchQuery = (
+  { __typename?: 'Query' }
+  & { result: (
+    { __typename?: 'OMDBInfo' }
+    & { ratings: (
+      { __typename?: 'Ratings' }
+      & Pick<Ratings, 'IMDB' | 'rottenTomatoes' | 'metaCritic'>
+    ) }
+  ) }
 );
 
 export type SearchTorrentQueryVariables = {
@@ -1741,6 +1777,44 @@ export function useGetTvShowSeasonsLazyQuery(baseOptions?: ApolloReactHooks.Lazy
 export type GetTvShowSeasonsQueryHookResult = ReturnType<typeof useGetTvShowSeasonsQuery>;
 export type GetTvShowSeasonsLazyQueryHookResult = ReturnType<typeof useGetTvShowSeasonsLazyQuery>;
 export type GetTvShowSeasonsQueryResult = ApolloReactCommon.QueryResult<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>;
+export const OmdbSearchDocument = gql`
+    query omdbSearch($title: String!, $year: String) {
+  result: omdbSearch(title: $title, year: $year) {
+    ratings {
+      IMDB
+      rottenTomatoes
+      metaCritic
+    }
+  }
+}
+    `;
+
+/**
+ * __useOmdbSearchQuery__
+ *
+ * To run a query within a React component, call `useOmdbSearchQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOmdbSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOmdbSearchQuery({
+ *   variables: {
+ *      title: // value for 'title'
+ *      year: // value for 'year'
+ *   },
+ * });
+ */
+export function useOmdbSearchQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
+        return ApolloReactHooks.useQuery<OmdbSearchQuery, OmdbSearchQueryVariables>(OmdbSearchDocument, baseOptions);
+      }
+export function useOmdbSearchLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<OmdbSearchQuery, OmdbSearchQueryVariables>(OmdbSearchDocument, baseOptions);
+        }
+export type OmdbSearchQueryHookResult = ReturnType<typeof useOmdbSearchQuery>;
+export type OmdbSearchLazyQueryHookResult = ReturnType<typeof useOmdbSearchLazyQuery>;
+export type OmdbSearchQueryResult = ApolloReactCommon.QueryResult<OmdbSearchQuery, OmdbSearchQueryVariables>;
 export const SearchTorrentDocument = gql`
     query searchTorrent($query: String!) {
   results: searchJackett(query: $query) {

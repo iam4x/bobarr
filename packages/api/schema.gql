@@ -141,6 +141,10 @@ type Mutation {
   removeTVShow(tmdbId: Int!): GraphQLCommonResponse!
 }
 
+type OMDBInfo {
+  ratings: Ratings!
+}
+
 type ParamsHash {
   region: String!
   language: String!
@@ -184,6 +188,13 @@ type Query {
   getTVShows: [EnrichedTVShow!]!
   getMissingTVEpisodes: [EnrichedTVEpisode!]!
   getMissingMovies: [EnrichedMovie!]!
+  omdbSearch(title: String!, year: String): OMDBInfo!
+}
+
+type Ratings {
+  IMDB: String
+  rottenTomatoes: String
+  metaCritic: String
 }
 
 type SearchingMedia {

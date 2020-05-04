@@ -18,13 +18,13 @@ import {
 
 import { getImageURL } from '../../utils/get-cached-image-url';
 
-import { RatingComponent } from '../rating/rating.component';
 import { ManualSearchComponent } from '../manual-search/manual-search.component';
 
 import { useAddLibrary } from './use-add-library.hook';
 import { useRemoveLibrary } from './use-remove-library.hook';
 
 import { MovieDetailsStyles } from './movie-details.styles';
+import { RatingDetailComponent } from './rating-details.component';
 
 interface MovieDetailsProps {
   movie: TmdbSearchResult | EnrichedMovie;
@@ -96,7 +96,7 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
                   )}
                 </div>
                 <div className="informations-row">
-                  <RatingComponent rating={movie.voteAverage * 10} />
+                  <RatingDetailComponent movie={movie} />
                   <a
                     className="play-trailer btn"
                     href={youtubeSearchURL}
