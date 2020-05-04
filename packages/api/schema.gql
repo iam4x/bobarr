@@ -157,6 +157,7 @@ type Quality {
   score: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
+  type: Entertainment!
 }
 
 input QualityInput {
@@ -165,7 +166,7 @@ input QualityInput {
 }
 
 type Query {
-  getQualityParams: [Quality!]!
+  getQualityParams(type: Entertainment!): [Quality!]!
   getTags: [Tag!]!
   getParams: ParamsHash!
   search(query: String!): TMDBSearchResults!
