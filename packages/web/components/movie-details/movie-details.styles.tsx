@@ -6,6 +6,16 @@ export const MovieDetailsStyles = styled.div`
   max-height: 80vh;
   position: relative;
 
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+
+  .disable-scrollbars {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
   .close-icon {
     position: absolute;
     color: #fff;
