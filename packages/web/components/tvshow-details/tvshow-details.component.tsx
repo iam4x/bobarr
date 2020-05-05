@@ -14,7 +14,6 @@ import {
 import { TmdbSearchResult, useGetParamsQuery } from '../../utils/graphql';
 import { getImageURL } from '../../utils/get-cached-image-url';
 
-import { RatingComponent } from '../rating/rating.component';
 import { useGetSeasons } from './use-get-seasons.hook';
 import { TVShowSeasonsModalComponentStyles } from './tvshow-details.styles';
 import { RatingDetailComponent } from '../movie-details/rating-details.component';
