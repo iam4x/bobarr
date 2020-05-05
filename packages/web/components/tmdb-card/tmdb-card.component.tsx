@@ -10,7 +10,7 @@ import {
 
 import { getImageURL } from '../../utils/get-cached-image-url';
 
-import { TVShowSeasonsModalComponent } from '../tvshow-seasons-modal/tvshow-seasons-modal.component';
+import { TVShowSeasonsModalComponent } from '../tvshow-details/tvshow-details.component';
 import { MovieDetailsComponent } from '../movie-details/movie-details.component';
 import { RatingComponent } from '../rating/rating.component';
 

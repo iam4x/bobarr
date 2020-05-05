@@ -6,6 +6,16 @@ export const MovieDetailsStyles = styled.div`
   max-height: 80vh;
   position: relative;
 
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+
+  .disable-scrollbars {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
   .close-icon {
     position: absolute;
     color: #fff;
@@ -35,6 +45,11 @@ export const MovieDetailsStyles = styled.div`
 
     svg {
       margin-right: 8px;
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+      opacity: 0.8;
     }
   }
 

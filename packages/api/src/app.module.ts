@@ -16,6 +16,7 @@ import { TransmissionModule } from 'src/modules/transmission/transmission.module
 import { RedisModule } from 'src/modules/redis/redis.module';
 import { HealthController } from 'src/modules/health/health.controller';
 import { ImageCacheModule } from 'src/modules/image-cache/image-cache.module';
+import { OMDBModule } from './modules/omdb/omdb.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ImageCacheModule } from 'src/modules/image-cache/image-cache.module';
     ParamsModule,
     LibraryModule,
     TMDBModule,
+    OMDBModule,
     JackettModule,
     JobsModule,
     TransmissionModule,

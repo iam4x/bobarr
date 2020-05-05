@@ -20,6 +20,7 @@ import {
   TagInput,
   QualityInput,
 } from './params.dto';
+import { Entertainment } from '../tmdb/tmdb.dto';
 
 @Resolver()
 export class ParamsResolver {
@@ -33,8 +34,11 @@ export class ParamsResolver {
   }
 
   @Query((_returns) => [Quality])
-  public getQualityParams() {
-    return this.paramsService.getQualities();
+  public getQualityParams(
+    @Args('type', { type: () => Entertainment })
+    type: Entertainment = Entertainment.Movie
+  ) {
+    return this.paramsService.getQualities(type);
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)

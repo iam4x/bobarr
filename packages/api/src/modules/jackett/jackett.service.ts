@@ -20,6 +20,7 @@ import { Quality } from 'src/entities/quality.entity';
 import { Tag } from 'src/entities/tag.entity';
 
 import { JackettResult, JackettIndexer } from './jackett.dto';
+import { Entertainment } from '../tmdb/tmdb.dto';
 
 @Injectable()
 export class JackettService {
@@ -75,7 +76,7 @@ export class JackettService {
       `${movie.originalTitle} ${dayjs(movie.releaseDate).format('YYYY')}`,
     ];
 
-    return this.search(queries, { maxSize });
+    return this.search(queries, { maxSize, type: Entertainment.Movie });
   }
 
   public async searchSeason(seasonId: number) {
@@ -111,6 +112,7 @@ export class JackettService {
     return this.search(queries, {
       maxSize: maxSize * tvSeason.episodes.length,
       isSeason: true,
+      type: Entertainment.TvShow,
     });
   }
 
@@ -147,12 +149,17 @@ export class JackettService {
       ])
       .flat();
 
-    return this.search(queries, { maxSize });
+    return this.search(queries, { maxSize, type: Entertainment.TvShow });
   }
 
   public async search(
     queries: string[],
-    opts: { maxSize?: number; isSeason?: boolean; withoutFilter?: boolean }
+    opts: {
+      maxSize?: number;
+      isSeason?: boolean;
+      withoutFilter?: boolean;
+      type?: Entertainment;
+    }
   ) {
     const indexers = await this.getConfiguredIndexers();
     const noResultsError = 'NO_RESULTS';
@@ -192,14 +199,16 @@ export class JackettService {
     maxSize = Infinity,
     isSeason = false,
     withoutFilter = false,
+    type,
   }: {
     queries: string[];
     indexer?: JackettIndexer;
     maxSize?: number;
     isSeason?: boolean;
     withoutFilter?: boolean;
+    type?: Entertainment;
   }) {
-    const qualityParams = await this.paramsService.getQualities();
+    const qualityParams = await this.paramsService.getQualities(type);
     const preferredTags = await this.paramsService.getTags();
 
     const rawResults = await mapSeries(uniq(queries), async (query) => {
