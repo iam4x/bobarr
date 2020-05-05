@@ -17,6 +17,7 @@ import { getImageURL } from '../../utils/get-cached-image-url';
 import { RatingComponent } from '../rating/rating.component';
 import { useGetSeasons } from './use-get-seasons.hook';
 import { TVShowSeasonsModalComponentStyles } from './tvshow-details.styles';
+import { RatingDetailComponent } from '../movie-details/rating-details.component';
 
 interface TVShowSeasonsModalComponentProps {
   visible: boolean;
@@ -115,7 +116,7 @@ export function TVShowSeasonsModalComponent(
                 )}
               </div>
               <div className="information-row">
-                <RatingComponent rating={tvShow.voteAverage * 10} />
+                <RatingDetailComponent entertainment={tvShow} />
                 <a
                   className="play-trailer btn"
                   href={youtubeSearchURL}
