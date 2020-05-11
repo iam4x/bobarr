@@ -21,6 +21,7 @@ import { Tag } from 'src/entities/tag.entity';
 
 import { JackettResult, JackettIndexer } from './jackett.dto';
 import { Entertainment } from '../tmdb/tmdb.dto';
+import { PromiseRaceAll } from 'src/utils/promise-resolve';
 
 @Injectable()
 export class JackettService {
@@ -33,6 +34,8 @@ export class JackettService {
   ) {
     this.logger = logger.child({ context: 'JackettService' });
   }
+
+  private JACKETT_RESPONSE_TIMEOUT = 5000; // 5 seconds
 
   private async request<TData>(path: string, params: Record<string, any>) {
     const jackettApiKey = await this.paramsService.get(
@@ -163,13 +166,20 @@ export class JackettService {
   ) {
     const indexers = await this.getConfiguredIndexers();
     const noResultsError = 'NO_RESULTS';
+
     try {
       const allIndexers = indexers.map((indexer) =>
         this.searchIndexer({ ...opts, queries, indexer })
       );
 
-      const resolvedIndexers = await Promise.all(allIndexers);
-      const flattenIndexers = resolvedIndexers.flat();
+      const resolvedIndexers = await PromiseRaceAll(
+        allIndexers,
+        this.JACKETT_RESPONSE_TIMEOUT
+      );
+      const flattenIndexers = resolvedIndexers
+        .filter((item) => Boolean(item))
+        ?.flat();
+
       const sortedByBest = orderBy(
         flattenIndexers,
         ['tag.score', 'quality.score', 'seeders'],
@@ -218,17 +228,21 @@ export class JackettService {
         query: normalizedQuery,
       });
 
-      const { data } = await this.request<{ Results: JackettResult[] }>(
-        '/results',
-        {
-          Query: normalizedQuery,
-          Category: [2000, 5000, 5070],
-          Tracker: indexer ? [indexer.id] : undefined,
-          _: Number(new Date()),
-        }
-      );
+      try {
+        const { data } = await this.request<{ Results: JackettResult[] }>(
+          '/results',
+          {
+            Query: normalizedQuery,
+            Category: [2000, 5000, 5070],
+            Tracker: indexer ? [indexer.id] : undefined,
+            _: Number(new Date()),
+          }
+        );
 
-      return data.Results;
+        return data.Results;
+      } catch (e) {
+        return [];
+      }
     });
 
     this.logger.info(`found ${rawResults.flat().length} potential results`);
