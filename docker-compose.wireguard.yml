@@ -1,0 +1,41 @@
+version: "3.6"
+
+services:
+  vpn:
+    image: linuxserver/wireguard
+    container_name: bobarr-vpn
+    env_file: .env
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    security_opt:
+      - label:disable
+    networks:
+      - default
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=0
+    volumes:
+      - ./packages/vpn/wg0.conf:/config/wg0.conf
+      - /lib/modules:/lib/modules
+    restart: always
+
+  api:
+    links:
+      - vpn:transmission
+    networks:
+      - default
+
+  transmission:
+    network_mode: "service:vpn"
+    depends_on:
+      - vpn
+
+  transmission-web:
+    links:
+      - vpn:transmission
+    networks:
+      - default

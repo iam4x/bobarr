@@ -27,6 +27,12 @@ export const DiscoverStyles = styled.div`
       }
     }
 
+    &--filter-entertainment {
+      label:first-of-type {
+        margin-right: 32px;
+      }
+    }
+
     &--result {
       flex: 8;
     }
@@ -46,11 +52,6 @@ export const DiscoverStyles = styled.div`
       > div {
         display: inline-block;
         padding-bottom: 20px;
-      }
-
-      .percent {
-        top: 12px;
-        left: 12px;
       }
     }
   }

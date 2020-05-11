@@ -42,10 +42,12 @@ export type EnrichedMovie = {
   state: DownloadableMediaState;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  originalTitle?: Maybe<Scalars['String']>;
-  posterPath?: Maybe<Scalars['String']>;
+  overview: Scalars['String'];
   voteAverage: Scalars['Float'];
   releaseDate: Scalars['String'];
+  originalTitle?: Maybe<Scalars['String']>;
+  posterPath?: Maybe<Scalars['String']>;
+  runtime?: Maybe<Scalars['Float']>;
 };
 
 export type EnrichedTvEpisode = {
@@ -68,11 +70,18 @@ export type EnrichedTvShow = {
   title: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  originalTitle?: Maybe<Scalars['String']>;
-  posterPath?: Maybe<Scalars['String']>;
+  overview: Scalars['String'];
   voteAverage: Scalars['Float'];
   releaseDate: Scalars['String'];
+  originalTitle?: Maybe<Scalars['String']>;
+  posterPath?: Maybe<Scalars['String']>;
+  runtime?: Maybe<Scalars['Float']>;
 };
+
+export enum Entertainment {
+  TvShow = 'TvShow',
+  Movie = 'Movie'
+}
 
 export enum FileType {
   Episode = 'EPISODE',
@@ -191,6 +200,11 @@ export type MutationRemoveTvShowArgs = {
   tmdbId: Scalars['Int'];
 };
 
+export type OmdbInfo = {
+   __typename?: 'OMDBInfo';
+  ratings: Ratings;
+};
+
 export type ParamsHash = {
    __typename?: 'ParamsHash';
   region: Scalars['String'];
@@ -209,6 +223,7 @@ export type Quality = {
   score: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  type: Entertainment;
 };
 
 export type QualityInput = {
@@ -237,6 +252,12 @@ export type Query = {
   getTVShows: Array<EnrichedTvShow>;
   getMissingTVEpisodes: Array<EnrichedTvEpisode>;
   getMissingMovies: Array<EnrichedMovie>;
+  omdbSearch: OmdbInfo;
+};
+
+
+export type QueryGetQualityParamsArgs = {
+  type: Entertainment;
 };
 
 
@@ -252,10 +273,10 @@ export type QueryGetTvShowSeasonsArgs = {
 
 export type QueryDiscoverArgs = {
   originLanguage?: Maybe<Scalars['String']>;
-  year?: Maybe<Scalars['String']>;
+  primaryReleaseYear?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
   genres?: Maybe<Array<Scalars['Float']>>;
-  page?: Maybe<Scalars['Float']>;
+  entertainment?: Maybe<Entertainment>;
 };
 
 
@@ -266,6 +287,18 @@ export type QuerySearchJackettArgs = {
 
 export type QueryGetTorrentStatusArgs = {
   torrents: Array<GetTorrentStatusInput>;
+};
+
+
+export type QueryOmdbSearchArgs = {
+  title: Scalars['String'];
+};
+
+export type Ratings = {
+   __typename?: 'Ratings';
+  IMDB?: Maybe<Scalars['String']>;
+  rottenTomatoes?: Maybe<Scalars['String']>;
+  metaCritic?: Maybe<Scalars['String']>;
 };
 
 export type SearchingMedia = {
@@ -348,6 +381,8 @@ export type TmdbSearchResult = {
   tmdbId: Scalars['Float'];
   title: Scalars['String'];
   voteAverage: Scalars['Float'];
+  overview: Scalars['String'];
+  runtime?: Maybe<Scalars['Float']>;
   posterPath?: Maybe<Scalars['String']>;
   releaseDate?: Maybe<Scalars['String']>;
 };
@@ -541,8 +576,9 @@ export type UpdateParamsMutation = (
 );
 
 export type GetDiscoverQueryVariables = {
+  entertainment?: Maybe<Entertainment>;
   originLanguage?: Maybe<Scalars['String']>;
-  year?: Maybe<Scalars['String']>;
+  primaryReleaseYear?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
   genres?: Maybe<Array<Scalars['Float']>>;
   page?: Maybe<Scalars['Float']>;
@@ -551,14 +587,10 @@ export type GetDiscoverQueryVariables = {
 
 export type GetDiscoverQuery = (
   { __typename?: 'Query' }
-  & { movies: (
-    { __typename?: 'TMDBPaginatedResult' }
-    & Pick<TmdbPaginatedResult, 'page' | 'totalPages' | 'totalResults'>
-    & { results: Array<(
-      { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
-    )> }
-  ) }
+  & { results: Array<(
+    { __typename?: 'TMDBSearchResult' }
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate'>
+  )> }
 );
 
 export type GetDownloadingQueryVariables = {};
@@ -610,7 +642,7 @@ export type GetLibraryMoviesQuery = (
   { __typename?: 'Query' }
   & { movies: Array<(
     { __typename?: 'EnrichedMovie' }
-    & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'state' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
+    & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'state' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -621,7 +653,7 @@ export type GetLibraryTvShowsQuery = (
   { __typename?: 'Query' }
   & { tvShows: Array<(
     { __typename?: 'EnrichedTVShow' }
-    & Pick<EnrichedTvShow, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'posterPath' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
+    & Pick<EnrichedTvShow, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'posterPath' | 'runtime' | 'overview' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -663,22 +695,24 @@ export type GetPopularQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )> }
   ) }
 );
 
-export type GetQualityQueryVariables = {};
+export type GetQualityQueryVariables = {
+  type: Entertainment;
+};
 
 
 export type GetQualityQuery = (
   { __typename?: 'Query' }
   & { qualities: Array<(
     { __typename?: 'Quality' }
-    & Pick<Quality, 'id' | 'name' | 'match' | 'score' | 'updatedAt' | 'createdAt'>
+    & Pick<Quality, 'id' | 'name' | 'match' | 'score' | 'updatedAt' | 'createdAt' | 'type'>
   )> }
 );
 
@@ -689,10 +723,10 @@ export type GetRecommendedQuery = (
   { __typename?: 'Query' }
   & { tvShows: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
   )>, movies: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
   )> }
 );
 
@@ -733,6 +767,22 @@ export type GetTvShowSeasonsQuery = (
   )> }
 );
 
+export type OmdbSearchQueryVariables = {
+  title: Scalars['String'];
+};
+
+
+export type OmdbSearchQuery = (
+  { __typename?: 'Query' }
+  & { result: (
+    { __typename?: 'OMDBInfo' }
+    & { ratings: (
+      { __typename?: 'Ratings' }
+      & Pick<Ratings, 'IMDB' | 'rottenTomatoes' | 'metaCritic'>
+    ) }
+  ) }
+);
+
 export type SearchTorrentQueryVariables = {
   query: Scalars['String'];
 };
@@ -757,10 +807,10 @@ export type SearchQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'voteAverage'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )> }
   ) }
 );
@@ -1162,19 +1212,16 @@ export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMu
 export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDiscoverDocument = gql`
-    query getDiscover($originLanguage: String, $year: String, $score: Float, $genres: [Float!], $page: Float) {
-  movies: discover(originLanguage: $originLanguage, year: $year, score: $score, genres: $genres, page: $page) {
-    page
-    totalPages
-    totalResults
-    results {
-      id
-      tmdbId
-      title
-      releaseDate
-      posterPath
-      voteAverage
-    }
+    query getDiscover($entertainment: Entertainment, $originLanguage: String, $primaryReleaseYear: String, $score: Float, $genres: [Float!]) {
+  results: discover(entertainment: $entertainment, originLanguage: $originLanguage, primaryReleaseYear: $primaryReleaseYear, score: $score, genres: $genres) {
+    id
+    tmdbId
+    title
+    posterPath
+    overview
+    runtime
+    voteAverage
+    releaseDate
   }
 }
     `;
@@ -1191,8 +1238,9 @@ export const GetDiscoverDocument = gql`
  * @example
  * const { data, loading, error } = useGetDiscoverQuery({
  *   variables: {
+ *      entertainment: // value for 'entertainment'
  *      originLanguage: // value for 'originLanguage'
- *      year: // value for 'year'
+ *      primaryReleaseYear: // value for 'primaryReleaseYear'
  *      score: // value for 'score'
  *      genres: // value for 'genres'
  *      page: // value for 'page'
@@ -1333,6 +1381,8 @@ export const GetLibraryMoviesDocument = gql`
     originalTitle
     state
     posterPath
+    overview
+    runtime
     voteAverage
     releaseDate
     createdAt
@@ -1373,6 +1423,8 @@ export const GetLibraryTvShowsDocument = gql`
     title
     originalTitle
     posterPath
+    runtime
+    overview
     voteAverage
     releaseDate
     createdAt
@@ -1495,6 +1547,8 @@ export const GetPopularDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
     tvShows {
@@ -1503,6 +1557,8 @@ export const GetPopularDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
   }
@@ -1534,14 +1590,15 @@ export type GetPopularQueryHookResult = ReturnType<typeof useGetPopularQuery>;
 export type GetPopularLazyQueryHookResult = ReturnType<typeof useGetPopularLazyQuery>;
 export type GetPopularQueryResult = ApolloReactCommon.QueryResult<GetPopularQuery, GetPopularQueryVariables>;
 export const GetQualityDocument = gql`
-    query getQuality {
-  qualities: getQualityParams {
+    query getQuality($type: Entertainment!) {
+  qualities: getQualityParams(type: $type) {
     id
     name
     match
     score
     updatedAt
     createdAt
+    type
   }
 }
     `;
@@ -1558,6 +1615,7 @@ export const GetQualityDocument = gql`
  * @example
  * const { data, loading, error } = useGetQualityQuery({
  *   variables: {
+ *      type: // value for 'type'
  *   },
  * });
  */
@@ -1578,6 +1636,8 @@ export const GetRecommendedDocument = gql`
     title
     releaseDate
     posterPath
+    overview
+    runtime
     voteAverage
   }
   movies: getRecommendedMovies {
@@ -1586,6 +1646,8 @@ export const GetRecommendedDocument = gql`
     title
     releaseDate
     posterPath
+    overview
+    runtime
     voteAverage
   }
 }
@@ -1733,6 +1795,43 @@ export function useGetTvShowSeasonsLazyQuery(baseOptions?: ApolloReactHooks.Lazy
 export type GetTvShowSeasonsQueryHookResult = ReturnType<typeof useGetTvShowSeasonsQuery>;
 export type GetTvShowSeasonsLazyQueryHookResult = ReturnType<typeof useGetTvShowSeasonsLazyQuery>;
 export type GetTvShowSeasonsQueryResult = ApolloReactCommon.QueryResult<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>;
+export const OmdbSearchDocument = gql`
+    query omdbSearch($title: String!) {
+  result: omdbSearch(title: $title) {
+    ratings {
+      IMDB
+      rottenTomatoes
+      metaCritic
+    }
+  }
+}
+    `;
+
+/**
+ * __useOmdbSearchQuery__
+ *
+ * To run a query within a React component, call `useOmdbSearchQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOmdbSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOmdbSearchQuery({
+ *   variables: {
+ *      title: // value for 'title'
+ *   },
+ * });
+ */
+export function useOmdbSearchQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
+        return ApolloReactHooks.useQuery<OmdbSearchQuery, OmdbSearchQueryVariables>(OmdbSearchDocument, baseOptions);
+      }
+export function useOmdbSearchLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<OmdbSearchQuery, OmdbSearchQueryVariables>(OmdbSearchDocument, baseOptions);
+        }
+export type OmdbSearchQueryHookResult = ReturnType<typeof useOmdbSearchQuery>;
+export type OmdbSearchLazyQueryHookResult = ReturnType<typeof useOmdbSearchLazyQuery>;
+export type OmdbSearchQueryResult = ApolloReactCommon.QueryResult<OmdbSearchQuery, OmdbSearchQueryVariables>;
 export const SearchTorrentDocument = gql`
     query searchTorrent($query: String!) {
   results: searchJackett(query: $query) {
@@ -1788,6 +1887,8 @@ export const SearchDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
     tvShows {
@@ -1796,6 +1897,8 @@ export const SearchDocument = gql`
       title
       releaseDate
       posterPath
+      overview
+      runtime
       voteAverage
     }
   }

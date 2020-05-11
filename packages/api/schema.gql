@@ -38,10 +38,12 @@ type EnrichedMovie {
   state: DownloadableMediaState!
   createdAt: DateTime!
   updatedAt: DateTime!
-  originalTitle: String
-  posterPath: String
+  overview: String!
   voteAverage: Float!
   releaseDate: String!
+  originalTitle: String
+  posterPath: String
+  runtime: Float
 }
 
 type EnrichedTVEpisode {
@@ -62,10 +64,17 @@ type EnrichedTVShow {
   title: String!
   createdAt: DateTime!
   updatedAt: DateTime!
-  originalTitle: String
-  posterPath: String
+  overview: String!
   voteAverage: Float!
   releaseDate: String!
+  originalTitle: String
+  posterPath: String
+  runtime: Float
+}
+
+enum Entertainment {
+  TvShow
+  Movie
 }
 
 enum FileType {
@@ -132,6 +141,10 @@ type Mutation {
   removeTVShow(tmdbId: Int!): GraphQLCommonResponse!
 }
 
+type OMDBInfo {
+  ratings: Ratings!
+}
+
 type ParamsHash {
   region: String!
   language: String!
@@ -148,6 +161,7 @@ type Quality {
   score: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
+  type: Entertainment!
 }
 
 input QualityInput {
@@ -156,7 +170,7 @@ input QualityInput {
 }
 
 type Query {
-  getQualityParams: [Quality!]!
+  getQualityParams(type: Entertainment!): [Quality!]!
   getTags: [Tag!]!
   getParams: ParamsHash!
   search(query: String!): TMDBSearchResults!
@@ -164,7 +178,7 @@ type Query {
   getTVShowSeasons(tvShowTMDBId: Int!): [TMDBFormattedTVSeason!]!
   getRecommendedTVShows: [TMDBSearchResult!]!
   getRecommendedMovies: [TMDBSearchResult!]!
-  discover(originLanguage: String, year: String, score: Float, genres: [Float!], page: Float): TMDBPaginatedResult!
+  discover(originLanguage: String, primaryReleaseYear: String, score: Float, genres: [Float!], entertainment: Entertainment = Movie): [TMDBSearchResult!]!
   getLanguages: [TMDBLanguagesResult!]!
   getGenres: TMDBGenresResults!
   searchJackett(query: String!): [JackettFormattedResult!]!
@@ -175,6 +189,13 @@ type Query {
   getTVShows: [EnrichedTVShow!]!
   getMissingTVEpisodes: [EnrichedTVEpisode!]!
   getMissingMovies: [EnrichedMovie!]!
+  omdbSearch(title: String!): OMDBInfo!
+}
+
+type Ratings {
+  IMDB: String
+  rottenTomatoes: String
+  metaCritic: String
 }
 
 type SearchingMedia {
@@ -248,6 +269,8 @@ type TMDBSearchResult {
   tmdbId: Float!
   title: String!
   voteAverage: Float!
+  overview: String!
+  runtime: Float
   posterPath: String
   releaseDate: String
 }

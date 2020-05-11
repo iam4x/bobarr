@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, notification, Popover } from 'antd';
+import { Card, Button, notification, Popover, Radio } from 'antd';
 import { FaQuestionCircle } from 'react-icons/fa';
 
 import {
@@ -13,18 +13,19 @@ import {
   useGetQualityQuery,
   Quality,
   useSaveQualityMutation,
-  GetQualityDocument,
+  Entertainment,
 } from '../../utils/graphql';
 
 import { reorder } from './settings.helpers';
+import { RadioChangeEvent } from 'antd/lib/radio';
 
 export function QualityParamsComponent() {
   const [qualities, setQualities] = useState<Quality[]>([]);
-
-  const { data, loading } = useGetQualityQuery();
+  const [type, setType] = useState<Entertainment>(Entertainment.Movie);
+  const { data, loading } = useGetQualityQuery({
+    variables: { type },
+  });
   const [saveQuality, { loading: saveLoading }] = useSaveQualityMutation({
-    awaitRefetchQueries: true,
-    refetchQueries: [{ query: GetQualityDocument }],
     onError: ({ message }) =>
       notification.error({
         message: message.replace('GraphQL error: ', ''),
@@ -58,6 +59,11 @@ export function QualityParamsComponent() {
     });
   };
 
+  const onTypeChange = (event: RadioChangeEvent) => {
+    event.preventDefault();
+    setType(event.target.value);
+  };
+
   useEffect(() => {
     if (data?.qualities) setQualities(data.qualities);
   }, [data]);
@@ -75,9 +81,17 @@ export function QualityParamsComponent() {
         </>
       }
       className="quality-preference"
-      loading={loading}
+      loading={loading && !qualities?.length}
     >
       <DragDropContext onDragEnd={handleDragEnd}>
+        <Radio.Group
+          onChange={onTypeChange}
+          value={type}
+          style={{ paddingBottom: '20px' }}
+        >
+          <Radio value={Entertainment.Movie}>{Entertainment.Movie}</Radio>
+          <Radio value={Entertainment.TvShow}>TV Show</Radio>
+        </Radio.Group>
         <Droppable droppableId="droppable">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>

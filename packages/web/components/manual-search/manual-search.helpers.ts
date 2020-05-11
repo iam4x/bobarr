@@ -14,7 +14,7 @@ export function getDefaultSearchQuery(media: Media) {
 
   if (media.__typename === 'EnrichedMovie') {
     const year = dayjs(media.releaseDate).format('YYYY');
-    return `${media.title} (${year})`;
+    return `${media.title} ${year}`;
   }
 
   return '';

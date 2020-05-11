@@ -1,4 +1,17 @@
-import { ObjectType, Field, ArgsType } from '@nestjs/graphql';
+import { ObjectType, Field, ArgsType, registerEnumType } from '@nestjs/graphql';
+export interface TMDBRequestParams {
+  query?: string;
+  language?: string;
+  region?: string;
+  year?: number;
+  with_genres?: string;
+  'vote_count.gte'?: number;
+  'vote_average.gte'?: number;
+  with_original_language?: string;
+  primary_release_year?: number; // movie
+  first_air_date_year?: number; // tv show
+  page?: number;
+}
 
 export interface TMDBMovie {
   id: number;
@@ -142,6 +155,8 @@ export class TMDBSearchResult {
   @Field() public tmdbId!: number;
   @Field() public title!: string;
   @Field() public voteAverage!: number;
+  @Field() public overview!: string;
+  @Field({ nullable: true }) public runtime!: number;
   @Field({ nullable: true }) public posterPath?: string;
   @Field({ nullable: true }) public releaseDate?: string;
 }
@@ -180,11 +195,22 @@ export class TMDBGenresResults {
   public tvShowGenres!: TMDBGenresResult[];
 }
 
+export enum Entertainment {
+  TvShow = 'TvShow',
+  Movie = 'Movie',
+}
+
+registerEnumType(Entertainment, {
+  name: 'Entertainment',
+});
+
 @ArgsType()
 export class GetDiscoverQueries {
   @Field({ nullable: true }) public originLanguage?: string;
-  @Field({ nullable: true }) public year?: string;
+  @Field({ nullable: true }) public primaryReleaseYear?: string;
   @Field({ nullable: true }) public score?: number;
   @Field((_type) => [Number], { nullable: true }) public genres?: number[];
   @Field({ nullable: true }) public page?: number;
+  @Field((_type) => Entertainment) public entertainment: Entertainment =
+    Entertainment.Movie;
 }

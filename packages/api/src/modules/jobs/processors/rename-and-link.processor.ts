@@ -178,17 +178,35 @@ export class RenameAndLinkProcessor {
       `Season ${seasonNb}`
     );
 
-    const torrentFiles = torrent.transmissionTorrent.files
-      .filter((file) => {
+    const torrentFiles = torrent.transmissionTorrent.files.reduce(
+      (
+        results: Array<{ original: string; ext: string; episodeNb: number }>,
+        file
+      ) => {
         const ext = path.extname(file.name);
-        const [, episodeNb] = /S\d+E(\d+)/.exec(file.name.toUpperCase()) || [];
-        return episodeNb && allowedExtensions.includes(ext.replace(/^\./, ''));
-      })
-      .map((file) => {
-        const ext = path.extname(file.name);
-        const [, episodeNb] = /S\d+E(\d+)/.exec(file.name.toUpperCase()) || [];
-        return { original: file.name, ext, episodeNb: parseInt(episodeNb, 10) };
+        const [, episodeNb] =
+          /S\d+ ?E(\d+)/.exec(file.name.toUpperCase()) || [];
+
+        if (episodeNb && allowedExtensions.includes(ext.replace(/^\./, ''))) {
+          return [
+            ...results,
+            { original: file.name, ext, episodeNb: parseInt(episodeNb, 10) },
+          ];
+        }
+
+        return results;
+      },
+      []
+    );
+
+    if (torrentFiles.length === 0) {
+      this.logger.error('did not find any files in torrent');
+      this.logger.error('here are the raw torrent files (before filter)', {
+        files: torrent.transmissionTorrent.files,
       });
+
+      throw new Error('could not find any files in torrent');
+    }
 
     await childCommand(`mkdir -p "${seasonFolder}"`);
     await mapSeries(torrentFiles, async (file) => {

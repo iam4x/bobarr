@@ -8,6 +8,7 @@ import {
   GetDiscoverQueryVariables,
   useGetLibraryMoviesQuery,
   useGetParamsQuery,
+  Entertainment,
 } from '../../utils/graphql';
 import { DiscoverFilterFormComponent } from './discover-filter-from.component';
 import dayjs from 'dayjs';
@@ -20,17 +21,21 @@ export function DiscoverComponent() {
   const [filterParams, setFilterParams] = useState<GetDiscoverQueryVariables>({
     originLanguage: defaultUserParams?.params.language,
     score: 70,
+    entertainment: Entertainment.Movie,
   });
 
   const tmdbIds = moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || [];
   const moviesSearchResults = data?.movies;
   const hasNoSearchResults = moviesSearchResults?.totalResults === 0;
+  const results = data?.results || [];
+  const hasNoSearchResults = results.length === 0;
 
   const onFinish = (formParams: GetDiscoverQueryVariables) => {
-    const { year, ...rest } = formParams;
-
+    const { primaryReleaseYear, ...rest } = formParams;
     setFilterParams({
-      ...(year && { year: dayjs(year).format('YYYY') }),
+      ...(primaryReleaseYear && {
+        primaryReleaseYear: dayjs(primaryReleaseYear).format('YYYY'),
+      }),
       ...rest,
     });
   };
@@ -55,7 +60,7 @@ export function DiscoverComponent() {
         <Wrapper>
           <div className="search-bar--title">What are we watching next?</div>
           <div className="search-bar--subtitle" style={{ marginBottom: 0 }}>
-            Dive deeper to discover a movie...
+            Dive deeper to discover next entertainment
           </div>
         </Wrapper>
       </div>
@@ -95,7 +100,7 @@ export function DiscoverComponent() {
                       )}
                       <div className="discover--result-cards-container">
                         {!hasNoSearchResults &&
-                          moviesSearchResults?.results.map((res) => (
+                          results.map((res) => (
                             <TMDBCardComponent
                               key={res.id}
                               type="movie"

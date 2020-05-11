@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
 } from 'typeorm';
+import { Entertainment } from 'src/modules/tmdb/tmdb.dto';
 
 @Entity()
 @ObjectType()
@@ -16,7 +17,7 @@ export class Quality {
   public id!: number;
 
   @Field()
-  @Column('varchar', { unique: true })
+  @Column('varchar')
   public name!: string;
 
   @Field((_type) => [String])
@@ -34,4 +35,8 @@ export class Quality {
   @Field()
   @UpdateDateColumn()
   public updatedAt!: Date;
+
+  @Field((_type) => Entertainment)
+  @Column({ type: 'enum', enum: Entertainment, default: Entertainment.Movie })
+  public type!: Entertainment;
 }
