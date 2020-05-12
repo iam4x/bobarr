@@ -233,35 +233,35 @@ export class TMDBService {
   }
 
   private async discoverMovie(args: TMDBRequestParams) {
-    const { results } = await this.request<{ results: TMDBMovie[] }>(
+    const TMDBResults = await this.request<TMDBPagination<TMDBMovie[]>>(
       `/discover/movie`,
       args
     );
 
-    const {
-      page: pageNumber,
-      total_pages,
-      total_results,
-      results,
-    } = TMDBResults;
+    const { page, total_pages, total_results, results } = TMDBResults;
 
     return {
-      page: pageNumber,
+      page,
       totalResults: total_results,
       totalPages: total_pages,
       results: results.map(this.mapMovie),
     };
-
-    // return results.results.map(this.mapMovie);
   }
 
   private async discoverTvShow(args: TMDBRequestParams) {
-    const { results } = await this.request<{ results: TMDBTVShow[] }>(
+    const TMDBResults = await this.request<TMDBPagination<TMDBTVShow[]>>(
       `/discover/tv`,
       args
     );
 
-    return results.map(this.mapTVShow);
+    const { page, total_pages, total_results, results } = TMDBResults;
+
+    return {
+      page,
+      totalResults: total_results,
+      totalPages: total_pages,
+      results: results.map(this.mapTVShow),
+    };
   }
 
   public async getLanguages() {

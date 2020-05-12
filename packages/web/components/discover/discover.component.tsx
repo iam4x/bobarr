@@ -24,11 +24,11 @@ export function DiscoverComponent() {
     entertainment: Entertainment.Movie,
   });
 
-  const tmdbIds = moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || [];
-  const moviesSearchResults = data?.movies;
-  const hasNoSearchResults = moviesSearchResults?.totalResults === 0;
-  const results = data?.results || [];
-  const hasNoSearchResults = results.length === 0;
+  // const tmdbIds = moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || [];
+  const TMDBResults = data?.TMDBResults;
+  const hasNoSearchResults = TMDBResults?.totalResults === 0;
+
+  // console.log(tmdbIds);
 
   const onFinish = (formParams: GetDiscoverQueryVariables) => {
     const { primaryReleaseYear, ...rest } = formParams;
@@ -70,9 +70,9 @@ export function DiscoverComponent() {
             <div className="search-results--category" style={{ marginLeft: 0 }}>
               Discover by filter
               <Badge
-                count={moviesSearchResults?.totalResults}
+                count={TMDBResults?.totalResults}
                 overflowCount={9999}
-                style={{ marginLeft: 22 }}
+                style={{ marginLeft: 15 }}
               />
             </div>
             <div className="wrapper">
@@ -100,20 +100,21 @@ export function DiscoverComponent() {
                       )}
                       <div className="discover--result-cards-container">
                         {!hasNoSearchResults &&
-                          results.map((res) => (
-                            <TMDBCardComponent
-                              key={res.id}
-                              type="movie"
-                              result={res}
-                              inLibrary={tmdbIds.includes(res.tmdbId)}
-                            />
-                          ))}
+                          TMDBResults?.results
+                            // ?.filter((item) => tmdbIds.includes(item.tmdbId))
+                            ?.map((res) => (
+                              <TMDBCardComponent
+                                key={res.id}
+                                type="movie"
+                                result={res}
+                              />
+                            ))}
                       </div>
                     </Skeleton>
                   </Card>
                   <Pagination
                     defaultCurrent={6}
-                    total={moviesSearchResults?.totalResults}
+                    total={TMDBResults?.totalResults}
                     onChange={onPagination}
                     showSizeChanger={false}
                     pageSize={20}
