@@ -15,20 +15,23 @@ import dayjs from 'dayjs';
 
 export function DiscoverComponent() {
   const [discover, { data, loading }] = useGetDiscoverLazyQuery();
-  const { data: moviesLibrary } = useGetLibraryMoviesQuery();
   const { data: defaultUserParams } = useGetParamsQuery();
-
   const [filterParams, setFilterParams] = useState<GetDiscoverQueryVariables>({
     originLanguage: defaultUserParams?.params.language,
     score: 70,
     entertainment: Entertainment.Movie,
   });
 
-  // const tmdbIds = moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || [];
+  const { data: moviesLibrary } = useGetLibraryMoviesQuery();
+  const { data: tvShowsLibrary } = useGetLibraryMoviesQuery();
+
+  const tmdbIds =
+    filterParams.entertainment === Entertainment.Movie
+      ? moviesLibrary?.movies?.map(({ tmdbId }) => tmdbId) || []
+      : tvShowsLibrary?.movies?.map(({ tmdbId }) => tmdbId) || [];
+
   const TMDBResults = data?.TMDBResults;
   const hasNoSearchResults = TMDBResults?.totalResults === 0;
-
-  // console.log(tmdbIds);
 
   const onFinish = (formParams: GetDiscoverQueryVariables) => {
     const { primaryReleaseYear, ...rest } = formParams;
@@ -101,11 +104,11 @@ export function DiscoverComponent() {
                       <div className="discover--result-cards-container">
                         {!hasNoSearchResults &&
                           TMDBResults?.results
-                            // ?.filter((item) => tmdbIds.includes(item.tmdbId))
+                            ?.filter((item) => !tmdbIds.includes(item.tmdbId))
                             ?.map((res) => (
                               <TMDBCardComponent
                                 key={res.id}
-                                type="movie"
+                                type={Entertainment.Movie ? 'movie' : 'tvshow'}
                                 result={res}
                               />
                             ))}
