@@ -184,8 +184,12 @@ export class RenameAndLinkProcessor {
         file
       ) => {
         const ext = path.extname(file.name);
-        const [, episodeNb] =
-          /S\d+ ?E(\d+)/.exec(file.name.toUpperCase()) || [];
+        const fileName = path.basename(file.name.toUpperCase());
+
+        const [, episodeNb1] = /S\d+ ?E(\d+)/.exec(fileName) || []; // Foobar_S01E01.mkv
+        const [, episodeNb2] = /\d+X(\d+)/.exec(fileName) || []; // Foobar_1x01.mkv
+
+        const episodeNb = episodeNb1 || episodeNb2;
 
         if (episodeNb && allowedExtensions.includes(ext.replace(/^\./, ''))) {
           return [
