@@ -86,8 +86,8 @@ export function TVSeasonDetailsComponent({
         return (
           <Tag
             icon={<SearchOutlined />}
-            style={{ width: 80, textAlign: 'center' }}
             onClick={() => setManualSearch(row)}
+            style={{ width: 80, textAlign: 'center', cursor: 'pointer' }}
           >
             {inLibrary ? 'Replace' : 'Search'}
           </Tag>
