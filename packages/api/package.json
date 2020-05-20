@@ -1,6 +1,6 @@
 {
   "name": "@bobarr/api",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.1",
   "description": "bobarr api server",
   "author": "iam4x <iam4x@me.com>",
   "private": true,
