@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { PureQueryOptions } from 'apollo-client';
 import { Modal, Button, Skeleton, Input } from 'antd';
 
 import { useSearchTorrentLazyQuery } from '../../utils/graphql';
@@ -9,6 +10,7 @@ import { JackettResultsTable } from './jackett-results-table';
 
 interface ManualSearchProps {
   media: Media;
+  refetchQueries?: PureQueryOptions[];
   onRequestClose: () => void;
 }
 
@@ -54,6 +56,7 @@ export function ManualSearchComponent(props: ManualSearchProps) {
           <JackettResultsTable
             media={props.media}
             results={data?.results || []}
+            refetchQueries={props.refetchQueries}
           />
         </Skeleton>
       </ManualSearchStyles>

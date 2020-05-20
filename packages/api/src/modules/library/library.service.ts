@@ -37,12 +37,15 @@ export class LibraryService {
     private readonly movieDAO: MovieDAO,
     private readonly tvShowDAO: TVShowDAO,
     private readonly tvEpisodeDAO: TVEpisodeDAO,
+    private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tmdbService: TMDBService,
     private readonly jobsService: JobsService,
     private readonly transmissionService: TransmissionService,
     private readonly mediaViewDAO: MediaViewDAO
   ) {
     this.logger = logger.child({ context: 'LibraryService' });
+
+    this.getTVSeasonDetails({ tvShowTMDBId: 60625, seasonNumber: 4 });
   }
 
   public async getDownloading() {
@@ -139,7 +142,7 @@ export class LibraryService {
   @LazyTransaction()
   public async removeMovie(
     { tmdbId, softDelete = false }: { tmdbId: number; softDelete?: boolean },
-    @TransactionManager() manager?: EntityManager
+    @TransactionManager() manager: EntityManager | null
   ) {
     this.logger.info('start remove movie', { tmdbId });
     const movieDAO = manager!.getCustomRepository(MovieDAO);
@@ -244,7 +247,7 @@ export class LibraryService {
   public async downloadMovie(
     movieId: number,
     jackettResult: JackettInput,
-    @TransactionManager() manager?: EntityManager
+    @TransactionManager() manager: EntityManager | null
   ) {
     this.logger.info('start download movie', { movieId });
     this.logger.info(jackettResult.title);
@@ -265,13 +268,16 @@ export class LibraryService {
     });
 
     const torrent = await this.transmissionService.addTorrentURL(
-      jackettResult.downloadLink,
       {
-        resourceType: FileType.MOVIE,
-        resourceId: movieId,
-        quality: jackettResult.quality,
-        tag: jackettResult.tag,
-      }
+        url: jackettResult.downloadLink,
+        torrentAttributes: {
+          resourceType: FileType.MOVIE,
+          resourceId: movieId,
+          quality: jackettResult.quality,
+          tag: jackettResult.tag,
+        },
+      },
+      manager
     );
 
     this.logger.info('download movie started', {
@@ -284,7 +290,7 @@ export class LibraryService {
   public async downloadTVSeason(
     seasonId: number,
     jackettResult: JackettInput,
-    @TransactionManager() manager?: EntityManager
+    @TransactionManager() manager: EntityManager | null
   ) {
     this.logger.info('start download tv season', { seasonId });
     this.logger.info(jackettResult.title);
@@ -295,13 +301,16 @@ export class LibraryService {
     });
 
     const torrent = await this.transmissionService.addTorrentURL(
-      jackettResult.downloadLink,
       {
-        resourceType: FileType.SEASON,
-        resourceId: seasonId,
-        quality: jackettResult.quality,
-        tag: jackettResult.tag,
-      }
+        url: jackettResult.downloadLink,
+        torrentAttributes: {
+          resourceType: FileType.SEASON,
+          resourceId: seasonId,
+          quality: jackettResult.quality,
+          tag: jackettResult.tag,
+        },
+      },
+      manager
     );
 
     this.logger.info('download tv season started', {
@@ -314,24 +323,46 @@ export class LibraryService {
   public async downloadTVEpisode(
     episodeId: number,
     jackettResult: JackettInput,
-    @TransactionManager() manager?: EntityManager
+    @TransactionManager() manager: EntityManager | null
   ) {
     this.logger.info('start download tv episode', { episodeId });
     this.logger.info(jackettResult.title);
 
-    await manager!.getCustomRepository(TVEpisodeDAO).save({
+    const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
+    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+
+    const tvEpisode = await tvEpisodeDAO.findOneOrFail({ id: episodeId });
+
+    if (tvEpisode.state !== DownloadableMediaState.MISSING) {
+      this.logger.info('episode already downloaded, removing existing files');
+
+      const torrents = await torrentDAO.find({
+        where: { resourceId: episodeId, resourceType: FileType.EPISODE },
+      });
+
+      await forEachSeries(torrents, (torrent) =>
+        this.transmissionService.removeTorrentAndFiles(torrent.torrentHash)
+      );
+
+      await torrentDAO.remove(torrents);
+    }
+
+    tvEpisodeDAO.save({
       id: episodeId,
       state: DownloadableMediaState.DOWNLOADING,
     });
 
     const torrent = await this.transmissionService.addTorrentURL(
-      jackettResult.downloadLink,
       {
-        resourceType: FileType.EPISODE,
-        resourceId: episodeId,
-        quality: jackettResult.quality,
-        tag: jackettResult.tag,
-      }
+        url: jackettResult.downloadLink,
+        torrentAttributes: {
+          resourceType: FileType.EPISODE,
+          resourceId: episodeId,
+          quality: jackettResult.quality,
+          tag: jackettResult.tag,
+        },
+      },
+      manager
     );
 
     this.logger.info('download episode started', {
@@ -432,6 +463,27 @@ export class LibraryService {
       tvShow,
       missingSeasons,
     };
+  }
+
+  public async getTVSeasonDetails({
+    tvShowTMDBId,
+    seasonNumber,
+  }: {
+    tvShowTMDBId: number;
+    seasonNumber: number;
+  }) {
+    const episodes = await this.tvEpisodeDAO
+      .createQueryBuilder('episode')
+      .innerJoinAndSelect(
+        'episode.tvShow',
+        'tvShow',
+        'tvShow.tmdbId = :tvShowTMDBId',
+        { tvShowTMDBId }
+      )
+      .where('episode.seasonNumber = :seasonNumber', { seasonNumber })
+      .orderBy('episode.episodeNumber')
+      .getMany();
+    return map(episodes, this.enrichTVEpisode);
   }
 
   private enrichMovie = async (movie: Movie) => {
