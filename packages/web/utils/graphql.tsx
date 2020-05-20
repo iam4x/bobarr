@@ -59,8 +59,8 @@ export type EnrichedTvEpisode = {
   tvShow: TvShow;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  voteAverage: Scalars['Float'];
   releaseDate: Scalars['String'];
+  voteAverage?: Maybe<Scalars['Float']>;
 };
 
 export type EnrichedTvShow = {
@@ -252,6 +252,7 @@ export type Query = {
   getTVShows: Array<EnrichedTvShow>;
   getMissingTVEpisodes: Array<EnrichedTvEpisode>;
   getMissingMovies: Array<EnrichedMovie>;
+  getTVSeasonDetails: Array<EnrichedTvEpisode>;
   omdbSearch: OmdbInfo;
 };
 
@@ -287,6 +288,12 @@ export type QuerySearchJackettArgs = {
 
 export type QueryGetTorrentStatusArgs = {
   torrents: Array<GetTorrentStatusInput>;
+};
+
+
+export type QueryGetTvSeasonDetailsArgs = {
+  seasonNumber: Scalars['Int'];
+  tvShowTMDBId: Scalars['Int'];
 };
 
 
@@ -742,6 +749,24 @@ export type GetTorrentStatusQuery = (
   & { torrents: Array<(
     { __typename?: 'TorrentStatus' }
     & Pick<TorrentStatus, 'id' | 'resourceId' | 'resourceType' | 'percentDone' | 'rateDownload' | 'rateUpload' | 'uploadRatio' | 'uploadedEver' | 'totalSize' | 'status'>
+  )> }
+);
+
+export type GetTvSeasonDetailsQueryVariables = {
+  tvShowTMDBId: Scalars['Int'];
+  seasonNumber: Scalars['Int'];
+};
+
+
+export type GetTvSeasonDetailsQuery = (
+  { __typename?: 'Query' }
+  & { episodes: Array<(
+    { __typename?: 'EnrichedTVEpisode' }
+    & Pick<EnrichedTvEpisode, 'id' | 'episodeNumber' | 'seasonNumber' | 'state' | 'updatedAt' | 'voteAverage' | 'releaseDate' | 'createdAt'>
+    & { tvShow: (
+      { __typename?: 'TVShow' }
+      & Pick<TvShow, 'id' | 'title'>
+    ) }
   )> }
 );
 
@@ -1745,6 +1770,51 @@ export function useGetTorrentStatusLazyQuery(baseOptions?: ApolloReactHooks.Lazy
 export type GetTorrentStatusQueryHookResult = ReturnType<typeof useGetTorrentStatusQuery>;
 export type GetTorrentStatusLazyQueryHookResult = ReturnType<typeof useGetTorrentStatusLazyQuery>;
 export type GetTorrentStatusQueryResult = ApolloReactCommon.QueryResult<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>;
+export const GetTvSeasonDetailsDocument = gql`
+    query getTVSeasonDetails($tvShowTMDBId: Int!, $seasonNumber: Int!) {
+  episodes: getTVSeasonDetails(tvShowTMDBId: $tvShowTMDBId, seasonNumber: $seasonNumber) {
+    id
+    episodeNumber
+    seasonNumber
+    state
+    updatedAt
+    voteAverage
+    releaseDate
+    createdAt
+    tvShow {
+      id
+      title
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetTvSeasonDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetTvSeasonDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTvSeasonDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTvSeasonDetailsQuery({
+ *   variables: {
+ *      tvShowTMDBId: // value for 'tvShowTMDBId'
+ *      seasonNumber: // value for 'seasonNumber'
+ *   },
+ * });
+ */
+export function useGetTvSeasonDetailsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>(GetTvSeasonDetailsDocument, baseOptions);
+      }
+export function useGetTvSeasonDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>(GetTvSeasonDetailsDocument, baseOptions);
+        }
+export type GetTvSeasonDetailsQueryHookResult = ReturnType<typeof useGetTvSeasonDetailsQuery>;
+export type GetTvSeasonDetailsLazyQueryHookResult = ReturnType<typeof useGetTvSeasonDetailsLazyQuery>;
+export type GetTvSeasonDetailsQueryResult = ApolloReactCommon.QueryResult<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>;
 export const GetTvShowSeasonsDocument = gql`
     query getTVShowSeasons($tvShowTMDBId: Int!) {
   seasons: getTVShowSeasons(tvShowTMDBId: $tvShowTMDBId) {

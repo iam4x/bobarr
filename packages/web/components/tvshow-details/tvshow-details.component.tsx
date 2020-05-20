@@ -17,6 +17,7 @@ import { getImageURL } from '../../utils/get-cached-image-url';
 import { useGetSeasons } from './use-get-seasons.hook';
 import { TVShowSeasonsModalComponentStyles } from './tvshow-details.styles';
 import { RatingDetailComponent } from '../movie-details/rating-details.component';
+import { TVSeasonDetailsComponent } from './tvseason-details.component';
 
 interface TVShowSeasonsModalComponentProps {
   visible: boolean;
@@ -126,6 +127,15 @@ export function TVShowSeasonsModalComponent(
                 </a>
               </div>
               <div className="overview">{tvShow.overview}</div>
+              <div className="seasons-details">
+                {seasons.map((season) => (
+                  <TVSeasonDetailsComponent
+                    key={season.id}
+                    season={season}
+                    tvShowTMDBId={tvShow.tmdbId}
+                  />
+                ))}
+              </div>
               <div className="buttons">
                 <div className="seasons">
                   {seasons.map((season) => (

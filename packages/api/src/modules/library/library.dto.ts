@@ -27,8 +27,8 @@ export class EnrichedTVShow extends TVShow {
 
 @ObjectType()
 export class EnrichedTVEpisode extends TVEpisode {
-  @Field() public voteAverage!: number;
   @Field() public releaseDate?: string;
+  @Field({ nullable: true }) public voteAverage!: number;
 }
 
 @ObjectType()

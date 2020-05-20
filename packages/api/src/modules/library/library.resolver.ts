@@ -54,13 +54,24 @@ export class LibraryResolver {
     return this.libraryService.findMissingMovies();
   }
 
+  @Query((_returns) => [EnrichedTVEpisode])
+  public getTVSeasonDetails(
+    @Args('tvShowTMDBId', { type: () => Int }) tvShowTMDBId: number,
+    @Args('seasonNumber', { type: () => Int }) seasonNumber: number
+  ) {
+    return this.libraryService.getTVSeasonDetails({
+      tvShowTMDBId,
+      seasonNumber,
+    });
+  }
+
   @Mutation((_returns) => GraphQLCommonResponse)
   public async downloadMovie(
     @Args('movieId', { type: () => Int }) movieId: number,
     @Args('jackettResult', { type: () => JackettInput })
     jackettResult: JackettInput
   ) {
-    await this.libraryService.downloadMovie(movieId, jackettResult);
+    await this.libraryService.downloadMovie(movieId, jackettResult, null);
     return { success: true, message: 'MOVIE_DOWNLOAD_STARTED' };
   }
 
@@ -70,7 +81,7 @@ export class LibraryResolver {
     @Args('jackettResult', { type: () => JackettInput })
     jackettResult: JackettInput
   ) {
-    await this.libraryService.downloadTVEpisode(episodeId, jackettResult);
+    await this.libraryService.downloadTVEpisode(episodeId, jackettResult, null);
     return { success: true, message: 'TV_EPISODE_DOWNLOAD_STARTED' };
   }
 
@@ -92,7 +103,7 @@ export class LibraryResolver {
   public async removeMovie(
     @Args('tmdbId', { type: () => Int }) tmdbId: number
   ) {
-    await this.libraryService.removeMovie({ tmdbId, softDelete: false });
+    await this.libraryService.removeMovie({ tmdbId, softDelete: false }, null);
     return { success: true, message: 'MOVIE_REMOVED_FROM_LIBRARY' };
   }
 
