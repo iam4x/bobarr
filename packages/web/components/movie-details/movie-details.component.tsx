@@ -96,7 +96,7 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
                   )}
                 </div>
                 <div className="informations-row">
-                  <RatingDetailComponent movie={movie} />
+                  <RatingDetailComponent entertainment={movie} />
                   <a
                     className="play-trailer btn"
                     href={youtubeSearchURL}

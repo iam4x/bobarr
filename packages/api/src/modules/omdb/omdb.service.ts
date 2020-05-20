@@ -28,7 +28,7 @@ export class OMDBService {
   }
 
   private mapResult(omdbSearchResult: OMDBSearchResult) {
-    const ratings = omdbSearchResult.Ratings.reduce(
+    const ratings = omdbSearchResult.Ratings?.reduce(
       (prev, { Source, Value }) => {
         return {
           ...prev,
