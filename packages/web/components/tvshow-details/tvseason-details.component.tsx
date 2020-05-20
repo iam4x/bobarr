@@ -141,10 +141,7 @@ export function TVSeasonDetailsComponent({
             columns={columns}
             showHeader={false}
             pagination={false}
-            loading={
-              (data && data.episodes.length === 0 && loading) ||
-              (!data && loading)
-            }
+            loading={!data && loading}
           />
         )}
       </div>

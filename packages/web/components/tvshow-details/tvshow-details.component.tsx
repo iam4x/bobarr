@@ -128,13 +128,15 @@ export function TVShowSeasonsModalComponent(
               </div>
               <div className="overview">{tvShow.overview}</div>
               <div className="seasons-details">
-                {seasons.map((season) => (
-                  <TVSeasonDetailsComponent
-                    key={season.id}
-                    season={season}
-                    tvShowTMDBId={tvShow.tmdbId}
-                  />
-                ))}
+                {seasons
+                  .filter((season) => season.inLibrary)
+                  .map((season) => (
+                    <TVSeasonDetailsComponent
+                      key={season.id}
+                      season={season}
+                      tvShowTMDBId={tvShow.tmdbId}
+                    />
+                  ))}
               </div>
               <div className="buttons">
                 <div className="seasons">
