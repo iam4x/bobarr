@@ -10,6 +10,7 @@ import {
   TmdbFormattedTvSeason,
   EnrichedTvEpisode,
   DownloadableMediaState,
+  GetTvSeasonDetailsDocument,
 } from '../../utils/graphql';
 
 import { availableIn } from '../../utils/available-in';
@@ -30,6 +31,8 @@ export function TVSeasonDetailsComponent({
   const [manualSearch, setManualSearch] = useState<TvEpisode | null>(null);
 
   const { data, loading } = useGetTvSeasonDetailsQuery({
+    pollInterval: 5000,
+    fetchPolicy: 'cache-and-network',
     variables: { tvShowTMDBId, seasonNumber: season.seasonNumber },
   });
 
@@ -102,6 +105,15 @@ export function TVSeasonDetailsComponent({
         <ManualSearchComponent
           media={manualSearch}
           onRequestClose={() => setManualSearch(null)}
+          refetchQueries={[
+            {
+              query: GetTvSeasonDetailsDocument,
+              variables: {
+                tvShowTMDBId,
+                seasonNumber: season.seasonNumber,
+              },
+            },
+          ]}
         />
       )}
 
@@ -129,7 +141,10 @@ export function TVSeasonDetailsComponent({
             columns={columns}
             showHeader={false}
             pagination={false}
-            loading={loading}
+            loading={
+              (data && data.episodes.length === 0 && loading) ||
+              (!data && loading)
+            }
           />
         )}
       </div>
