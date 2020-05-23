@@ -35,8 +35,6 @@ export class JackettService {
     this.logger = logger.child({ context: 'JackettService' });
   }
 
-  private JACKETT_RESPONSE_TIMEOUT = 5000; // 5 seconds
-
   private async request<TData>(path: string, params: Record<string, any>) {
     const jackettApiKey = await this.paramsService.get(
       ParameterKey.JACKETT_API_KEY
@@ -166,6 +164,7 @@ export class JackettService {
   ) {
     const indexers = await this.getConfiguredIndexers();
     const noResultsError = 'NO_RESULTS';
+    const JACKETT_RESPONSE_TIMEOUT = opts.withoutFilter ? 30000 : 1200000; // 2 minute : 30 seconds;
 
     try {
       const allIndexers = indexers.map((indexer) =>
@@ -174,7 +173,7 @@ export class JackettService {
 
       const resolvedIndexers = await PromiseRaceAll(
         allIndexers,
-        this.JACKETT_RESPONSE_TIMEOUT
+        JACKETT_RESPONSE_TIMEOUT
       );
       const flattenIndexers = resolvedIndexers
         .filter((item) => Boolean(item))
@@ -186,7 +185,7 @@ export class JackettService {
         ['desc', 'desc', 'desc']
       );
 
-      return [sortedByBest[0]];
+      return opts.withoutFilter ? sortedByBest : [sortedByBest[0]];
     } catch (error) {
       // return empty results array, let application continue it's lifecycle
       if (Array.isArray(error) && error[0].message === noResultsError) {
