@@ -164,7 +164,7 @@ export class JackettService {
   ) {
     const indexers = await this.getConfiguredIndexers();
     const noResultsError = 'NO_RESULTS';
-    const JACKETT_RESPONSE_TIMEOUT = opts.withoutFilter ? 30000 : 1200000; // 2 minute : 30 seconds;
+    const JACKETT_RESPONSE_TIMEOUT = opts.withoutFilter ? 30000 : 1200000; // 30 seconds : 2 minutes;
 
     try {
       const allIndexers = indexers.map((indexer) =>
