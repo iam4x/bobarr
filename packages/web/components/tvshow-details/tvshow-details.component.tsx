@@ -14,9 +14,10 @@ import {
 import { TmdbSearchResult, useGetParamsQuery } from '../../utils/graphql';
 import { getImageURL } from '../../utils/get-cached-image-url';
 
-import { RatingComponent } from '../rating/rating.component';
 import { useGetSeasons } from './use-get-seasons.hook';
 import { TVShowSeasonsModalComponentStyles } from './tvshow-details.styles';
+import { RatingDetailComponent } from '../movie-details/rating-details.component';
+import { TVSeasonDetailsComponent } from './tvseason-details.component';
 
 interface TVShowSeasonsModalComponentProps {
   visible: boolean;
@@ -115,7 +116,7 @@ export function TVShowSeasonsModalComponent(
                 )}
               </div>
               <div className="information-row">
-                <RatingComponent rating={tvShow.voteAverage * 10} />
+                <RatingDetailComponent entertainment={tvShow} />
                 <a
                   className="play-trailer btn"
                   href={youtubeSearchURL}
@@ -126,6 +127,17 @@ export function TVShowSeasonsModalComponent(
                 </a>
               </div>
               <div className="overview">{tvShow.overview}</div>
+              <div className="seasons-details">
+                {seasons
+                  .filter((season) => season.inLibrary)
+                  .map((season) => (
+                    <TVSeasonDetailsComponent
+                      key={season.id}
+                      season={season}
+                      tvShowTMDBId={tvShow.tmdbId}
+                    />
+                  ))}
+              </div>
               <div className="buttons">
                 <div className="seasons">
                   {seasons.map((season) => (

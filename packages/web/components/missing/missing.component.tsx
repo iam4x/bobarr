@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { SearchOutlined } from '@ant-design/icons';
 
 import { formatNumber } from '../../utils/format-number';
+import { availableIn } from '../../utils/available-in';
 
 import {
   useGetMissingQuery,
@@ -106,7 +107,7 @@ export function MissingComponent() {
                   </div>
                 )}
 
-                <AvailableIn date={row.date} />
+                <Tag>{availableIn(row.date)}</Tag>
               </div>
             ))}
           </div>
@@ -116,19 +117,4 @@ export function MissingComponent() {
   }
 
   return <noscript />;
-}
-
-function AvailableIn({ date }: { date: dayjs.Dayjs }) {
-  const days = date.diff(new Date(), 'day');
-
-  let label = `Available in ${days} days`;
-  if (days === 0) label = `On air today`;
-  if (days > 14) label = `Avaible on ${date.format('DD/MM')}`;
-
-  // next year release
-  if (date.format('YYYY') !== dayjs(new Date()).format('YYYY')) {
-    label = `Available in ${date.format('YYYY')}`;
-  }
-
-  return <Tag>{label}</Tag>;
 }

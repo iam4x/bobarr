@@ -4,10 +4,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { Transmission } from 'transmission-client';
-import { DeepPartial } from 'typeorm';
+import { DeepPartial, TransactionManager, EntityManager } from 'typeorm';
 
 import { Torrent } from 'src/entities/torrent.entity';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
+import { LazyTransaction } from 'src/utils/lazy-transaction';
 
 @Injectable()
 export class TransmissionService {
@@ -36,15 +37,21 @@ export class TransmissionService {
       .then(({ torrents: [torrent] }) => torrent);
   }
 
+  @LazyTransaction()
   public async addTorrentURL(
-    url: string,
-    torrentAttributes: DeepPartial<Torrent>
+    {
+      url,
+      torrentAttributes,
+    }: { url: string; torrentAttributes: DeepPartial<Torrent> },
+    @TransactionManager() manager: EntityManager | null
   ) {
+    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+
     this.logger.info('start download torrent from url', torrentAttributes);
     const transmissionTorrent = await this.addURL(url);
 
     this.logger.info('torrent download started', torrentAttributes);
-    const torrent = await this.torrentDAO.save({
+    const torrent = await torrentDAO.save({
       ...torrentAttributes,
       torrentHash: transmissionTorrent.hashString,
     });

@@ -76,12 +76,16 @@ export class DownloadProcessor {
       return;
     }
 
-    await this.libraryService.downloadMovie(movieId, {
-      title: bestResult.title,
-      downloadLink: bestResult.downloadLink,
-      tag: bestResult.tag.label,
-      quality: bestResult.quality.label,
-    });
+    await this.libraryService.downloadMovie(
+      movieId,
+      {
+        title: bestResult.title,
+        downloadLink: bestResult.downloadLink,
+        tag: bestResult.tag.label,
+        quality: bestResult.quality.label,
+      },
+      null
+    );
 
     return;
   }
@@ -120,12 +124,16 @@ export class DownloadProcessor {
       return;
     }
 
-    await this.libraryService.downloadTVSeason(seasonId, {
-      title: bestResult.title,
-      downloadLink: bestResult.downloadLink,
-      tag: bestResult.tag.label,
-      quality: bestResult.quality.label,
-    });
+    await this.libraryService.downloadTVSeason(
+      seasonId,
+      {
+        title: bestResult.title,
+        downloadLink: bestResult.downloadLink,
+        tag: bestResult.tag.label,
+        quality: bestResult.quality.label,
+      },
+      null
+    );
 
     return;
   }
@@ -146,12 +154,16 @@ export class DownloadProcessor {
       return;
     }
 
-    await this.libraryService.downloadTVEpisode(episodeId, {
-      title: bestResult.title,
-      downloadLink: bestResult.downloadLink,
-      tag: bestResult.tag.label,
-      quality: bestResult.quality.label,
-    });
+    await this.libraryService.downloadTVEpisode(
+      episodeId,
+      {
+        title: bestResult.title,
+        downloadLink: bestResult.downloadLink,
+        tag: bestResult.tag.label,
+        quality: bestResult.quality.label,
+      },
+      null
+    );
 
     return;
   }

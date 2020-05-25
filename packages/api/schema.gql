@@ -54,8 +54,8 @@ type EnrichedTVEpisode {
   tvShow: TVShow!
   createdAt: DateTime!
   updatedAt: DateTime!
-  voteAverage: Float!
   releaseDate: String!
+  voteAverage: Float
 }
 
 type EnrichedTVShow {
@@ -178,7 +178,7 @@ type Query {
   getTVShowSeasons(tvShowTMDBId: Int!): [TMDBFormattedTVSeason!]!
   getRecommendedTVShows: [TMDBSearchResult!]!
   getRecommendedMovies: [TMDBSearchResult!]!
-  discover(originLanguage: String, primaryReleaseYear: String, score: Float, genres: [Float!], entertainment: Entertainment = Movie): [TMDBSearchResult!]!
+  discover(originLanguage: String, primaryReleaseYear: String, score: Float, genres: [Float!], page: Float, entertainment: Entertainment = Movie): TMDBPaginatedResult!
   getLanguages: [TMDBLanguagesResult!]!
   getGenres: TMDBGenresResults!
   searchJackett(query: String!): [JackettFormattedResult!]!
@@ -189,6 +189,7 @@ type Query {
   getTVShows: [EnrichedTVShow!]!
   getMissingTVEpisodes: [EnrichedTVEpisode!]!
   getMissingMovies: [EnrichedMovie!]!
+  getTVSeasonDetails(seasonNumber: Int!, tvShowTMDBId: Int!): [EnrichedTVEpisode!]!
   omdbSearch(title: String!): OMDBInfo!
 }
 
@@ -255,6 +256,13 @@ type TMDBGenresResults {
 type TMDBLanguagesResult {
   code: String!
   language: String!
+}
+
+type TMDBPaginatedResult {
+  page: Float!
+  totalResults: Float!
+  totalPages: Float!
+  results: [TMDBSearchResult!]!
 }
 
 type TMDBSearchResult {

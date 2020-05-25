@@ -39,4 +39,44 @@ export const TVShowSeasonsModalComponentStyles = styled(MovieDetailsStyles)`
   .season-episodes-count {
     font-size: 0.9em;
   }
+
+  .seasons-details {
+    padding-top: 12px;
+
+    .season-title {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+
+      .season-number {
+        font-size: 1.25em;
+        font-weight: 600;
+        margin-right: 8px;
+      }
+
+      .season-year {
+        font-size: 1em;
+        font-weight: 300;
+      }
+
+      .season-toggle {
+        margin-right: 12px;
+        margin-top: 4px;
+      }
+    }
+
+    .ant-table {
+      color: #fff;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 4px;
+
+      tr :hover > td {
+        background: inherit;
+      }
+
+      tr > td {
+        border: none;
+      }
+    }
+  }
 `;

@@ -2,6 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import prettySize from 'prettysize';
 import { truncate, pick } from 'lodash';
+import { PureQueryOptions } from 'apollo-client';
 
 import { Table, Popover, Tag, notification } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
@@ -20,6 +21,7 @@ import {
 import { Media } from './manual-search.helpers';
 
 interface JackettResultTableProps {
+  refetchQueries?: PureQueryOptions[];
   results: JackettFormattedResult[];
   media: Media;
 }
@@ -71,8 +73,13 @@ export function JackettResultsTable(props: JackettResultTableProps) {
       title: <DownloadOutlined />,
       width: 35,
       render: (row: JackettFormattedResult) => (
-        // eslint-disable-next-line react/prop-types
-        <ManualDownloadMedia media={props.media} jackettResult={row} />
+        <ManualDownloadMedia
+          jackettResult={row}
+          // eslint-disable-next-line react/prop-types
+          media={props.media}
+          // eslint-disable-next-line react/prop-types
+          refetchQueries={props.refetchQueries || []}
+        />
       ),
     },
   ];
@@ -90,9 +97,11 @@ export function JackettResultsTable(props: JackettResultTableProps) {
 function ManualDownloadMedia({
   media,
   jackettResult,
+  refetchQueries,
 }: {
   media: Media;
   jackettResult: JackettFormattedResult;
+  refetchQueries: PureQueryOptions[];
 }) {
   const jackettInput = pick(jackettResult, [
     'title',
@@ -107,6 +116,7 @@ function ManualDownloadMedia({
       { query: GetLibraryMoviesDocument },
       { query: GetDownloadingDocument },
       { query: GetMissingDocument },
+      ...refetchQueries,
     ],
     onError: ({ message }) =>
       notification.error({
@@ -129,6 +139,7 @@ function ManualDownloadMedia({
       { query: GetLibraryTvShowsDocument },
       { query: GetDownloadingDocument },
       { query: GetMissingDocument },
+      ...refetchQueries,
     ],
     onError: ({ message }) =>
       notification.error({

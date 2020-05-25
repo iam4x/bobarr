@@ -5,7 +5,7 @@ Bobarr is a movies and tv shows collection manager for BitTorrent users. It uses
 
 ![Screenshot](./screenshot.png)
 
-**This is an early release!**
+**This is a beta release!**
 
 ## Why ?
 

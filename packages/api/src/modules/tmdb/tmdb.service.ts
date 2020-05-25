@@ -22,6 +22,7 @@ import {
   TMDBGenres,
   TMDBLanguage,
   GetDiscoverQueries,
+  TMDBPagination,
   Entertainment,
   TMDBRequestParams,
 } from './tmdb.dto';
@@ -206,6 +207,7 @@ export class TMDBService {
       originLanguage,
       score,
       genres,
+      page,
     } = args;
 
     const normalizedArgs = {
@@ -219,6 +221,7 @@ export class TMDBService {
       ...(Entertainment.TvShow && {
         first_air_date_year: Number(primaryReleaseYear),
       }),
+      page,
     };
 
     this.logger.info('finish discovery filter');
@@ -230,21 +233,35 @@ export class TMDBService {
   }
 
   private async discoverMovie(args: TMDBRequestParams) {
-    const { results } = await this.request<{ results: TMDBMovie[] }>(
+    const TMDBResults = await this.request<TMDBPagination<TMDBMovie[]>>(
       `/discover/movie`,
       args
     );
 
-    return results.map(this.mapMovie);
+    const { page, total_pages, total_results, results } = TMDBResults;
+
+    return {
+      page,
+      totalResults: total_results,
+      totalPages: total_pages,
+      results: results.map(this.mapMovie),
+    };
   }
 
   private async discoverTvShow(args: TMDBRequestParams) {
-    const { results } = await this.request<{ results: TMDBTVShow[] }>(
+    const TMDBResults = await this.request<TMDBPagination<TMDBTVShow[]>>(
       `/discover/tv`,
       args
     );
 
-    return results.map(this.mapTVShow);
+    const { page, total_pages, total_results, results } = TMDBResults;
+
+    return {
+      page,
+      totalResults: total_results,
+      totalPages: total_pages,
+      results: results.map(this.mapTVShow),
+    };
   }
 
   public async getLanguages() {
