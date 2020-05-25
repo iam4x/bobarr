@@ -241,7 +241,7 @@ export type Query = {
   getTVShowSeasons: Array<TmdbFormattedTvSeason>;
   getRecommendedTVShows: Array<TmdbSearchResult>;
   getRecommendedMovies: Array<TmdbSearchResult>;
-  discover: Array<TmdbSearchResult>;
+  discover: TmdbPaginatedResult;
   getLanguages: Array<TmdbLanguagesResult>;
   getGenres: TmdbGenresResults;
   searchJackett: Array<JackettFormattedResult>;
@@ -277,6 +277,7 @@ export type QueryDiscoverArgs = {
   primaryReleaseYear?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
   genres?: Maybe<Array<Scalars['Float']>>;
+  page?: Maybe<Scalars['Float']>;
   entertainment?: Maybe<Entertainment>;
 };
 
@@ -372,6 +373,14 @@ export type TmdbLanguagesResult = {
    __typename?: 'TMDBLanguagesResult';
   code: Scalars['String'];
   language: Scalars['String'];
+};
+
+export type TmdbPaginatedResult = {
+   __typename?: 'TMDBPaginatedResult';
+  page: Scalars['Float'];
+  totalResults: Scalars['Float'];
+  totalPages: Scalars['Float'];
+  results: Array<TmdbSearchResult>;
 };
 
 export type TmdbSearchResult = {
@@ -580,15 +589,20 @@ export type GetDiscoverQueryVariables = {
   primaryReleaseYear?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
   genres?: Maybe<Array<Scalars['Float']>>;
+  page?: Maybe<Scalars['Float']>;
 };
 
 
 export type GetDiscoverQuery = (
   { __typename?: 'Query' }
-  & { results: Array<(
-    { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate'>
-  )> }
+  & { TMDBResults: (
+    { __typename?: 'TMDBPaginatedResult' }
+    & Pick<TmdbPaginatedResult, 'page' | 'totalResults' | 'totalPages'>
+    & { results: Array<(
+      { __typename?: 'TMDBSearchResult' }
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate'>
+    )> }
+  ) }
 );
 
 export type GetDownloadingQueryVariables = {};
@@ -1228,16 +1242,21 @@ export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMu
 export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetDiscoverDocument = gql`
-    query getDiscover($entertainment: Entertainment, $originLanguage: String, $primaryReleaseYear: String, $score: Float, $genres: [Float!]) {
-  results: discover(entertainment: $entertainment, originLanguage: $originLanguage, primaryReleaseYear: $primaryReleaseYear, score: $score, genres: $genres) {
-    id
-    tmdbId
-    title
-    posterPath
-    overview
-    runtime
-    voteAverage
-    releaseDate
+    query getDiscover($entertainment: Entertainment, $originLanguage: String, $primaryReleaseYear: String, $score: Float, $genres: [Float!], $page: Float) {
+  TMDBResults: discover(entertainment: $entertainment, originLanguage: $originLanguage, primaryReleaseYear: $primaryReleaseYear, score: $score, genres: $genres, page: $page) {
+    page
+    totalResults
+    totalPages
+    results {
+      id
+      tmdbId
+      title
+      posterPath
+      overview
+      runtime
+      voteAverage
+      releaseDate
+    }
   }
 }
     `;
@@ -1259,6 +1278,7 @@ export const GetDiscoverDocument = gql`
  *      primaryReleaseYear: // value for 'primaryReleaseYear'
  *      score: // value for 'score'
  *      genres: // value for 'genres'
+ *      page: // value for 'page'
  *   },
  * });
  */

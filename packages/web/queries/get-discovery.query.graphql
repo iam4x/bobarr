@@ -4,14 +4,20 @@ query getDiscover(
   $primaryReleaseYear: String
   $score: Float
   $genres: [Float!]
+  $page: Float
 ) {
-  results: discover(
+  TMDBResults: discover(
     entertainment: $entertainment
     originLanguage: $originLanguage
     primaryReleaseYear: $primaryReleaseYear
     score: $score
     genres: $genres
+    page: $page
   ) {
+    page
+    totalResults
+    totalPages
+    results {
     id
     tmdbId
     title
@@ -20,5 +26,6 @@ query getDiscover(
     runtime
     voteAverage
     releaseDate
+    }
   }
 }
