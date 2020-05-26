@@ -22,6 +22,7 @@ import { Tag } from 'src/entities/tag.entity';
 import { JackettResult, JackettIndexer } from './jackett.dto';
 import { Entertainment } from '../tmdb/tmdb.dto';
 import { PromiseRaceAll } from 'src/utils/promise-resolve';
+import { JACKETT_RESPONSE_TIMEOUT } from 'src/config';
 
 @Injectable()
 export class JackettService {
@@ -164,7 +165,6 @@ export class JackettService {
   ) {
     const indexers = await this.getConfiguredIndexers();
     const noResultsError = 'NO_RESULTS';
-    const JACKETT_RESPONSE_TIMEOUT = opts.withoutFilter ? 30000 : 1200000; // 30 seconds : 2 minutes;
 
     try {
       const allIndexers = indexers.map((indexer) =>
@@ -173,7 +173,9 @@ export class JackettService {
 
       const resolvedIndexers = await PromiseRaceAll(
         allIndexers,
-        JACKETT_RESPONSE_TIMEOUT
+        opts.withoutFilter
+          ? JACKETT_RESPONSE_TIMEOUT.manual
+          : JACKETT_RESPONSE_TIMEOUT.automatic
       );
       const flattenIndexers = resolvedIndexers
         .filter((item) => Boolean(item))
