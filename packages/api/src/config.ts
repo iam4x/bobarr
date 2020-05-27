@@ -14,3 +14,8 @@ export const REDIS_CONFIG = {
   port: 6379,
   password: process.env.REDIS_PASSWORD,
 };
+
+export const JACKETT_RESPONSE_TIMEOUT = {
+  automatic: Number(process.env.JACKETT_AUTOMATIC_SEARCH_TIMEOUT),
+  manual: Number(process.env.JACKETT_MANUAL_SEARCH_TIMEOUT),
+};

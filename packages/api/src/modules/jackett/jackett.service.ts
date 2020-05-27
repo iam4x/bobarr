@@ -10,7 +10,6 @@ import { Logger } from 'winston';
 import { ParameterKey } from 'src/app.dto';
 import { formatNumber } from 'src/utils/format-number';
 import { sanitize } from 'src/utils/sanitize';
-import { firstOf } from 'src/utils/first-promise-resolve';
 
 import { ParamsService } from 'src/modules/params/params.service';
 import { LibraryService } from 'src/modules/library/library.service';
@@ -22,6 +21,8 @@ import { Tag } from 'src/entities/tag.entity';
 
 import { JackettResult, JackettIndexer } from './jackett.dto';
 import { Entertainment } from '../tmdb/tmdb.dto';
+import { PromiseRaceAll } from 'src/utils/promise-resolve';
+import { JACKETT_RESPONSE_TIMEOUT } from 'src/config';
 
 @Injectable()
 export class JackettService {
@@ -164,17 +165,29 @@ export class JackettService {
   ) {
     const indexers = await this.getConfiguredIndexers();
     const noResultsError = 'NO_RESULTS';
+
     try {
-      const results = await firstOf(
-        indexers.map((indexer) =>
-          this.searchIndexer({ ...opts, queries, indexer }).then((rows) =>
-            rows.length > 0
-              ? Promise.resolve(rows)
-              : Promise.reject(new Error(noResultsError))
-          )
-        )
+      const allIndexers = indexers.map((indexer) =>
+        this.searchIndexer({ ...opts, queries, indexer })
       );
-      return results;
+
+      const resolvedIndexers = await PromiseRaceAll(
+        allIndexers,
+        opts.withoutFilter
+          ? JACKETT_RESPONSE_TIMEOUT.manual
+          : JACKETT_RESPONSE_TIMEOUT.automatic
+      );
+      const flattenIndexers = resolvedIndexers
+        .filter((item) => Boolean(item))
+        ?.flat();
+
+      const sortedByBest = orderBy(
+        flattenIndexers,
+        ['tag.score', 'quality.score', 'seeders'],
+        ['desc', 'desc', 'desc']
+      );
+
+      return opts.withoutFilter ? sortedByBest : [sortedByBest[0]];
     } catch (error) {
       // return empty results array, let application continue it's lifecycle
       if (Array.isArray(error) && error[0].message === noResultsError) {
@@ -216,17 +229,21 @@ export class JackettService {
         query: normalizedQuery,
       });
 
-      const { data } = await this.request<{ Results: JackettResult[] }>(
-        '/results',
-        {
-          Query: normalizedQuery,
-          Category: [2000, 5000, 5070],
-          Tracker: indexer ? [indexer.id] : undefined,
-          _: Number(new Date()),
-        }
-      );
+      try {
+        const { data } = await this.request<{ Results: JackettResult[] }>(
+          '/results',
+          {
+            Query: normalizedQuery,
+            Category: [2000, 5000, 5070],
+            Tracker: indexer ? [indexer.id] : undefined,
+            _: Number(new Date()),
+          }
+        );
 
-      return data.Results;
+        return data.Results;
+      } catch (e) {
+        return [];
+      }
     });
 
     this.logger.info(`found ${rawResults.flat().length} potential results`);
@@ -254,11 +271,7 @@ export class JackettService {
 
     this.logger.info(`found ${results.length} downloadable results`);
 
-    return orderBy(
-      results,
-      ['tag.score', 'quality.score', 'seeders'],
-      ['desc', 'desc', 'desc']
-    );
+    return results;
   }
 
   private formatSearchResult = ({
