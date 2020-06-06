@@ -22,7 +22,7 @@
     "@nestjs/terminus": "^7.0.1",
     "@nestjs/typeorm": "^7.0.0",
     "add": "^2.0.6",
-    "apollo-server-express": "^2.11.0",
+    "apollo-server-express": "^2.14.2",
     "axios": "~0.18.1",
     "bull": "^3.13.0",
     "bull-board": "^0.7.0",
