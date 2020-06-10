@@ -12,6 +12,7 @@ import { TMDBModule } from 'src/modules/tmdb/tmdb.module';
 import { JobsModule } from 'src/modules/jobs/jobs.module';
 import { TransmissionModule } from 'src/modules/transmission/transmission.module';
 import { RedisModule } from 'src/modules/redis/redis.module';
+import { ParamsModule } from 'src/modules/params/params.module';
 
 import { LibraryResolver } from './library.resolver';
 import { LibraryService } from './library.service';
@@ -29,6 +30,7 @@ import { LibraryService } from './library.service';
     TMDBModule,
     TransmissionModule,
     RedisModule,
+    ParamsModule,
     forwardRef(() => JobsModule),
   ],
   providers: [LibraryResolver, LibraryService],

@@ -21,13 +21,17 @@ import { TVShowDAO } from 'src/entities/dao/tvshow.dao';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 import { MediaViewDAO } from 'src/entities/dao/media-view.dao';
+import { TVShow } from 'src/entities/tvshow.entity';
+import { TVSeason } from 'src/entities/tvseason.entity';
+import { TVEpisode } from 'src/entities/tvepisode.entity';
+import { ParameterDAO } from 'src/entities/dao/parameter.dao';
+import { QualityDAO } from 'src/entities/dao/quality.dao';
+import { TagDAO } from 'src/entities/dao/tag.dao';
 
 import { TMDBService } from 'src/modules/tmdb/tmdb.service';
 import { JobsService } from 'src/modules/jobs/jobs.service';
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
-import { TVShow } from 'src/entities/tvshow.entity';
-import { TVSeason } from 'src/entities/tvseason.entity';
-import { TVEpisode } from 'src/entities/tvepisode.entity';
+import { ParamsService } from 'src/modules/params/params.service';
 
 import { JackettInput } from './library.dto';
 
@@ -39,11 +43,11 @@ export class LibraryService {
     private readonly movieDAO: MovieDAO,
     private readonly tvShowDAO: TVShowDAO,
     private readonly tvEpisodeDAO: TVEpisodeDAO,
-    private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tmdbService: TMDBService,
     private readonly jobsService: JobsService,
     private readonly transmissionService: TransmissionService,
-    private readonly mediaViewDAO: MediaViewDAO
+    private readonly mediaViewDAO: MediaViewDAO,
+    private readonly paramsService: ParamsService
   ) {
     this.logger = logger.child({ context: 'LibraryService' });
 
@@ -486,6 +490,43 @@ export class LibraryService {
       .orderBy('episode.episodeNumber')
       .getMany();
     return map(episodes, this.enrichTVEpisode);
+  }
+
+  @LazyTransaction()
+  public async reset(
+    {
+      deleteFiles = false,
+      resetSettings = false,
+    }: { deleteFiles: boolean; resetSettings: boolean },
+    @TransactionManager() manager: EntityManager | null
+  ) {
+    this.logger.info('start reset library', { deleteFiles, resetSettings });
+
+    await manager!.getCustomRepository(MovieDAO).delete({});
+    await manager!.getCustomRepository(TVShowDAO).delete({});
+    await manager!.getCustomRepository(TVSeasonDAO).delete({});
+    await manager!.getCustomRepository(TVEpisodeDAO).delete({});
+
+    if (deleteFiles) {
+      await forEachSeries(
+        await manager!.getCustomRepository(TorrentDAO).find(),
+        (torrent) =>
+          this.transmissionService.removeTorrentAndFiles(torrent.torrentHash)
+      );
+      await manager!.getCustomRepository(TorrentDAO).delete({});
+    }
+
+    if (resetSettings) {
+      await manager!.getCustomRepository(ParameterDAO).delete({});
+      await manager!.getCustomRepository(QualityDAO).delete({});
+      await manager!.getCustomRepository(TagDAO).delete({});
+      await this.paramsService.initializeParamsStore(manager);
+      await this.paramsService.initializeQuality(manager);
+    }
+
+    this.jobsService.startScanLibrary();
+
+    this.logger.info('finish reset library', { deleteFiles, resetSettings });
   }
 
   private enrichMovie = async (movie: Movie) => {

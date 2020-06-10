@@ -11,14 +11,16 @@ import {
 } from 'typeorm';
 
 import { ParameterKey } from 'src/app.dto';
+import { LazyTransaction } from 'src/utils/lazy-transaction';
+
+import { Entertainment } from 'src/modules/tmdb/tmdb.dto';
 
 import { ParameterDAO } from 'src/entities/dao/parameter.dao';
 import { QualityDAO } from 'src/entities/dao/quality.dao';
 import { TagDAO } from 'src/entities/dao/tag.dao';
+import { Quality } from 'src/entities/quality.entity';
 
 import { TagInput } from './params.dto';
-import { Quality } from 'src/entities/quality.entity';
-import { Entertainment } from '../tmdb/tmdb.dto';
 
 @Injectable()
 export class ParamsService {
@@ -27,11 +29,14 @@ export class ParamsService {
     private readonly qualityDAO: QualityDAO,
     private readonly tagDAO: TagDAO
   ) {
-    this.initializeParamsStore();
-    this.initializeQuality();
+    this.initializeParamsStore(null);
+    this.initializeQuality(null);
   }
 
-  private async initializeParamsStore() {
+  @LazyTransaction()
+  public async initializeParamsStore(
+    @TransactionManager() manager: EntityManager | null
+  ) {
     const defaultParams: Array<[ParameterKey, string]> = [
       [ParameterKey.LANGUAGE, 'en'],
       [ParameterKey.REGION, 'US'],
@@ -42,11 +47,15 @@ export class ParamsService {
     ];
 
     await map(defaultParams, ([key, value]) =>
-      this.parameterDAO.findOrCreate({ key, value })
+      manager!.getCustomRepository(ParameterDAO).findOrCreate({ key, value })
     );
   }
 
-  private async initializeQuality() {
+  @LazyTransaction()
+  public async initializeQuality(
+    @TransactionManager() manager: EntityManager | null
+  ) {
+    const qualityDAO = manager!.getCustomRepository(QualityDAO);
     const defaultQualities: Array<Omit<
       Quality,
       'id' | 'createdAt' | 'updatedAt'
@@ -102,12 +111,12 @@ export class ParamsService {
     ];
 
     await map(defaultQualities, async (quality) => {
-      const match = await this.qualityDAO.findOne({
+      const match = await qualityDAO.findOne({
         where: { name: quality.name, type: quality.type },
       });
 
       if (!match) {
-        await this.qualityDAO.save(quality);
+        await qualityDAO.save(quality);
       }
     });
   }

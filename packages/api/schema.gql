@@ -139,6 +139,7 @@ type Mutation {
   removeMovie(tmdbId: Int!): GraphQLCommonResponse!
   trackTVShow(seasonNumbers: [Int!]!, tmdbId: Int!): TVShow!
   removeTVShow(tmdbId: Int!): GraphQLCommonResponse!
+  resetLibrary(resetSettings: Boolean!, deleteFiles: Boolean!): GraphQLCommonResponse!
 }
 
 type OMDBInfo {
