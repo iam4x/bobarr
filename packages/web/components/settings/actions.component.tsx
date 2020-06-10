@@ -1,10 +1,11 @@
 import React from 'react';
-import { Button, Card, notification } from 'antd';
+import { Button, Card, notification, Modal, Checkbox, Alert } from 'antd';
 
 import {
   useStartScanLibraryMutation,
   useStartFindNewEpisodesMutation,
   useStartDownloadMissingMutation,
+  useResetLibraryMutation,
 } from '../../utils/graphql';
 
 export function ActionsComponents() {
@@ -37,6 +38,51 @@ export function ActionsComponents() {
       }),
   });
 
+  const [resetLibrary] = useResetLibraryMutation({
+    onCompleted: () => {
+      Modal.info({
+        title: 'Reset succesfull!',
+        content: 'The page will now reload',
+        onOk: () => window.location.reload(),
+      });
+    },
+  });
+
+  function handleResetClick() {
+    const mutableState = { deleteFiles: false, resetSettings: false };
+    Modal.confirm({
+      title: '⚠️ Warning',
+      content: (
+        <>
+          <Alert
+            type="warning"
+            message="This will remove everything from bobarr database and it will re-scan your library folder."
+            style={{ marginBottom: 24 }}
+          />
+          <div>
+            <Checkbox
+              onChange={({ target: { checked } }) =>
+                (mutableState.deleteFiles = checked)
+              }
+            >
+              Delete files downloaded with bobarr
+            </Checkbox>
+          </div>
+          <div>
+            <Checkbox
+              onChange={({ target: { checked } }) =>
+                (mutableState.resetSettings = checked)
+              }
+            >
+              Reset settings
+            </Checkbox>
+          </div>
+        </>
+      ),
+      onOk: () => resetLibrary({ variables: mutableState }),
+    });
+  }
+
   return (
     <Card title="Actions" className="actions">
       <Button
@@ -62,6 +108,9 @@ export function ActionsComponents() {
         loading={loading1 || loading2 || loading3}
       >
         Download missing files
+      </Button>
+      <Button size="large" type="danger" onClick={handleResetClick}>
+        Reset bobarr
       </Button>
     </Card>
   );

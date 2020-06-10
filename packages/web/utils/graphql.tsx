@@ -149,6 +149,7 @@ export type Mutation = {
   removeMovie: GraphQlCommonResponse;
   trackTVShow: TvShow;
   removeTVShow: GraphQlCommonResponse;
+  resetLibrary: GraphQlCommonResponse;
 };
 
 
@@ -198,6 +199,12 @@ export type MutationTrackTvShowArgs = {
 
 export type MutationRemoveTvShowArgs = {
   tmdbId: Scalars['Int'];
+};
+
+
+export type MutationResetLibraryArgs = {
+  resetSettings: Scalars['Boolean'];
+  deleteFiles: Scalars['Boolean'];
 };
 
 export type OmdbInfo = {
@@ -509,6 +516,20 @@ export type RemoveTvShowMutationVariables = {
 
 
 export type RemoveTvShowMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
+export type ResetLibraryMutationVariables = {
+  deleteFiles: Scalars['Boolean'];
+  resetSettings: Scalars['Boolean'];
+};
+
+
+export type ResetLibraryMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
@@ -1076,6 +1097,40 @@ export function useRemoveTvShowMutation(baseOptions?: ApolloReactHooks.MutationH
 export type RemoveTvShowMutationHookResult = ReturnType<typeof useRemoveTvShowMutation>;
 export type RemoveTvShowMutationResult = ApolloReactCommon.MutationResult<RemoveTvShowMutation>;
 export type RemoveTvShowMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveTvShowMutation, RemoveTvShowMutationVariables>;
+export const ResetLibraryDocument = gql`
+    mutation resetLibrary($deleteFiles: Boolean!, $resetSettings: Boolean!) {
+  result: resetLibrary(deleteFiles: $deleteFiles, resetSettings: $resetSettings) {
+    success
+    message
+  }
+}
+    `;
+export type ResetLibraryMutationFn = ApolloReactCommon.MutationFunction<ResetLibraryMutation, ResetLibraryMutationVariables>;
+
+/**
+ * __useResetLibraryMutation__
+ *
+ * To run a mutation, you first call `useResetLibraryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useResetLibraryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [resetLibraryMutation, { data, loading, error }] = useResetLibraryMutation({
+ *   variables: {
+ *      deleteFiles: // value for 'deleteFiles'
+ *      resetSettings: // value for 'resetSettings'
+ *   },
+ * });
+ */
+export function useResetLibraryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ResetLibraryMutation, ResetLibraryMutationVariables>) {
+        return ApolloReactHooks.useMutation<ResetLibraryMutation, ResetLibraryMutationVariables>(ResetLibraryDocument, baseOptions);
+      }
+export type ResetLibraryMutationHookResult = ReturnType<typeof useResetLibraryMutation>;
+export type ResetLibraryMutationResult = ApolloReactCommon.MutationResult<ResetLibraryMutation>;
+export type ResetLibraryMutationOptions = ApolloReactCommon.BaseMutationOptions<ResetLibraryMutation, ResetLibraryMutationVariables>;
 export const SaveQualityDocument = gql`
     mutation saveQuality($qualities: [QualityInput!]!) {
   result: saveQualityParams(qualities: $qualities) {

@@ -128,4 +128,13 @@ export class LibraryResolver {
     await this.libraryService.removeTVShow(tmdbId);
     return { success: true, message: 'TVSHOW_REMOVED_FROM_LIBRARY' };
   }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
+  public async resetLibrary(
+    @Args('deleteFiles') deleteFiles: boolean,
+    @Args('resetSettings') resetSettings: boolean
+  ) {
+    await this.libraryService.reset({ deleteFiles, resetSettings }, null);
+    return { success: true, message: 'LIBRARY_RESET' };
+  }
 }
