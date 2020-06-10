@@ -7,6 +7,8 @@ Bobarr is a movies and tv shows collection manager for BitTorrent users. It uses
 
 **This is a beta release!**
 
+### Need help? Join the discord => https://discord.gg/PFwM4zk
+
 ## Why ?
 
 One of the main idea for bobarr is to be simple to setup, simple to use and having everything at the same place.
