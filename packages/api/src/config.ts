@@ -19,3 +19,8 @@ export const JACKETT_RESPONSE_TIMEOUT = {
   automatic: Number(process.env.JACKETT_AUTOMATIC_SEARCH_TIMEOUT),
   manual: Number(process.env.JACKETT_MANUAL_SEARCH_TIMEOUT),
 };
+
+export const LIBRARY_CONFIG = {
+  moviesFolderName: process.env.LIBRARY_MOVIES_FOLDER_NAME,
+  tvShowsFolderName: process.env.LIBRARY_TV_SHOWS_FOLDER_NAME,
+};

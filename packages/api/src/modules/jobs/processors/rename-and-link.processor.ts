@@ -9,6 +9,8 @@ import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
+import { LIBRARY_CONFIG } from 'src/config';
+
 import {
   JobsQueue,
   FileType,
@@ -64,7 +66,7 @@ export class RenameAndLinkProcessor {
 
     const newFolder = path.resolve(
       __dirname,
-      '../../../../../../library/movies/',
+      `../../../../../../library/${LIBRARY_CONFIG.moviesFolderName}/`,
       folderName
     );
 
@@ -111,7 +113,7 @@ export class RenameAndLinkProcessor {
     const seasonNb = formatNumber(episode.season.seasonNumber);
     const seasonFolder = path.resolve(
       __dirname,
-      '../../../../../../library/tvshows/',
+      `../../../../../../library/${LIBRARY_CONFIG.tvShowsFolderName}/`,
       tvShow.title,
       `Season ${seasonNb}`
     );
@@ -173,7 +175,7 @@ export class RenameAndLinkProcessor {
     const seasonNb = formatNumber(season.seasonNumber);
     const seasonFolder = path.resolve(
       __dirname,
-      '../../../../../../library/tvshows/',
+      `../../../../../../library/${LIBRARY_CONFIG.tvShowsFolderName}/`,
       tvShow.title,
       `Season ${seasonNb}`
     );

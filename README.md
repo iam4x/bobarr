@@ -82,6 +82,13 @@ If you were using radarr or sonarr already you may have a tvshow or movies folde
 
 The only requirement is to have a folder `tvshows` and a folder `movies` then bobarr can catch up and download to your user defined library folder.
 
+If your movies or tvshow folder have a different name, you can edit `.env` file with your folder names:
+
+```
+LIBRARY_MOVIES_FOLDER_NAME=movies
+LIBRARY_TV_SHOWS_FOLDER_NAME=tvshows
+```
+
 You can now head to http://localhost:3000 and hit that "Scan library folder" button.
 
 ## How to update

@@ -10,6 +10,8 @@ import { forEachSeries, map } from 'p-iteration';
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
 import { isPlainObject, times, orderBy } from 'lodash';
 
+import { LIBRARY_CONFIG } from 'src/config';
+
 import {
   JobsQueue,
   DownloadableMediaState,
@@ -108,7 +110,7 @@ export class ScanLibraryProcessor {
     const tvSeasonDAO = manager!.getCustomRepository(TVSeasonDAO);
     const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
 
-    const root = '/usr/library/tvshows';
+    const root = `/usr/library/${LIBRARY_CONFIG.tvShowsFolderName}`;
     const tvshows = (await fs.readdir(root, { withFileTypes: true }))
       .filter((dirent) => dirent.isDirectory())
       .map((dirent) => dirent.name);
@@ -227,7 +229,9 @@ export class ScanLibraryProcessor {
     this.logger.info('start scan movies folder');
     const movieDAO = manager!.getCustomRepository(MovieDAO);
 
-    const { tree } = await this.scanDirectoryTree('/usr/library/movies');
+    const { tree } = await this.scanDirectoryTree(
+      `/usr/library/${LIBRARY_CONFIG.moviesFolderName}`
+    );
     const movies = Object.entries(tree)
       .filter(([, value]) => typeof value === 'object')
       .map(([key]) => key);
