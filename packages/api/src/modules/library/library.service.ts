@@ -9,6 +9,8 @@ import path from 'path';
 
 import { DeepPartial, TransactionManager, EntityManager, Any } from 'typeorm';
 
+import { LIBRARY_CONFIG } from 'src/config';
+
 import { FileType, DownloadableMediaState } from 'src/app.dto';
 import { LazyTransaction } from 'src/utils/lazy-transaction';
 
@@ -165,7 +167,7 @@ export class LibraryService {
     const folderName = `${movie.title} (${year})`;
     const folderPath = path.resolve(
       __dirname,
-      '../../../../../library/movies',
+      `../../../../../library/${LIBRARY_CONFIG.moviesFolderName}`,
       folderName
     );
 
@@ -232,7 +234,7 @@ export class LibraryService {
     const enTVShow = await this.getTVShow(tvShow.id, { language: 'en' });
     const tvShowFolder = path.resolve(
       __dirname,
-      '../../../../../library/tvshows/',
+      `../../../../../library/${LIBRARY_CONFIG.tvShowsFolderName}/`,
       enTVShow.title
     );
 
