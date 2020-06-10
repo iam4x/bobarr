@@ -108,7 +108,12 @@ export function DiscoverComponent() {
                             ?.map((res) => (
                               <TMDBCardComponent
                                 key={res.id}
-                                type={Entertainment.Movie ? 'movie' : 'tvshow'}
+                                type={
+                                  filterParams.entertainment ===
+                                  Entertainment.Movie
+                                    ? 'movie'
+                                    : 'tvshow'
+                                }
                                 result={res}
                               />
                             ))}
