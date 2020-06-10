@@ -65,7 +65,7 @@ export function ActionsComponents() {
                 (mutableState.deleteFiles = checked)
               }
             >
-              Delete files downloaded with bobarr
+              Delete files downloaded from disk with bobarr (permanent)
             </Checkbox>
           </div>
           <div>
@@ -80,6 +80,7 @@ export function ActionsComponents() {
         </>
       ),
       onOk: () => resetLibrary({ variables: mutableState }),
+      width: 480,
     });
   }
 
