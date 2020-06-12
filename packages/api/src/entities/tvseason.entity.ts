@@ -29,6 +29,9 @@ export class TVSeason {
   @Column('varchar', { default: DownloadableMediaState.SEARCHING })
   public state: DownloadableMediaState = DownloadableMediaState.SEARCHING;
 
+  @Column('int')
+  public tvShowId!: number;
+
   @ManyToOne((_type) => TVShow, (tvshow) => tvshow.seasons, {
     nullable: false,
     onDelete: 'CASCADE',

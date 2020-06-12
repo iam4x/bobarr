@@ -3,12 +3,12 @@ import { EntityRepository, Repository } from 'typeorm';
 import { DownloadableMediaState } from 'src/app.dto';
 
 import { TVEpisode } from '../tvepisode.entity';
-import { TVShow } from '../tvshow.entity';
 
 @EntityRepository(TVEpisode)
 export class TVEpisodeDAO extends Repository<TVEpisode> {
   public async findOrCreate(episodeAttributes: {
-    tvShow: TVShow;
+    seasonId: number;
+    tvShowId: number;
     episodeNumber: number;
     seasonNumber: number;
   }) {

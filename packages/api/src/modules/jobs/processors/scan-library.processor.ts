@@ -185,18 +185,19 @@ export class ScanLibraryProcessor {
         this.logger.info('start processing season', { seasonNumber });
 
         const tvSeason = await tvSeasonDAO.findOrCreate({
-          tvShow,
+          tvShowId: tvShow.id,
           seasonNumber,
         });
 
-        await map(episodes, async (episodeNumber) => {
+        await forEachSeries(episodes, async (episodeNumber) => {
           this.logger.info(`start processing episode`, {
             season: seasonNumber,
             episode: episodeNumber,
           });
 
           const episode = await tvEpisodeDAO.findOrCreate({
-            tvShow,
+            tvShowId: tvShow.id,
+            seasonId: tvSeason.id,
             episodeNumber,
             seasonNumber,
           });
