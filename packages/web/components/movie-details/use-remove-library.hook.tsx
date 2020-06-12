@@ -37,10 +37,11 @@ export function useRemoveLibrary({
   const handleClick = () =>
     Modal.confirm({
       title: <strong>{result.title}</strong>,
-      content: `Remove from library and delete files ?`,
+      content: `Remove from library and delete files?`,
       centered: true,
       okText: 'Yes',
       cancelText: 'No',
+      okType: 'danger',
       onOk: () => removeMovie({ variables: { tmdbId: result.tmdbId } }),
     });
 

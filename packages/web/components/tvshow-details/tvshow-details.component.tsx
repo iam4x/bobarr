@@ -177,9 +177,11 @@ export function TVShowSeasonsModalComponent(
                         ? undefined
                         : () =>
                             Modal.confirm({
-                              title: 'Are you sure?',
+                              title: <strong>{tvShow.title}</strong>,
+                              content: `Remove from library and delete files?`,
                               centered: true,
                               okText: 'Yes',
+                              cancelText: 'No',
                               okType: 'danger',
                               onOk: () =>
                                 removeTVShow({
