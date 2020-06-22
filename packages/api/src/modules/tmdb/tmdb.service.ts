@@ -27,14 +27,20 @@ import {
   TMDBRequestParams,
 } from './tmdb.dto';
 
+import { CacheMethod } from '../redis/cache.interceptor';
+import { CacheKeys } from '../redis/cache.dto';
+import { RedisService } from '../redis/redis.service';
+
 @Injectable()
 export class TMDBService {
+  // eslint-disable-next-line max-params
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private readonly paramsService: ParamsService,
     private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tvShowDAO: TVShowDAO,
-    private readonly movieDAO: MovieDAO
+    private readonly movieDAO: MovieDAO,
+    private readonly redisService: RedisService // required for @CacheMethod
   ) {
     this.logger = logger.child({ context: 'TMDBService' });
   }
@@ -53,14 +59,26 @@ export class TMDBService {
       .then(({ data }) => data);
   }
 
+  @CacheMethod({
+    key: CacheKeys.TMDB_GET_MOVIE,
+    ttl: 6.048e8, // seven days
+  })
   public getMovie(movieTMDBId: number) {
     return this.request<TMDBMovie>(`/movie/${movieTMDBId}`);
   }
 
+  @CacheMethod({
+    key: CacheKeys.TMDB_GET_TV_SHOW,
+    ttl: 6.048e8, // seven days
+  })
   public getTVShow(tvShowTMDBId: number, params?: { language: string }) {
     return this.request<TMDBTVShow>(`/tv/${tvShowTMDBId}`, params);
   }
 
+  @CacheMethod({
+    key: CacheKeys.TMDB_GET_ENGLISH_TV_SHOW_NAME,
+    ttl: 6.048e8, // seven days
+  })
   public async getEnglishTVShowName(tvShowTMDBId: number) {
     const { name } = await this.request<TMDBTVShow>(`/tv/${tvShowTMDBId}`, {
       language: 'en',
@@ -68,6 +86,10 @@ export class TMDBService {
     return name;
   }
 
+  @CacheMethod({
+    key: CacheKeys.TMBDB_GET_TV_EPISODE,
+    ttl: 6.048e8, // seven days
+  })
   public getTVEpisode(
     tvShowTMDBId: number,
     seasonNumber: number,
@@ -78,6 +100,10 @@ export class TMDBService {
     );
   }
 
+  @CacheMethod({
+    key: CacheKeys.TMDB_GET_TV_SHOW_SEASONS,
+    ttl: 6.048e8, // seven days
+  })
   public async getTVShowSeasons(tvShowTMDBId: number) {
     const tvShow = await this.getTVShow(tvShowTMDBId);
     return map(tvShow.seasons, async (season) =>
@@ -143,7 +169,6 @@ export class TMDBService {
 
     return { movies, tvShows };
   }
-
   public async getRecommended(type: 'tvshow' | 'movie') {
     this.logger.info(`start get recommended ${type}s`);
 

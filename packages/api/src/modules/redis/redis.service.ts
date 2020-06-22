@@ -4,7 +4,7 @@ import { forEach } from 'p-iteration';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
-import { REDIS_CONFIG } from 'src/config';
+import { REDIS_CONFIG, DEBUG_REDIS } from 'src/config';
 import { CacheKeys } from './cache.dto';
 
 @Injectable()
@@ -25,24 +25,24 @@ export class RedisService {
   }
 
   private clearCache() {
-    this.logger.info('clear cache');
+    if (DEBUG_REDIS) this.logger.info('clear cache');
     return forEach(Object.entries(CacheKeys), ([, value]) =>
       this.deleteKeysPattern(value)
     );
   }
 
   public get(key: string) {
-    this.logger.info('get key', { key });
+    if (DEBUG_REDIS) this.logger.info('get key', { key });
     return this.client.get(key);
   }
 
   public set(key: string, data: string, ttl: number) {
-    this.logger.info('set key', { key });
+    if (DEBUG_REDIS) this.logger.info('set key', { key });
     return this.client.set(key, data, 'PX', ttl);
   }
 
   public async deleteKeysPattern(key: CacheKeys) {
-    this.logger.info('delete key', { key });
+    if (DEBUG_REDIS) this.logger.info('delete key', { key });
     const keys = await this.client.keys(`${key}*`);
     await Promise.all(keys.map((_) => this.client.del(_)));
   }

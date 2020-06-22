@@ -9,6 +9,7 @@ export const DB_CONFIG = {
   synchronize: true,
 };
 
+export const DEBUG_REDIS = process.env.DEBUG_REDIS || false;
 export const REDIS_CONFIG = {
   host: 'redis',
   port: 6379,
