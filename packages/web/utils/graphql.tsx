@@ -145,6 +145,7 @@ export type Mutation = {
    __typename?: 'Mutation';
   saveQualityParams: GraphQlCommonResponse;
   saveTags: GraphQlCommonResponse;
+  clearRedisCache: GraphQlCommonResponse;
   updateParams: GraphQlCommonResponse;
   startScanLibraryJob: GraphQlCommonResponse;
   startFindNewEpisodesJob: GraphQlCommonResponse;
@@ -442,6 +443,17 @@ export type UpdateParamsInput = {
   key: Scalars['String'];
   value: Scalars['String'];
 };
+
+export type ClearCacheMutationVariables = {};
+
+
+export type ClearCacheMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
 
 export type StartScanLibraryMutationVariables = {};
 
@@ -895,6 +907,38 @@ export type SearchQuery = (
 );
 
 
+export const ClearCacheDocument = gql`
+    mutation clearCache {
+  result: clearRedisCache {
+    success
+    message
+  }
+}
+    `;
+export type ClearCacheMutationFn = ApolloReactCommon.MutationFunction<ClearCacheMutation, ClearCacheMutationVariables>;
+
+/**
+ * __useClearCacheMutation__
+ *
+ * To run a mutation, you first call `useClearCacheMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useClearCacheMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [clearCacheMutation, { data, loading, error }] = useClearCacheMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useClearCacheMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ClearCacheMutation, ClearCacheMutationVariables>) {
+        return ApolloReactHooks.useMutation<ClearCacheMutation, ClearCacheMutationVariables>(ClearCacheDocument, baseOptions);
+      }
+export type ClearCacheMutationHookResult = ReturnType<typeof useClearCacheMutation>;
+export type ClearCacheMutationResult = ApolloReactCommon.MutationResult<ClearCacheMutation>;
+export type ClearCacheMutationOptions = ApolloReactCommon.BaseMutationOptions<ClearCacheMutation, ClearCacheMutationVariables>;
 export const StartScanLibraryDocument = gql`
     mutation startScanLibrary {
   result: startScanLibraryJob {

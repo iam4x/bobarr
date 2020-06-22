@@ -19,12 +19,9 @@ export class RedisService {
       port: REDIS_CONFIG.port,
       password: REDIS_CONFIG.password,
     });
-
-    // clear cache when api starts
-    this.clearCache();
   }
 
-  private clearCache() {
+  public clearCache() {
     if (DEBUG_REDIS) this.logger.info('clear cache');
     return forEach(Object.entries(CacheKeys), ([, value]) =>
       this.deleteKeysPattern(value)

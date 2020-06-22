@@ -134,6 +134,7 @@ type Movie {
 type Mutation {
   saveQualityParams(qualities: [QualityInput!]!): GraphQLCommonResponse!
   saveTags(tags: [TagInput!]!): GraphQLCommonResponse!
+  clearRedisCache: GraphQLCommonResponse!
   updateParams(params: [UpdateParamsInput!]!): GraphQLCommonResponse!
   startScanLibraryJob: GraphQLCommonResponse!
   startFindNewEpisodesJob: GraphQLCommonResponse!
