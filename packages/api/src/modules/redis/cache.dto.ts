@@ -1,4 +1,5 @@
 export enum CacheKeys {
+  CALENDAR = 'calendar',
   RECOMMENDED_TV_SHOWS = 'recommended_tv_shows',
   RECOMMENDED_MOVIES = 'recommended_movies',
   TMDB_GET_MOVIE = 'tmdb_get_movie',

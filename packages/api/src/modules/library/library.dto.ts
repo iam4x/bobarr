@@ -57,3 +57,10 @@ export class JackettInput {
   @Field() public quality!: string;
   @Field() public tag!: string;
 }
+
+@ObjectType()
+export class LibraryCalendar {
+  @Field((_type) => [EnrichedMovie]) public movies!: EnrichedMovie[];
+  @Field((_type) => [EnrichedTVEpisode])
+  public tvEpisodes!: EnrichedTVEpisode[];
+}

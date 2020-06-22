@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
-import { map, forEachSeries, forEach, reduce } from 'p-iteration';
+import { map, forEachSeries, forEach, reduce, mapSeries } from 'p-iteration';
 import { times } from 'lodash';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
@@ -143,6 +143,20 @@ export class LibraryService {
       where: { state: DownloadableMediaState.MISSING },
     });
     return rows.map(this.enrichMovie);
+  }
+
+  public async calendar() {
+    const movies = await mapSeries(
+      await this.movieDAO.find(),
+      this.enrichMovie
+    );
+
+    const tvEpisodes = await mapSeries(
+      await this.tvEpisodeDAO.find({ relations: ['tvShow'] }),
+      this.enrichTVEpisode
+    );
+
+    return { movies, tvEpisodes };
   }
 
   @LazyTransaction()

@@ -12,6 +12,7 @@ const links = [
   ['Search', '/search'],
   ['Discover', '/discover'],
   ['Suggestions', '/suggestions'],
+  ['Calendar', '/calendar'],
   ['Settings', '/settings'],
 ];
 

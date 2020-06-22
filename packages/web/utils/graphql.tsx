@@ -125,6 +125,12 @@ export type JackettInput = {
   tag: Scalars['String'];
 };
 
+export type LibraryCalendar = {
+   __typename?: 'LibraryCalendar';
+  movies: Array<EnrichedMovie>;
+  tvEpisodes: Array<EnrichedTvEpisode>;
+};
+
 export type Movie = {
    __typename?: 'Movie';
   id: Scalars['Float'];
@@ -260,6 +266,7 @@ export type Query = {
   getMissingTVEpisodes: Array<EnrichedTvEpisode>;
   getMissingMovies: Array<EnrichedMovie>;
   getTVSeasonDetails: Array<EnrichedTvEpisode>;
+  getCalendar: LibraryCalendar;
   omdbSearch: OmdbInfo;
 };
 
@@ -601,6 +608,27 @@ export type UpdateParamsMutation = (
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
     & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
+export type GetCalendarQueryVariables = {};
+
+
+export type GetCalendarQuery = (
+  { __typename?: 'Query' }
+  & { calendar: (
+    { __typename?: 'LibraryCalendar' }
+    & { movies: Array<(
+      { __typename?: 'EnrichedMovie' }
+      & Pick<EnrichedMovie, 'id' | 'title' | 'state' | 'releaseDate'>
+    )>, tvEpisodes: Array<(
+      { __typename?: 'EnrichedTVEpisode' }
+      & Pick<EnrichedTvEpisode, 'id' | 'episodeNumber' | 'seasonNumber' | 'state' | 'releaseDate'>
+      & { tvShow: (
+        { __typename?: 'TVShow' }
+        & Pick<TvShow, 'id' | 'title'>
+      ) }
+    )> }
   ) }
 );
 
@@ -1296,6 +1324,54 @@ export function useUpdateParamsMutation(baseOptions?: ApolloReactHooks.MutationH
 export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMutation>;
 export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
 export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
+export const GetCalendarDocument = gql`
+    query getCalendar {
+  calendar: getCalendar {
+    movies {
+      id
+      title
+      state
+      releaseDate
+    }
+    tvEpisodes {
+      id
+      tvShow {
+        id
+        title
+      }
+      episodeNumber
+      seasonNumber
+      state
+      releaseDate
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCalendarQuery__
+ *
+ * To run a query within a React component, call `useGetCalendarQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCalendarQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCalendarQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCalendarQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetCalendarQuery, GetCalendarQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetCalendarQuery, GetCalendarQueryVariables>(GetCalendarDocument, baseOptions);
+      }
+export function useGetCalendarLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetCalendarQuery, GetCalendarQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetCalendarQuery, GetCalendarQueryVariables>(GetCalendarDocument, baseOptions);
+        }
+export type GetCalendarQueryHookResult = ReturnType<typeof useGetCalendarQuery>;
+export type GetCalendarLazyQueryHookResult = ReturnType<typeof useGetCalendarLazyQuery>;
+export type GetCalendarQueryResult = ApolloReactCommon.QueryResult<GetCalendarQuery, GetCalendarQueryVariables>;
 export const GetDiscoverDocument = gql`
     query getDiscover($entertainment: Entertainment, $originLanguage: String, $primaryReleaseYear: String, $score: Float, $genres: [Float!], $page: Float) {
   TMDBResults: discover(entertainment: $entertainment, originLanguage: $originLanguage, primaryReleaseYear: $primaryReleaseYear, score: $score, genres: $genres, page: $page) {
