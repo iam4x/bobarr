@@ -87,7 +87,7 @@ export class TMDBService {
   }
 
   @CacheMethod({
-    key: CacheKeys.TMBDB_GET_TV_EPISODE,
+    key: CacheKeys.TMDB_GET_TV_EPISODE,
     ttl: 6.048e8, // seven days
   })
   public getTVEpisode(
@@ -185,7 +185,7 @@ export class TMDBService {
     const allSimilars = await reduce<any, any[]>(
       entities,
       async (results, entity) => {
-        const data = await this.request<{
+        const data = await this.cachedRecommendationsRequest<{
           results: Array<TMDBTVShow | TMDBMovie>;
         }>(url(entity.tmdbId));
 
@@ -221,6 +221,14 @@ export class TMDBService {
     return orderBy(allSimilars, ['count', 'popularity'], ['desc', 'desc'])
       .filter((_row, index) => index <= 50)
       .map(type === 'movie' ? this.mapMovie : this.mapTVShow);
+  }
+
+  @CacheMethod({
+    key: CacheKeys.TMDB_GET_RECOMMENDATIONS,
+    ttl: 6.048e8, // seven days
+  })
+  private cachedRecommendationsRequest<TData>(url: string) {
+    return this.request<TData>(url);
   }
 
   public async discover(args: GetDiscoverQueries) {

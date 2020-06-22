@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Tag, Skeleton } from 'antd';
+import { Calendar, Tag, Skeleton, Alert } from 'antd';
 
 import { useGetCalendarQuery } from '../../utils/graphql';
 import { formatNumber } from '../../utils/format-number';
@@ -7,11 +7,23 @@ import { formatNumber } from '../../utils/format-number';
 import { CalendarStyles } from './calendar.styles';
 
 export function CalendarComponent() {
-  const { data, loading } = useGetCalendarQuery();
+  const { data, loading, error } = useGetCalendarQuery();
 
   return (
     <CalendarStyles>
       <div className="wrapper">
+        {error && (
+          <Alert
+            type="error"
+            message={<pre>{JSON.stringify(error, null, 4)}</pre>}
+          />
+        )}
+        {loading && (
+          <Alert
+            type="info"
+            message="Dont't worry it might take some time on first load"
+          />
+        )}
         <Skeleton active={true} loading={loading}>
           <Calendar
             dateCellRender={(date) => {
