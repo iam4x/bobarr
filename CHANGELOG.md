@@ -6,9 +6,12 @@
 
 - better settings ui (https://github.com/iam4x/bobarr/issues/6)
 - env variable to change movies/tvshows folder name (https://github.com/iam4x/bobarr/issues/116)
+- calendar based on your actual library (https://github.com/iam4x/bobarr/issues/75)
+- clear redis cache action in settings
 
 ### Fixes
 
+- cache requests to tmdb api (perf)
 - fix discover download tvshow fails (https://github.com/iam4x/bobarr/issues/104)
 
 ## [v1.0.0-beta.1] - 2020-05-20

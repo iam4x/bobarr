@@ -12,6 +12,44 @@ import { map } from 'rxjs/operators';
 import { RedisService } from './redis.service';
 import { CacheKeys } from './cache.dto';
 
+export function CacheMethod<TValue = any>({
+  key,
+  ttl,
+}: {
+  key: CacheKeys;
+  ttl: number;
+}) {
+  return function (
+    _target: Record<string, any>,
+    _propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+    const method = descriptor.value;
+
+    // eslint-disable-next-line no-param-reassign
+    descriptor.value = async function (...args: any[]) {
+      const computedCacheKey = `${key}_${
+        args.length ? args.map((arg) => JSON.stringify(arg)) : 'no_args'
+      }`;
+
+      const cachedResult = await (this as any).redisService.get(
+        computedCacheKey
+      );
+
+      if (cachedResult) return JSON.parse(cachedResult);
+
+      const result = await method.apply(this, args);
+      await (this as any).redisService.set(
+        computedCacheKey,
+        JSON.stringify(result),
+        ttl
+      );
+
+      return result;
+    };
+  };
+}
+
 @Injectable()
 export abstract class CacheInterceptor implements NestInterceptor {
   protected abstract readonly ttl: number;

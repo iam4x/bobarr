@@ -11,6 +11,7 @@ import { ParameterDAO } from 'src/entities/dao/parameter.dao';
 import { QualityDAO } from 'src/entities/dao/quality.dao';
 import { Tag } from 'src/entities/tag.entity';
 import { Quality } from 'src/entities/quality.entity';
+import { RedisService } from 'src/modules/redis/redis.service';
 
 import { ParamsService } from './params.service';
 
@@ -28,7 +29,8 @@ export class ParamsResolver {
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private readonly paramsService: ParamsService,
     private readonly parameterDAO: ParameterDAO,
-    private readonly qualityDAO: QualityDAO
+    private readonly qualityDAO: QualityDAO,
+    private readonly redisService: RedisService
   ) {
     this.logger = logger.child({ context: 'ParamsResolver' });
   }
@@ -68,6 +70,12 @@ export class ParamsResolver {
   public async getParams() {
     const results = await this.parameterDAO.find({ order: { key: 'ASC' } });
     return Object.fromEntries(results.map((param) => [param.key, param.value]));
+  }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
+  public async clearRedisCache() {
+    await this.redisService.clearCache();
+    return { success: true, message: 'REDIS_CACHE_CLEARED' };
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)

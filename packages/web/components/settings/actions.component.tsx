@@ -6,6 +6,7 @@ import {
   useStartFindNewEpisodesMutation,
   useStartDownloadMissingMutation,
   useResetLibraryMutation,
+  useClearCacheMutation,
 } from '../../utils/graphql';
 
 export function ActionsComponents() {
@@ -42,6 +43,16 @@ export function ActionsComponents() {
     onCompleted: () => {
       Modal.info({
         title: 'Reset succesfull!',
+        content: 'The page will now reload',
+        onOk: () => window.location.reload(),
+      });
+    },
+  });
+
+  const [clearCache, { loading: loading4 }] = useClearCacheMutation({
+    onCompleted: () => {
+      Modal.info({
+        title: 'Cache cleared correctly!',
         content: 'The page will now reload',
         onOk: () => window.location.reload(),
       });
@@ -109,6 +120,14 @@ export function ActionsComponents() {
         loading={loading1 || loading2 || loading3}
       >
         Download missing files
+      </Button>
+      <Button
+        size="large"
+        type="default"
+        onClick={() => clearCache()}
+        loading={loading4}
+      >
+        Clear cache
       </Button>
       <Button size="large" type="danger" onClick={handleResetClick}>
         Reset bobarr

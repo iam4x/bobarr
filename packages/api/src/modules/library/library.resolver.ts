@@ -18,7 +18,9 @@ import {
   EnrichedTVEpisode,
   JackettInput,
   SearchingMedia,
+  LibraryCalendar,
 } from './library.dto';
+import { makeCacheInterceptor } from '../redis/cache.interceptor';
 
 @Resolver()
 export class LibraryResolver {
@@ -63,6 +65,17 @@ export class LibraryResolver {
       tvShowTMDBId,
       seasonNumber,
     });
+  }
+
+  @UseInterceptors(
+    makeCacheInterceptor({
+      key: CacheKeys.CALENDAR,
+      ttl: 1000 * 60 * 60 * 24, // one day
+    })
+  )
+  @Query((_returns) => LibraryCalendar)
+  public getCalendar() {
+    return this.libraryService.calendar();
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)
