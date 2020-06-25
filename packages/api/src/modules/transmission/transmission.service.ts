@@ -38,25 +38,65 @@ export class TransmissionService {
   }
 
   @LazyTransaction()
-  public async addTorrentURL(
+  public async addTorrent(
     {
-      url,
+      torrent,
+      torrentType,
       torrentAttributes,
-    }: { url: string; torrentAttributes: DeepPartial<Torrent> },
+    }: {
+      torrent: string;
+      torrentType: 'url' | 'base64';
+      torrentAttributes: DeepPartial<Torrent>;
+    },
     @TransactionManager() manager: EntityManager | null
   ) {
-    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+    this.logger.info(
+      `start download torrent from ${torrentType}`,
+      torrentAttributes
+    );
 
-    this.logger.info('start download torrent from url', torrentAttributes);
-    const transmissionTorrent = await this.addURL(url);
+    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+    const transmissionTorrent =
+      torrentType === 'url'
+        ? await this.addURL(torrent)
+        : await this.client.addBase64(torrent);
 
     this.logger.info('torrent download started', torrentAttributes);
-    const torrent = await torrentDAO.save({
+    const torrentEntity = await torrentDAO.save({
       ...torrentAttributes,
       torrentHash: transmissionTorrent.hashString,
     });
 
-    return torrent;
+    return torrentEntity;
+  }
+
+  public addTorrentBase64(
+    {
+      base64,
+      torrentAttributes,
+    }: {
+      base64: string;
+      torrentAttributes: DeepPartial<Torrent>;
+    },
+    manager: EntityManager | null
+  ) {
+    return this.addTorrent(
+      { torrent: base64, torrentType: 'base64', torrentAttributes },
+      manager
+    );
+  }
+
+  public addTorrentURL(
+    {
+      url,
+      torrentAttributes,
+    }: { url: string; torrentAttributes: DeepPartial<Torrent> },
+    manager: EntityManager | null
+  ) {
+    return this.addTorrent(
+      { torrent: url, torrentType: 'url', torrentAttributes },
+      manager
+    );
   }
 
   private async addURL(url: string) {

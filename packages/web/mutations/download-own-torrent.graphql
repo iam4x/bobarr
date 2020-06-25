@@ -1,0 +1,14 @@
+mutation downloadOwnTorrent(
+  $mediaId: Int!
+  $mediaType: FileType!
+  $torrentBase64: String!
+) {
+  downloadOwnTorrent(
+    mediaId: $mediaId
+    mediaType: $mediaType
+    torrentBase64: $torrentBase64
+  ) {
+    success
+    message
+  }
+}

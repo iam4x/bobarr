@@ -348,29 +348,7 @@ export class LibraryService {
     this.logger.info('start download tv episode', { episodeId });
     this.logger.info(jackettResult.title);
 
-    const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
-    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
-
-    const tvEpisode = await tvEpisodeDAO.findOneOrFail({ id: episodeId });
-
-    if (tvEpisode.state !== DownloadableMediaState.MISSING) {
-      this.logger.info('episode already downloaded, removing existing files');
-
-      const torrents = await torrentDAO.find({
-        where: { resourceId: episodeId, resourceType: FileType.EPISODE },
-      });
-
-      await forEachSeries(torrents, (torrent) =>
-        this.transmissionService.removeTorrentAndFiles(torrent.torrentHash)
-      );
-
-      await torrentDAO.remove(torrents);
-    }
-
-    tvEpisodeDAO.save({
-      id: episodeId,
-      state: DownloadableMediaState.DOWNLOADING,
-    });
+    await this.replaceTVEpisode(episodeId, manager!);
 
     const torrent = await this.transmissionService.addTorrentURL(
       {
@@ -541,6 +519,68 @@ export class LibraryService {
     this.jobsService.startScanLibrary();
 
     this.logger.info('finish reset library', { deleteFiles, resetSettings });
+  }
+
+  @LazyTransaction()
+  public async downloadOwnTorrent(
+    {
+      mediaId,
+      mediaType,
+      torrentBase64,
+    }: {
+      mediaId: number;
+      mediaType: FileType;
+      torrentBase64: string;
+    },
+    @TransactionManager() manager: EntityManager | null
+  ) {
+    this.logger.info('start download own torrent', { mediaId, mediaType });
+
+    if (mediaType === FileType.EPISODE) {
+      await this.replaceTVEpisode(mediaId, manager!);
+
+      const torrent = await this.transmissionService.addTorrentBase64(
+        {
+          base64: torrentBase64,
+          torrentAttributes: {
+            resourceType: FileType.EPISODE,
+            resourceId: mediaId,
+          },
+        },
+        manager
+      );
+
+      this.logger.info('download episode started', {
+        mediaId,
+        torrentId: torrent.id,
+      });
+    }
+  }
+
+  private async replaceTVEpisode(episodeId: number, manager: EntityManager) {
+    const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
+    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+
+    const tvEpisode = await tvEpisodeDAO.findOneOrFail({ id: episodeId });
+
+    if (tvEpisode.state !== DownloadableMediaState.MISSING) {
+      this.logger.info('episode already downloaded, removing existing files');
+
+      const torrents = await torrentDAO.find({
+        where: { resourceId: episodeId, resourceType: FileType.EPISODE },
+      });
+
+      await forEachSeries(torrents, (torrent) =>
+        this.transmissionService.removeTorrentAndFiles(torrent.torrentHash)
+      );
+
+      await torrentDAO.remove(torrents);
+    }
+
+    await tvEpisodeDAO.save({
+      id: episodeId,
+      state: DownloadableMediaState.DOWNLOADING,
+    });
   }
 
   private enrichMovie = async (movie: Movie) => {
