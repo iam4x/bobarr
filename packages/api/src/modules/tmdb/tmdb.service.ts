@@ -100,10 +100,6 @@ export class TMDBService {
     );
   }
 
-  @CacheMethod({
-    key: CacheKeys.TMDB_GET_TV_SHOW_SEASONS,
-    ttl: 6.048e8, // seven days
-  })
   public async getTVShowSeasons(tvShowTMDBId: number) {
     const tvShow = await this.getTVShow(tvShowTMDBId);
     return map(tvShow.seasons, async (season) =>
