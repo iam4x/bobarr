@@ -217,7 +217,7 @@ export type MutationResetLibraryArgs = {
 
 
 export type MutationDownloadOwnTorrentArgs = {
-  torrentBase64: Scalars['String'];
+  torrent: Scalars['String'];
   mediaType: FileType;
   mediaId: Scalars['Int'];
 };
@@ -466,7 +466,7 @@ export type ClearCacheMutation = (
 export type DownloadOwnTorrentMutationVariables = {
   mediaId: Scalars['Int'];
   mediaType: FileType;
-  torrentBase64: Scalars['String'];
+  torrent: Scalars['String'];
 };
 
 
@@ -963,8 +963,8 @@ export type ClearCacheMutationHookResult = ReturnType<typeof useClearCacheMutati
 export type ClearCacheMutationResult = ApolloReactCommon.MutationResult<ClearCacheMutation>;
 export type ClearCacheMutationOptions = ApolloReactCommon.BaseMutationOptions<ClearCacheMutation, ClearCacheMutationVariables>;
 export const DownloadOwnTorrentDocument = gql`
-    mutation downloadOwnTorrent($mediaId: Int!, $mediaType: FileType!, $torrentBase64: String!) {
-  downloadOwnTorrent(mediaId: $mediaId, mediaType: $mediaType, torrentBase64: $torrentBase64) {
+    mutation downloadOwnTorrent($mediaId: Int!, $mediaType: FileType!, $torrent: String!) {
+  downloadOwnTorrent(mediaId: $mediaId, mediaType: $mediaType, torrent: $torrent) {
     success
     message
   }
@@ -987,7 +987,7 @@ export type DownloadOwnTorrentMutationFn = ApolloReactCommon.MutationFunction<Do
  *   variables: {
  *      mediaId: // value for 'mediaId'
  *      mediaType: // value for 'mediaType'
- *      torrentBase64: // value for 'torrentBase64'
+ *      torrent: // value for 'torrent'
  *   },
  * });
  */

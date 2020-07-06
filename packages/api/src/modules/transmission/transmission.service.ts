@@ -45,7 +45,7 @@ export class TransmissionService {
       torrentAttributes,
     }: {
       torrent: string;
-      torrentType: 'url' | 'base64';
+      torrentType: 'url' | 'base64' | 'magnet';
       torrentAttributes: DeepPartial<Torrent>;
     },
     @TransactionManager() manager: EntityManager | null
@@ -56,15 +56,22 @@ export class TransmissionService {
     );
 
     const torrentDAO = manager!.getCustomRepository(TorrentDAO);
-    const transmissionTorrent =
-      torrentType === 'url'
-        ? await this.addURL(torrent)
-        : await this.client.addBase64(torrent);
+
+    let transmissionTorrent: { hashString: string };
+
+    if (torrentType === 'url') {
+      transmissionTorrent = await this.addURL(torrent);
+    } else if (torrentType === 'base64') {
+      transmissionTorrent = await this.client.addBase64(torrent);
+    } else if (torrentType === 'magnet') {
+      transmissionTorrent = await this.client.addMagnet(torrent, {});
+    }
 
     this.logger.info('torrent download started', torrentAttributes);
+
     const torrentEntity = await torrentDAO.save({
       ...torrentAttributes,
-      torrentHash: transmissionTorrent.hashString,
+      torrentHash: transmissionTorrent!.hashString,
     });
 
     return torrentEntity;

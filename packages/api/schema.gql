@@ -146,7 +146,7 @@ type Mutation {
   trackTVShow(seasonNumbers: [Int!]!, tmdbId: Int!): TVShow!
   removeTVShow(tmdbId: Int!): GraphQLCommonResponse!
   resetLibrary(resetSettings: Boolean!, deleteFiles: Boolean!): GraphQLCommonResponse!
-  downloadOwnTorrent(torrentBase64: String!, mediaType: FileType!, mediaId: Int!): GraphQLCommonResponse!
+  downloadOwnTorrent(torrent: String!, mediaType: FileType!, mediaId: Int!): GraphQLCommonResponse!
 }
 
 type OMDBInfo {

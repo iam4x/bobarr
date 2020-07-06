@@ -155,10 +155,10 @@ export class LibraryResolver {
   public async downloadOwnTorrent(
     @Args('mediaId', { type: () => Int }) mediaId: number,
     @Args('mediaType', { type: () => FileType }) mediaType: FileType,
-    @Args('torrentBase64') torrentBase64: string
+    @Args('torrent') torrent: string
   ) {
     await this.libraryService.downloadOwnTorrent(
-      { mediaId, mediaType, torrentBase64 },
+      { mediaId, mediaType, torrent },
       null
     );
     return { success: true, message: 'DOWNLOAD_STARTED' };

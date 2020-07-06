@@ -77,12 +77,40 @@ export function ManualSearchComponent(props: ManualSearchProps) {
             props.media.__typename === 'EnrichedTVEpisode'
               ? FileType.Episode
               : FileType.Movie,
-          torrentBase64: base64,
+          torrent: base64,
         },
       });
     }
 
     setUploadTorrentLoading(false);
+  };
+
+  const handlePasteMagnetLink = async () => {
+    setUploadTorrentLoading(true);
+
+    const magnetLink = await navigator.clipboard.readText();
+
+    if (typeof magnetLink !== 'string' || !magnetLink.startsWith('magnet:')) {
+      setUploadTorrentLoading(false);
+      return notification.error({
+        message: 'You dont have a magnet link in your clipboard to paste',
+      });
+    }
+
+    if (props.media.id) {
+      await downloadOwnTorrent({
+        variables: {
+          mediaId: props.media.id,
+          mediaType:
+            props.media.__typename === 'EnrichedTVEpisode'
+              ? FileType.Episode
+              : FileType.Movie,
+          torrent: magnetLink,
+        },
+      });
+    }
+
+    return setUploadTorrentLoading(false);
   };
 
   /* eslint-disable-next-line */
@@ -117,12 +145,19 @@ export function ManualSearchComponent(props: ManualSearchProps) {
           />
           <Button
             type="primary"
-            className="add-own-torrent"
+            className="action-btn"
             onClick={() => $fileInput.current?.click()}
             loading={isUploadTorrentLoading}
             disabled={isUploadTorrentLoading}
           >
             Select own .torrent
+          </Button>
+          <Button
+            type="primary"
+            className="action-btn"
+            onClick={handlePasteMagnetLink}
+          >
+            Paste magnet link
           </Button>
         </div>
         <Skeleton active={true} loading={loading}>

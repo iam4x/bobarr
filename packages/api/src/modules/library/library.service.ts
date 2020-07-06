@@ -526,55 +526,43 @@ export class LibraryService {
     {
       mediaId,
       mediaType,
-      torrentBase64,
+      torrent,
     }: {
       mediaId: number;
       mediaType: FileType;
-      torrentBase64: string;
+      torrent: string;
     },
     @TransactionManager() manager: EntityManager | null
   ) {
     this.logger.info('start download own torrent', { mediaId, mediaType });
 
+    const baseOpts = {
+      torrent,
+      torrentType: torrent.startsWith('magnet') ? 'magnet' : 'base64',
+      torrentAttributes: {
+        resourceId: mediaId,
+        resourceType: mediaType,
+      },
+    } as const;
+
     if (mediaType === FileType.EPISODE) {
       await this.replaceTVEpisode(mediaId, manager!);
-
-      const torrent = await this.transmissionService.addTorrentBase64(
-        {
-          base64: torrentBase64,
-          torrentAttributes: {
-            resourceType: FileType.EPISODE,
-            resourceId: mediaId,
-          },
-        },
-        manager
-      );
-
-      this.logger.info('download episode started', {
-        mediaId,
-        torrentId: torrent.id,
-      });
     }
 
     if (mediaType === FileType.MOVIE) {
       await this.replaceMovie(mediaId, manager!);
-
-      const torrent = await this.transmissionService.addTorrentBase64(
-        {
-          base64: torrentBase64,
-          torrentAttributes: {
-            resourceType: FileType.MOVIE,
-            resourceId: mediaId,
-          },
-        },
-        manager
-      );
-
-      this.logger.info('download movie started', {
-        mediaId,
-        torrentId: torrent.id,
-      });
     }
+
+    const torrentEntity = await this.transmissionService.addTorrent(
+      baseOpts,
+      manager
+    );
+
+    this.logger.info('download started', {
+      mediaId,
+      mediaType,
+      torrentId: torrentEntity.id,
+    });
   }
 
   private async replaceTVEpisode(episodeId: number, manager: EntityManager) {

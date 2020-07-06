@@ -11,7 +11,7 @@ export const ManualSearchStyles = styled.div`
     margin-top: 12px;
     margin-bottom: 12px;
 
-    .add-own-torrent {
+    .action-btn {
       margin-left: 12px;
     }
   }
