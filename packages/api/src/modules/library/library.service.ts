@@ -287,9 +287,10 @@ export class LibraryService {
       state: DownloadableMediaState.DOWNLOADING,
     });
 
-    const torrent = await this.transmissionService.addTorrentURL(
+    const torrent = await this.transmissionService.addTorrent(
       {
-        url: jackettResult.downloadLink,
+        torrent: jackettResult.downloadLink,
+        torrentType: 'url',
         torrentAttributes: {
           resourceType: FileType.MOVIE,
           resourceId: movieId,
@@ -320,9 +321,10 @@ export class LibraryService {
       state: DownloadableMediaState.DOWNLOADING,
     });
 
-    const torrent = await this.transmissionService.addTorrentURL(
+    const torrent = await this.transmissionService.addTorrent(
       {
-        url: jackettResult.downloadLink,
+        torrent: jackettResult.downloadLink,
+        torrentType: 'url',
         torrentAttributes: {
           resourceType: FileType.SEASON,
           resourceId: seasonId,
@@ -350,9 +352,10 @@ export class LibraryService {
 
     await this.replaceTVEpisode(episodeId, manager!);
 
-    const torrent = await this.transmissionService.addTorrentURL(
+    const torrent = await this.transmissionService.addTorrent(
       {
-        url: jackettResult.downloadLink,
+        torrent: jackettResult.downloadLink,
+        torrentType: 'url',
         torrentAttributes: {
           resourceType: FileType.EPISODE,
           resourceId: episodeId,
@@ -538,7 +541,7 @@ export class LibraryService {
 
     const baseOpts = {
       torrent,
-      torrentType: torrent.startsWith('magnet') ? 'magnet' : 'base64',
+      torrentType: torrent.startsWith('magnet') ? 'url' : 'base64',
       torrentAttributes: {
         resourceId: mediaId,
         resourceType: mediaType,
