@@ -54,6 +54,27 @@ export class TMDBService {
       baseURL: 'https://api.themoviedb.org/3/',
     });
 
+    client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        this.logger.error('request error', {
+          error: error?.response?.data || error,
+          path,
+          params,
+        });
+
+        return Promise.reject(
+          new Error(
+            JSON.stringify(
+              error.response && error.response.data
+                ? error.response.data
+                : error.response
+            )
+          )
+        );
+      }
+    );
+
     return client
       .get<TData>(path, { params })
       .then(({ data }) => data);
