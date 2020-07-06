@@ -16,6 +16,8 @@ import {
   FileType,
   DownloadableMediaState,
   RenameAndLinkQueueProcessors,
+  ParameterKey,
+  OrganizeLibraryStrategy,
 } from 'src/app.dto';
 
 import allowedExtensions from 'src/utils/allowed-file-extensions.json';
@@ -24,9 +26,11 @@ import { formatNumber } from 'src/utils/format-number';
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
+import { TorrentDAO } from 'src/entities/dao/torrent.dao';
 
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
 import { LibraryService } from 'src/modules/library/library.service';
+import { ParamsService } from 'src/modules/params/params.service';
 
 @Processor(JobsQueue.RENAME_AND_LINK)
 export class RenameAndLinkProcessor {
@@ -36,16 +40,36 @@ export class RenameAndLinkProcessor {
     private readonly movieDAO: MovieDAO,
     private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tvEpisodeDAO: TVEpisodeDAO,
+    private readonly torrentDAO: TorrentDAO,
     private readonly transmissionService: TransmissionService,
-    private readonly libraryService: LibraryService
+    private readonly libraryService: LibraryService,
+    private readonly paramsService: ParamsService
   ) {
     this.logger = this.logger.child({ context: 'RenameAndLinkProcessor' });
+  }
+
+  private getOrganizeStrategyCommand(strategy: OrganizeLibraryStrategy) {
+    switch (strategy) {
+      case OrganizeLibraryStrategy.LINK:
+        return 'ln -s';
+      case OrganizeLibraryStrategy.MOVE:
+        return 'mv';
+      case OrganizeLibraryStrategy.COPY:
+        return 'cp -R';
+      default: {
+        throw new Error('unknown strategy');
+      }
+    }
   }
 
   @Process(RenameAndLinkQueueProcessors.HANDLE_MOVIE)
   public async renameAndLinkMovie(job: Job<{ movieId: number }>) {
     const { movieId } = job.data;
     this.logger.info('start rename and link movie', { movieId });
+
+    const organizeStrategy = (await this.paramsService.get(
+      ParameterKey.ORGANIZE_LIBRARY_STRATEGY
+    )) as OrganizeLibraryStrategy;
 
     const movie = await this.libraryService.getMovie(movieId);
     const torrent = await this.transmissionService.getResourceTorrent({
@@ -74,13 +98,18 @@ export class RenameAndLinkProcessor {
     await mapSeries(torrentFiles, async (torrentFile) => {
       await childCommand(
         oneLine`
-          cd "${newFolder}" &&
-          ln -s
-            "../../downloads/complete/${torrentFile.original}"
-            "${torrentFile.next}"
-        `
+            cd "${newFolder}" &&
+            ${this.getOrganizeStrategyCommand(organizeStrategy)}
+              "../../downloads/complete/${torrentFile.original}"
+              "${torrentFile.next}"
+          `
       );
     });
+
+    if (organizeStrategy === OrganizeLibraryStrategy.MOVE) {
+      await this.transmissionService.removeTorrentAndFiles(torrent.torrentHash);
+      await this.torrentDAO.remove(torrent);
+    }
 
     await this.movieDAO.save({
       id: movieId,
@@ -94,6 +123,10 @@ export class RenameAndLinkProcessor {
   public async renameAndLinkEpisode(job: Job<{ episodeId: number }>) {
     const { episodeId } = job.data;
     this.logger.info('start rename and link episode', { episodeId });
+
+    const organizeStrategy = (await this.paramsService.get(
+      ParameterKey.ORGANIZE_LIBRARY_STRATEGY
+    )) as OrganizeLibraryStrategy;
 
     const episode = await this.tvEpisodeDAO.findOneOrFail({
       where: { id: episodeId },
@@ -138,12 +171,17 @@ export class RenameAndLinkProcessor {
       await childCommand(
         oneLine`
           cd "${seasonFolder}" &&
-          ln -s
+          ${this.getOrganizeStrategyCommand(organizeStrategy)}
             "../../../downloads/complete/${torrentFile.original}"
             "${torrentFile.next}"
         `
       );
     });
+
+    if (organizeStrategy === OrganizeLibraryStrategy.MOVE) {
+      await this.transmissionService.removeTorrentAndFiles(torrent.torrentHash);
+      await this.torrentDAO.remove(torrent);
+    }
 
     await this.tvEpisodeDAO.save({
       id: episode.id,
@@ -157,6 +195,10 @@ export class RenameAndLinkProcessor {
   public async renameAndLinkSeason(job: Job<{ seasonId: number }>) {
     const { seasonId } = job.data;
     this.logger.info('start rename and link season', { seasonId });
+
+    const organizeStrategy = (await this.paramsService.get(
+      ParameterKey.ORGANIZE_LIBRARY_STRATEGY
+    )) as OrganizeLibraryStrategy;
 
     const season = await this.tvSeasonDAO.findOneOrFail({
       where: { id: seasonId },
@@ -225,12 +267,17 @@ export class RenameAndLinkProcessor {
       await childCommand(
         oneLine`
           cd "${seasonFolder}" &&
-          ln -s
+          ${this.getOrganizeStrategyCommand(organizeStrategy)}
           "../../../downloads/complete/${file.original}"
           "${newName}${file.ext}"
         `
       );
     });
+
+    if (organizeStrategy === OrganizeLibraryStrategy.MOVE) {
+      await this.transmissionService.removeTorrentAndFiles(torrent.torrentHash);
+      await this.torrentDAO.remove(torrent);
+    }
 
     await this.tvEpisodeDAO.save(
       season.episodes
