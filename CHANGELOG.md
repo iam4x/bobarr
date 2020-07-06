@@ -4,7 +4,7 @@
 
 ### Added
 
-- better settings ui (https://github.com/iam4x/bobarr/issues/6)
+- upload own .torrent or paste magnet link (https://github.com/iam4x/bobarr/issues/123)
 - env variable to change movies/tvshows folder name (https://github.com/iam4x/bobarr/issues/116)
 - calendar based on your actual library (https://github.com/iam4x/bobarr/issues/75)
 - clear redis cache action in settings
