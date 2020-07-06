@@ -555,6 +555,26 @@ export class LibraryService {
         torrentId: torrent.id,
       });
     }
+
+    if (mediaType === FileType.MOVIE) {
+      await this.replaceMovie(mediaId, manager!);
+
+      const torrent = await this.transmissionService.addTorrentBase64(
+        {
+          base64: torrentBase64,
+          torrentAttributes: {
+            resourceType: FileType.MOVIE,
+            resourceId: mediaId,
+          },
+        },
+        manager
+      );
+
+      this.logger.info('download movie started', {
+        mediaId,
+        torrentId: torrent.id,
+      });
+    }
   }
 
   private async replaceTVEpisode(episodeId: number, manager: EntityManager) {
@@ -579,6 +599,32 @@ export class LibraryService {
 
     await tvEpisodeDAO.save({
       id: episodeId,
+      state: DownloadableMediaState.DOWNLOADING,
+    });
+  }
+
+  private async replaceMovie(movieId: number, manager: EntityManager) {
+    const movieDAO = manager!.getCustomRepository(MovieDAO);
+    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+
+    const movie = await movieDAO.findOneOrFail({ id: movieId });
+
+    if (movie.state !== DownloadableMediaState.MISSING) {
+      this.logger.info('movie already downloaded, removing existing files');
+
+      const torrents = await torrentDAO.find({
+        where: { resourceId: movieId, resourceType: FileType.MOVIE },
+      });
+
+      await forEachSeries(torrents, (torrent) =>
+        this.transmissionService.removeTorrentAndFiles(torrent.torrentHash)
+      );
+
+      await torrentDAO.remove(torrents);
+    }
+
+    await movieDAO.save({
+      id: movieId,
       state: DownloadableMediaState.DOWNLOADING,
     });
   }
