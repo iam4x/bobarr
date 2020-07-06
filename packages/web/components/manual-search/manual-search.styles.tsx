@@ -7,8 +7,13 @@ export const ManualSearchStyles = styled.div`
   }
 
   .search-input {
+    display: flex;
     margin-top: 12px;
     margin-bottom: 12px;
+
+    .action-btn {
+      margin-left: 12px;
+    }
   }
 
   .ant-table {

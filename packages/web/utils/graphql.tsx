@@ -157,6 +157,7 @@ export type Mutation = {
   trackTVShow: TvShow;
   removeTVShow: GraphQlCommonResponse;
   resetLibrary: GraphQlCommonResponse;
+  downloadOwnTorrent: GraphQlCommonResponse;
 };
 
 
@@ -212,6 +213,13 @@ export type MutationRemoveTvShowArgs = {
 export type MutationResetLibraryArgs = {
   resetSettings: Scalars['Boolean'];
   deleteFiles: Scalars['Boolean'];
+};
+
+
+export type MutationDownloadOwnTorrentArgs = {
+  torrent: Scalars['String'];
+  mediaType: FileType;
+  mediaId: Scalars['Int'];
 };
 
 export type OmdbInfo = {
@@ -450,6 +458,21 @@ export type ClearCacheMutationVariables = {};
 export type ClearCacheMutation = (
   { __typename?: 'Mutation' }
   & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
+export type DownloadOwnTorrentMutationVariables = {
+  mediaId: Scalars['Int'];
+  mediaType: FileType;
+  torrent: Scalars['String'];
+};
+
+
+export type DownloadOwnTorrentMutation = (
+  { __typename?: 'Mutation' }
+  & { downloadOwnTorrent: (
     { __typename?: 'GraphQLCommonResponse' }
     & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
@@ -939,6 +962,41 @@ export function useClearCacheMutation(baseOptions?: ApolloReactHooks.MutationHoo
 export type ClearCacheMutationHookResult = ReturnType<typeof useClearCacheMutation>;
 export type ClearCacheMutationResult = ApolloReactCommon.MutationResult<ClearCacheMutation>;
 export type ClearCacheMutationOptions = ApolloReactCommon.BaseMutationOptions<ClearCacheMutation, ClearCacheMutationVariables>;
+export const DownloadOwnTorrentDocument = gql`
+    mutation downloadOwnTorrent($mediaId: Int!, $mediaType: FileType!, $torrent: String!) {
+  downloadOwnTorrent(mediaId: $mediaId, mediaType: $mediaType, torrent: $torrent) {
+    success
+    message
+  }
+}
+    `;
+export type DownloadOwnTorrentMutationFn = ApolloReactCommon.MutationFunction<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>;
+
+/**
+ * __useDownloadOwnTorrentMutation__
+ *
+ * To run a mutation, you first call `useDownloadOwnTorrentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDownloadOwnTorrentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [downloadOwnTorrentMutation, { data, loading, error }] = useDownloadOwnTorrentMutation({
+ *   variables: {
+ *      mediaId: // value for 'mediaId'
+ *      mediaType: // value for 'mediaType'
+ *      torrent: // value for 'torrent'
+ *   },
+ * });
+ */
+export function useDownloadOwnTorrentMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>) {
+        return ApolloReactHooks.useMutation<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>(DownloadOwnTorrentDocument, baseOptions);
+      }
+export type DownloadOwnTorrentMutationHookResult = ReturnType<typeof useDownloadOwnTorrentMutation>;
+export type DownloadOwnTorrentMutationResult = ApolloReactCommon.MutationResult<DownloadOwnTorrentMutation>;
+export type DownloadOwnTorrentMutationOptions = ApolloReactCommon.BaseMutationOptions<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>;
 export const StartScanLibraryDocument = gql`
     mutation startScanLibrary {
   result: startScanLibraryJob {

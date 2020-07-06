@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UseInterceptors } from '@nestjs/common';
 
-import { GraphQLCommonResponse } from 'src/app.dto';
+import { GraphQLCommonResponse, FileType } from 'src/app.dto';
 
 import { makeInvalidateCacheInterceptor } from 'src/modules/redis/invalidate-cache.interceptor';
 import { CacheKeys } from 'src/modules/redis/cache.dto';
@@ -149,5 +149,18 @@ export class LibraryResolver {
   ) {
     await this.libraryService.reset({ deleteFiles, resetSettings }, null);
     return { success: true, message: 'LIBRARY_RESET' };
+  }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
+  public async downloadOwnTorrent(
+    @Args('mediaId', { type: () => Int }) mediaId: number,
+    @Args('mediaType', { type: () => FileType }) mediaType: FileType,
+    @Args('torrent') torrent: string
+  ) {
+    await this.libraryService.downloadOwnTorrent(
+      { mediaId, mediaType, torrent },
+      null
+    );
+    return { success: true, message: 'DOWNLOAD_STARTED' };
   }
 }

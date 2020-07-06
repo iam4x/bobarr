@@ -38,25 +38,72 @@ export class TransmissionService {
   }
 
   @LazyTransaction()
-  public async addTorrentURL(
+  public async addTorrent(
+    {
+      torrent,
+      torrentType,
+      torrentAttributes,
+    }: {
+      torrent: string;
+      torrentType: 'url' | 'base64' | 'magnet';
+      torrentAttributes: DeepPartial<Torrent>;
+    },
+    @TransactionManager() manager: EntityManager | null
+  ) {
+    this.logger.info(
+      `start download torrent from ${torrentType}`,
+      torrentAttributes
+    );
+
+    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+
+    let transmissionTorrent: { hashString: string };
+
+    if (torrentType === 'url') {
+      transmissionTorrent = await this.addURL(torrent);
+    } else if (torrentType === 'base64') {
+      transmissionTorrent = await this.client.addBase64(torrent);
+    } else if (torrentType === 'magnet') {
+      transmissionTorrent = await this.client.addMagnet(torrent, {});
+    }
+
+    this.logger.info('torrent download started', torrentAttributes);
+
+    const torrentEntity = await torrentDAO.save({
+      ...torrentAttributes,
+      torrentHash: transmissionTorrent!.hashString,
+    });
+
+    return torrentEntity;
+  }
+
+  public addTorrentBase64(
+    {
+      base64,
+      torrentAttributes,
+    }: {
+      base64: string;
+      torrentAttributes: DeepPartial<Torrent>;
+    },
+    manager: EntityManager | null
+  ) {
+    return this.addTorrent(
+      { torrent: base64, torrentType: 'base64', torrentAttributes },
+      manager
+    );
+  }
+
+  public addTorrentURL(
     {
       url,
       torrentAttributes,
     }: { url: string; torrentAttributes: DeepPartial<Torrent> },
-    @TransactionManager() manager: EntityManager | null
+    manager: EntityManager | null
   ) {
-    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
-
-    this.logger.info('start download torrent from url', torrentAttributes);
-    const transmissionTorrent = await this.addURL(url);
-
-    this.logger.info('torrent download started', torrentAttributes);
-    const torrent = await torrentDAO.save({
-      ...torrentAttributes,
-      torrentHash: transmissionTorrent.hashString,
-    });
-
-    return torrent;
+    return this.addTorrent(
+      { torrent: url, torrentType: 'url', torrentAttributes },
+      manager
+    );
   }
 
   private async addURL(url: string) {
