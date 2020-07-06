@@ -23,7 +23,7 @@ services:
     command: "exit 0"
     restart: always
     entrypoint: ["/sbin/tini", "--", "/usr/bin/openvpn.sh"]
-    command: '-p "49150" -p "49150;udp"'
+    command: '-p "51413" -p "51413;udp" -f ""'
     tty: true
 
   api:
