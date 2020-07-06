@@ -13,6 +13,7 @@
 
 - cache requests to tmdb api (perf)
 - fix discover download tvshow fails (https://github.com/iam4x/bobarr/issues/104)
+- enable firewall in vpn container, this will prevent download starts before vpn is connected (https://github.com/iam4x/bobarr/issues/132)
 
 ## [v1.0.0-beta.1] - 2020-05-20
 
