@@ -15,7 +15,7 @@ services:
       - 1.0.0.1
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.disable_ipv6=1
     volumes:
       - /dev/net:/dev/net:z
       - ./packages/vpn:/vpn
