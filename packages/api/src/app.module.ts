@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import {TypeOrmModule, TypeOrmModuleAsyncOptions} from '@nestjs/typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModuleOptions } from "@nestjs/typeorm/dist/interfaces/typeorm-options.interface";
 import { WinstonModule } from 'nest-winston';
 import { TerminusModule } from '@nestjs/terminus';
 import { winstonOptions } from './utils/winston-options';
@@ -18,18 +19,17 @@ import { ImageCacheModule } from 'src/modules/image-cache/image-cache.module';
 import { OMDBModule } from './modules/omdb/omdb.module';
 
 import config from './config';
-import {TypeOrmModuleOptions} from "@nestjs/typeorm/dist/interfaces/typeorm-options.interface";
-import path from "path";
+import path from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-        isGlobal: true,
-        envFilePath: [
-          path.resolve(__dirname, '../../../.env'),
-          path.resolve(__dirname, '.env'),
-        ],
-        load: [config],
+      isGlobal: true,
+      envFilePath: [
+        path.resolve(__dirname, '../../../.env'),
+        path.resolve(__dirname, '.env'),
+      ],
+      load: [config],
     }),
     WinstonModule.forRoot(winstonOptions),
     TypeOrmModule.forRootAsync({

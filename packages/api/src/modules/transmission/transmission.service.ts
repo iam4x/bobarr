@@ -1,15 +1,15 @@
-import axios from 'axios';
-import getRedirects from 'lib-get-redirects';
-import { Inject, Injectable } from '@nestjs/common';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { ConfigService } from '@nestjs/config';
-import { Logger } from 'winston';
-import { Transmission } from 'transmission-client';
-import { DeepPartial, TransactionManager, EntityManager } from 'typeorm';
+import axios from "axios";
+import getRedirects from "lib-get-redirects";
+import { Inject, Injectable } from "@nestjs/common";
+import { WINSTON_MODULE_PROVIDER } from "nest-winston";
+import { ConfigService } from "@nestjs/config";
+import { Logger } from "winston";
+import { Transmission } from "transmission-client";
+import { DeepPartial, TransactionManager, EntityManager } from "typeorm";
 
-import { Torrent } from 'src/entities/torrent.entity';
-import { TorrentDAO } from 'src/entities/dao/torrent.dao';
-import { LazyTransaction } from 'src/utils/lazy-transaction';
+import { Torrent } from "src/entities/torrent.entity";
+import { TorrentDAO } from "src/entities/dao/torrent.dao";
+import { LazyTransaction } from "src/utils/lazy-transaction";
 
 @Injectable()
 export class TransmissionService {
@@ -18,15 +18,15 @@ export class TransmissionService {
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private readonly torrentDAO: TorrentDAO,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {
-    this.logger = logger.child({ context: 'TransmissionService' });
+    this.logger = logger.child({ context: "TransmissionService" });
 
     this.client = new Transmission({
-      host: this.configService.get('transmission.host'),
-      port: this.configService.get('transmission.port'),
-      username: this.configService.get('transmission.username'),
-      password: this.configService.get('transmission.password'),
+      host: this.configService.get("transmission.host"),
+      port: this.configService.get("transmission.port"),
+      username: this.configService.get("transmission.username"),
+      password: this.configService.get("transmission.password"),
     });
   }
 
@@ -54,7 +54,7 @@ export class TransmissionService {
       torrentAttributes,
     }: {
       torrent: string;
-      torrentType: 'url' | 'base64';
+      torrentType: "url" | "base64";
       torrentAttributes: DeepPartial<Torrent>;
     },
     @TransactionManager() manager: EntityManager | null
@@ -67,11 +67,11 @@ export class TransmissionService {
     const torrentDAO = manager!.getCustomRepository(TorrentDAO);
 
     const transmissionTorrent =
-      torrentType === 'url'
+      torrentType === "url"
         ? await this.addURL(torrent)
         : await this.client.addBase64(torrent);
 
-    this.logger.info('torrent download started', torrentAttributes);
+    this.logger.info("torrent download started", torrentAttributes);
 
     const torrentEntity = await torrentDAO.save({
       ...torrentAttributes,
@@ -82,7 +82,7 @@ export class TransmissionService {
   }
 
   private async addURL(url: string) {
-    if (url.startsWith('magnet')) {
+    if (url.startsWith("magnet")) {
       return this.client.addMagnet(url, {});
     }
 
@@ -93,7 +93,7 @@ export class TransmissionService {
       return this.handleTorrentFile(url);
     } catch (error) {
       // redirected to a magnet uri, start it as magnet
-      if (error?.options?.uri?.startsWith('magnet')) {
+      if (error?.options?.uri?.startsWith("magnet")) {
         return this.client.addMagnet(error.options.uri, {});
       }
       // not handled error, throw
@@ -102,8 +102,8 @@ export class TransmissionService {
   }
 
   private async handleTorrentFile(url: string) {
-    const response = await axios.get(url, { responseType: 'arraybuffer' });
-    const base64 = Buffer.from(response.data, 'binary').toString('base64');
+    const response = await axios.get(url, { responseType: "arraybuffer" });
+    const base64 = Buffer.from(response.data, "binary").toString("base64");
     return this.client.addBase64(base64);
   }
 }
