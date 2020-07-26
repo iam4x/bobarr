@@ -10,7 +10,5 @@ module.exports = {
 
     "new-cap": "off",
     "no-console": "warn",
-
-    "max-params": 6,
   },
 };
