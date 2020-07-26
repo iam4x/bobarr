@@ -2,7 +2,6 @@ import { Module, forwardRef } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { REDIS_CONFIG } from 'src/config';
 import { JobsQueue } from 'src/app.dto';
 
 import { MovieDAO } from 'src/entities/dao/movie.dao';
@@ -23,17 +22,37 @@ import { ScanLibraryProcessor } from './processors/scan-library.processor';
 import { JobsService } from './jobs.service';
 import { JobsResolver } from './jobs.resolver';
 
-const queues = [
-  { name: JobsQueue.REFRESH_TORRENT, redis: REDIS_CONFIG },
-  { name: JobsQueue.DOWNLOAD, redis: REDIS_CONFIG },
-  { name: JobsQueue.RENAME_AND_LINK, redis: REDIS_CONFIG },
-  { name: JobsQueue.SCAN_LIBRARY, redis: REDIS_CONFIG },
-];
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([MovieDAO, TorrentDAO, TVSeasonDAO, TVEpisodeDAO]),
-    BullModule.registerQueue(...queues),
+    BullModule.registerQueueAsync(
+    {
+      imports: [ConfigModule],
+      name: JobsQueue.REFRESH_TORRENT,
+      useFactory: async (configService: ConfigService) => ({ redis: configService.get('redis') }),
+      inject: [ConfigService],
+    },
+    {
+      imports: [ConfigModule],
+      name: JobsQueue.DOWNLOAD,
+      useFactory: async (configService: ConfigService) => ({ redis: configService.get('redis') }),
+      inject: [ConfigService],
+    },
+    {
+      imports: [ConfigModule],
+      name: JobsQueue.RENAME_AND_LINK,
+      useFactory: async (configService: ConfigService) => ({ redis: configService.get('redis') }),
+      inject: [ConfigService],
+    },
+    {
+      imports: [ConfigModule],
+      name: JobsQueue.SCAN_LIBRARY,
+      useFactory: async (configService: ConfigService) => ({ redis: configService.get('redis') }),
+      inject: [ConfigService],
+    },
+    ),
     JackettModule,
     TransmissionModule,
     TMDBModule,

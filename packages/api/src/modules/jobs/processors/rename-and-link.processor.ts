@@ -3,13 +3,12 @@ import path from 'path';
 import { childCommand } from 'child-command';
 import { oneLine } from 'common-tags';
 import { Processor, Process } from '@nestjs/bull';
+import { ConfigService } from '@nestjs/config';
 import { mapSeries } from 'p-iteration';
 import { Job } from 'bull';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-
-import { LIBRARY_CONFIG } from 'src/config';
 
 import {
   JobsQueue,
@@ -37,7 +36,8 @@ export class RenameAndLinkProcessor {
     private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tvEpisodeDAO: TVEpisodeDAO,
     private readonly transmissionService: TransmissionService,
-    private readonly libraryService: LibraryService
+    private readonly libraryService: LibraryService,
+    private readonly configService: ConfigService,
   ) {
     this.logger = this.logger.child({ context: 'RenameAndLinkProcessor' });
   }
@@ -66,7 +66,7 @@ export class RenameAndLinkProcessor {
 
     const newFolder = path.resolve(
       __dirname,
-      `../../../../../../library/${LIBRARY_CONFIG.moviesFolderName}/`,
+      `../../../../../../library/${this.configService.get('library.moviesFolderName')}/`,
       folderName
     );
 
@@ -113,7 +113,7 @@ export class RenameAndLinkProcessor {
     const seasonNb = formatNumber(episode.season.seasonNumber);
     const seasonFolder = path.resolve(
       __dirname,
-      `../../../../../../library/${LIBRARY_CONFIG.tvShowsFolderName}/`,
+      `../../../../../../library/${this.configService.get('library.tvShowsFolderName')}/`,
       tvShow.title,
       `Season ${seasonNb}`
     );
@@ -175,7 +175,7 @@ export class RenameAndLinkProcessor {
     const seasonNb = formatNumber(season.seasonNumber);
     const seasonFolder = path.resolve(
       __dirname,
-      `../../../../../../library/${LIBRARY_CONFIG.tvShowsFolderName}/`,
+      `../../../../../../library/${this.configService.get('library.tvShowsFolderName')}/`,
       tvShow.title,
       `Season ${seasonNb}`
     );

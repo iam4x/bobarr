@@ -1,5 +1,7 @@
 node_modules
 
+.git
+
 # misc
 .DS_Store
 .idea

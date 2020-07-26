@@ -2,6 +2,7 @@ import axios from 'axios';
 import getRedirects from 'lib-get-redirects';
 import { Inject, Injectable } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { ConfigService } from '@nestjs/config';
 import { Logger } from 'winston';
 import { Transmission } from 'transmission-client';
 import { DeepPartial, TransactionManager, EntityManager } from 'typeorm';
@@ -12,13 +13,21 @@ import { LazyTransaction } from 'src/utils/lazy-transaction';
 
 @Injectable()
 export class TransmissionService {
-  private client = new Transmission({ host: 'transmission' });
+  private client: Transmission;
 
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
-    private readonly torrentDAO: TorrentDAO
+    private readonly torrentDAO: TorrentDAO,
+    private readonly configService: ConfigService,
   ) {
     this.logger = logger.child({ context: 'TransmissionService' });
+
+    this.client = new Transmission({
+      host: this.configService.get('transmission.host'),
+      port: this.configService.get('transmission.port'),
+      username: this.configService.get('transmission.username'),
+      password: this.configService.get('transmission.password'),
+    });
   }
 
   public removeTorrentAndFiles(torrentHash: string) {

@@ -3,14 +3,13 @@ import scan from 'scandirectory';
 import leven from 'leven';
 import { promises as fs } from 'fs';
 import { Processor, Process } from '@nestjs/bull';
+import { ConfigService } from '@nestjs/config';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { forEachSeries, map } from 'p-iteration';
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
 import { isPlainObject, times, orderBy } from 'lodash';
-
-import { LIBRARY_CONFIG } from 'src/config';
 
 import {
   JobsQueue,
@@ -34,7 +33,8 @@ export class ScanLibraryProcessor {
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private readonly jobsService: JobsService,
     private readonly tmdbService: TMDBService,
-    private readonly tvEpisodeDAO: TVEpisodeDAO
+    private readonly tvEpisodeDAO: TVEpisodeDAO,
+    private readonly configService: ConfigService,
   ) {
     this.logger = logger.child({ context: 'ScanLibrary' });
   }
@@ -110,7 +110,7 @@ export class ScanLibraryProcessor {
     const tvSeasonDAO = manager!.getCustomRepository(TVSeasonDAO);
     const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
 
-    const root = `/usr/library/${LIBRARY_CONFIG.tvShowsFolderName}`;
+    const root = `/usr/library/${this.configService.get('library.tvShowsFolderName')}`;
     const tvshows = (await fs.readdir(root, { withFileTypes: true }))
       .filter((dirent) => dirent.isDirectory())
       .map((dirent) => dirent.name);
@@ -231,7 +231,7 @@ export class ScanLibraryProcessor {
     const movieDAO = manager!.getCustomRepository(MovieDAO);
 
     const { tree } = await this.scanDirectoryTree(
-      `/usr/library/${LIBRARY_CONFIG.moviesFolderName}`
+      `/usr/library/${this.configService.get('library.moviesFolderName')}`
     );
     const movies = Object.entries(tree)
       .filter(([, value]) => typeof value === 'object')

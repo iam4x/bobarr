@@ -16,6 +16,7 @@
   "dependencies": {
     "@nestjs/bull": "^0.1.0",
     "@nestjs/common": "^7.0.0",
+    "@nestjs/config": "^0.5.0",
     "@nestjs/core": "^7.0.0",
     "@nestjs/graphql": "^7.1.5",
     "@nestjs/platform-express": "^7.0.0",

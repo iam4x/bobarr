@@ -12,6 +12,7 @@ export class JackettResolver {
     const results = await this.jacketService.search([query], {
       withoutFilter: true,
     });
+
     return results.map((result) => ({
       ...result,
       tag: result.tag.label,

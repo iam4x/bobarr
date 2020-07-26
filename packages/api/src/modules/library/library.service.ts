@@ -2,14 +2,13 @@ import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { map, forEachSeries, forEach, reduce, mapSeries } from 'p-iteration';
 import { times } from 'lodash';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { ConfigService } from '@nestjs/config';
 import { Logger } from 'winston';
 import childCommand from 'child-command';
 import dayjs from 'dayjs';
 import path from 'path';
 
 import { DeepPartial, TransactionManager, EntityManager, Any } from 'typeorm';
-
-import { LIBRARY_CONFIG } from 'src/config';
 
 import { FileType, DownloadableMediaState } from 'src/app.dto';
 import { LazyTransaction } from 'src/utils/lazy-transaction';
@@ -47,7 +46,8 @@ export class LibraryService {
     private readonly jobsService: JobsService,
     private readonly transmissionService: TransmissionService,
     private readonly mediaViewDAO: MediaViewDAO,
-    private readonly paramsService: ParamsService
+    private readonly paramsService: ParamsService,
+    private readonly configService: ConfigService,
   ) {
     this.logger = logger.child({ context: 'LibraryService' });
 
@@ -185,7 +185,7 @@ export class LibraryService {
     const folderName = `${movie.title} (${year})`;
     const folderPath = path.resolve(
       __dirname,
-      `../../../../../library/${LIBRARY_CONFIG.moviesFolderName}`,
+      `../../../../../library/${this.configService.get('library.moviesFolderName')}`,
       folderName
     );
 
@@ -252,7 +252,7 @@ export class LibraryService {
     const enTVShow = await this.getTVShow(tvShow.id, { language: 'en' });
     const tvShowFolder = path.resolve(
       __dirname,
-      `../../../../../library/${LIBRARY_CONFIG.tvShowsFolderName}/`,
+      `../../../../../library/${this.configService.get('library.tvShowsFolderName')}/`,
       enTVShow.title
     );
 

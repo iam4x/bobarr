@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import {TypeOrmModule, TypeOrmModuleAsyncOptions} from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import { TerminusModule } from '@nestjs/terminus';
-
-import { DB_CONFIG } from './config';
 import { winstonOptions } from './utils/winston-options';
 
 import { LibraryModule } from 'src/modules/library/library.module';
@@ -18,10 +17,26 @@ import { HealthController } from 'src/modules/health/health.controller';
 import { ImageCacheModule } from 'src/modules/image-cache/image-cache.module';
 import { OMDBModule } from './modules/omdb/omdb.module';
 
+import config from './config';
+import {TypeOrmModuleOptions} from "@nestjs/typeorm/dist/interfaces/typeorm-options.interface";
+import path from "path";
+
 @Module({
   imports: [
+    ConfigModule.forRoot({
+        isGlobal: true,
+        envFilePath: [
+          path.resolve(__dirname, '../../../.env'),
+          path.resolve(__dirname, '.env'),
+        ],
+        load: [config],
+    }),
     WinstonModule.forRoot(winstonOptions),
-    TypeOrmModule.forRoot(DB_CONFIG),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => configService.get<TypeOrmModuleOptions>('database', {}),
+      inject: [ConfigService],
+    }),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
       introspection: true,
