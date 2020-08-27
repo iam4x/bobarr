@@ -25,6 +25,7 @@ import { useRemoveLibrary } from './use-remove-library.hook';
 
 import { MovieDetailsStyles } from './movie-details.styles';
 import { RatingDetailComponent } from './rating-details.component';
+import { MovieFileDetailsComponent } from './movie-file-details.component';
 
 interface MovieDetailsProps {
   movie: TmdbSearchResult | EnrichedMovie;
@@ -131,6 +132,9 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
                     </div>
                   )}
                 </div>
+                {inLibrary && (
+                  <MovieFileDetailsComponent tmdbId={props.movie.tmdbId} />
+                )}
               </div>
             </div>
           </div>

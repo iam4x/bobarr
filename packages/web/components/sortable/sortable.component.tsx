@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Input, Empty } from 'antd';
-import { orderBy } from 'lodash';
+import { orderBy, last } from 'lodash';
 
 import {
   SortDescendingOutlined,
@@ -21,7 +21,7 @@ export function useSortable<TEntity>(props: UseSortableProps<TEntity>) {
   const [results, setResults] = useState(rows || []);
   const [searchQuery, setSearchQuery] = useState('');
   const [orderByAttribute, setOrderByAttribute] = useState(
-    `${sortAttributes[0].key}:asc`
+    `${last(sortAttributes)!.key}:desc`
   );
 
   const [key, order] = orderByAttribute.split(':') as [string, 'desc' | 'asc'];

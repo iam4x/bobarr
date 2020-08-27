@@ -19,7 +19,9 @@ import {
   JackettInput,
   SearchingMedia,
   LibraryCalendar,
+  LibraryFileDetails,
 } from './library.dto';
+
 import { makeCacheInterceptor } from '../redis/cache.interceptor';
 
 @Resolver()
@@ -76,6 +78,13 @@ export class LibraryResolver {
   @Query((_returns) => LibraryCalendar)
   public getCalendar() {
     return this.libraryService.calendar();
+  }
+
+  @Query((_returns) => LibraryFileDetails)
+  public getMovieFileDetails(
+    @Args('tmdbId', { type: () => Int }) tmdbId: number
+  ) {
+    return this.libraryService.getMovieFileDetails(tmdbId);
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)

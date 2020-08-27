@@ -122,6 +122,13 @@ type LibraryCalendar {
   tvEpisodes: [EnrichedTVEpisode!]!
 }
 
+type LibraryFileDetails {
+  id: Float!
+  libraryPath: String!
+  torrentFileName: String
+  libraryFileSize: BigInt
+}
+
 type Movie {
   id: Float!
   tmdbId: Float!
@@ -200,6 +207,7 @@ type Query {
   getMissingMovies: [EnrichedMovie!]!
   getTVSeasonDetails(seasonNumber: Int!, tvShowTMDBId: Int!): [EnrichedTVEpisode!]!
   getCalendar: LibraryCalendar!
+  getMovieFileDetails(tmdbId: Int!): LibraryFileDetails!
   omdbSearch(title: String!): OMDBInfo!
 }
 
