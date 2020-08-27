@@ -1,5 +1,3 @@
-/* eslint @typescript-eslint/camelcase:off */
-
 import axios from 'axios';
 import { Injectable, Inject } from '@nestjs/common';
 import { map, reduce } from 'p-iteration';
@@ -288,6 +286,7 @@ export class TMDBService {
       args
     );
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { page, total_pages, total_results, results } = TMDBResults;
 
     return {
@@ -304,6 +303,7 @@ export class TMDBService {
       args
     );
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { page, total_pages, total_results, results } = TMDBResults;
 
     return {
