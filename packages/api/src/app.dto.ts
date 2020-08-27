@@ -27,6 +27,13 @@ export enum ParameterKey {
   JACKETT_API_KEY = 'jackett_api_key',
   MAX_MOVIE_DOWNLOAD_SIZE = 'max_movie_download_size',
   MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE = 'max_tvshow_episode_download_size',
+  ORGANIZE_LIBRARY_STRATEGY = 'organize_library_strategy',
+}
+
+export enum OrganizeLibraryStrategy {
+  LINK = 'link',
+  COPY = 'copy',
+  MOVE = 'move',
 }
 
 export enum JobsQueue {

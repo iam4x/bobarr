@@ -4,6 +4,7 @@
 
 ### Added
 
+- choose the origanize file strategy between symlink, move or copy (https://github.com/iam4x/bobarr/issues/130)
 - upload own .torrent or paste magnet link (https://github.com/iam4x/bobarr/issues/123)
 - env variable to change movies/tvshows folder name (https://github.com/iam4x/bobarr/issues/116)
 - calendar based on your actual library (https://github.com/iam4x/bobarr/issues/75)

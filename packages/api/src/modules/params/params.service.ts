@@ -10,7 +10,7 @@ import {
   IsNull,
 } from 'typeorm';
 
-import { ParameterKey } from 'src/app.dto';
+import { ParameterKey, OrganizeLibraryStrategy } from 'src/app.dto';
 import { LazyTransaction } from 'src/utils/lazy-transaction';
 
 import { Entertainment } from 'src/modules/tmdb/tmdb.dto';
@@ -44,6 +44,7 @@ export class ParamsService {
       [ParameterKey.MAX_MOVIE_DOWNLOAD_SIZE, (20e9).toString()], // max file size 20gb
       [ParameterKey.MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE, (5e9).toString()], // max file size 5gb
       [ParameterKey.JACKETT_API_KEY, ''],
+      [ParameterKey.ORGANIZE_LIBRARY_STRATEGY, OrganizeLibraryStrategy.LINK],
     ];
 
     await map(defaultParams, ([key, value]) =>

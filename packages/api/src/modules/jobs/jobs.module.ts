@@ -14,6 +14,7 @@ import { JackettModule } from 'src/modules/jackett/jackett.module';
 import { LibraryModule } from 'src/modules/library/library.module';
 import { TransmissionModule } from 'src/modules/transmission/transmission.module';
 import { TMDBModule } from 'src/modules/tmdb/tmdb.module';
+import { ParamsModule } from 'src/modules/params/params.module';
 
 import { DownloadProcessor } from './processors/download.processor';
 import { RefreshTorrentProcessor } from './processors/refresh-torrent.processor';
@@ -37,6 +38,7 @@ const queues = [
     JackettModule,
     TransmissionModule,
     TMDBModule,
+    ParamsModule,
     forwardRef(() => LibraryModule),
   ],
   providers: [
