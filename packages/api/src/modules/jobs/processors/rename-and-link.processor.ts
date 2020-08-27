@@ -80,13 +80,46 @@ export class RenameAndLinkProcessor {
     const year = dayjs(movie.releaseDate).format('YYYY');
     const folderName = `${movie.title} (${year})`;
 
-    const torrentFiles = torrent.transmissionTorrent.files.map((file) => {
+    const nextName = [folderName, torrent.quality, torrent.tag.toUpperCase()]
+      .filter((str) => str.toLowerCase() !== 'unknown')
+      .join(' ');
+
+    const torrentFiles = torrent.transmissionTorrent.files.reduce<
+      Array<{ original: string; next: string }>
+    >((results, file) => {
       const ext = path.extname(file.name);
-      const next = [folderName, torrent.quality, torrent.tag.toUpperCase()]
-        .filter((str) => str.toLowerCase() !== 'unknown')
-        .join(' ');
-      return { original: file.name, next: `${next}${ext}` };
-    });
+      const isAllowedExt = allowedExtensions.includes(ext.replace(/^\./, ''));
+      const alreadyProcessed = results.some((_) => _.original === file.name);
+
+      if (isAllowedExt && !alreadyProcessed) {
+        // find files with same extension, we will pick the largest file
+        // which should be the movie and not a sample
+        const sameExtensionFiles = torrent.transmissionTorrent.files.filter(
+          (_) => _.name.endsWith(ext)
+        );
+
+        // we have more than one file, we will pick the largest
+        if (sameExtensionFiles.length > 1) {
+          const maxSizeFile = sameExtensionFiles.reduce((result, _) =>
+            result && result.length > _.length ? result : _
+          );
+
+          return [
+            ...results,
+            { original: maxSizeFile.name, next: `${nextName}${ext}` },
+          ];
+        }
+
+        return [...results, { original: file.name, next: `${nextName}${ext}` }];
+      }
+
+      if (!isAllowedExt && !alreadyProcessed) {
+        const [fileName] = file.name.split('/').reverse();
+        return [...results, { original: file.name, next: fileName }];
+      }
+
+      return results;
+    }, []);
 
     const newFolder = path.resolve(
       __dirname,
