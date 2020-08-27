@@ -4,7 +4,11 @@ import prettySize from 'prettysize';
 import { useGetMovieFileDetailsQuery } from '../../utils/graphql';
 
 export function MovieFileDetailsComponent({ tmdbId }: { tmdbId: number }) {
-  const { data } = useGetMovieFileDetailsQuery({ variables: { tmdbId } });
+  const { data } = useGetMovieFileDetailsQuery({
+    pollInterval: 5000,
+    variables: { tmdbId },
+  });
+
   return (
     <ul className="file-details">
       <li>
