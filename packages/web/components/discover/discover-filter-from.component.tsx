@@ -77,7 +77,7 @@ export function DiscoverFilterFormComponent(
     });
   };
 
-  const formatter = useCallback((score: number) => () => `${score}%`, []);
+  const formatter = useCallback((score?: number) => () => `${score}%`, []);
 
   return (
     <Form form={form} initialValues={props.params} onFinish={onSearch}>

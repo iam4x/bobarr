@@ -1,9 +1,19 @@
 import dayjs from 'dayjs';
 
 import { formatNumber } from '../../utils/format-number';
-import { EnrichedMovie, EnrichedTvEpisode } from '../../utils/graphql';
 
-export type Media = Partial<EnrichedMovie> | Partial<EnrichedTvEpisode>;
+import {
+  MissingTvEpisodesFragment,
+  MissingMoviesFragment,
+  EnrichedMovie,
+  EnrichedTvEpisode,
+} from '../../utils/graphql';
+
+export type Media =
+  | MissingTvEpisodesFragment
+  | MissingMoviesFragment
+  | EnrichedMovie
+  | EnrichedTvEpisode;
 
 export function getDefaultSearchQuery(media: Media) {
   if (media.__typename === 'EnrichedTVEpisode') {

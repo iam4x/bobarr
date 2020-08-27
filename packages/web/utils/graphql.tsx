@@ -9,7 +9,9 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: any;
+  /** The `BigInt` scalar type represents non-fractional signed whole numeric values. BigInt can represent values between -(2^53) + 1 and 2^53 - 1.  */
   BigInt: any;
 };
 
@@ -768,6 +770,20 @@ export type GetLibraryTvShowsQuery = (
   )> }
 );
 
+export type MissingTvEpisodesFragment = (
+  { __typename?: 'EnrichedTVEpisode' }
+  & Pick<EnrichedTvEpisode, 'id' | 'seasonNumber' | 'episodeNumber' | 'releaseDate'>
+  & { tvShow: (
+    { __typename?: 'TVShow' }
+    & Pick<TvShow, 'id' | 'title'>
+  ) }
+);
+
+export type MissingMoviesFragment = (
+  { __typename?: 'EnrichedMovie' }
+  & Pick<EnrichedMovie, 'id' | 'title' | 'releaseDate'>
+);
+
 export type GetMissingQueryVariables = {};
 
 
@@ -775,14 +791,10 @@ export type GetMissingQuery = (
   { __typename?: 'Query' }
   & { tvEpisodes: Array<(
     { __typename?: 'EnrichedTVEpisode' }
-    & Pick<EnrichedTvEpisode, 'id' | 'seasonNumber' | 'episodeNumber' | 'releaseDate'>
-    & { tvShow: (
-      { __typename?: 'TVShow' }
-      & Pick<TvShow, 'id' | 'title'>
-    ) }
+    & MissingTvEpisodesFragment
   )>, movies: Array<(
     { __typename?: 'EnrichedMovie' }
-    & Pick<EnrichedMovie, 'id' | 'title' | 'releaseDate'>
+    & MissingMoviesFragment
   )> }
 );
 
@@ -891,7 +903,7 @@ export type GetTvSeasonDetailsQuery = (
     & Pick<EnrichedTvEpisode, 'id' | 'episodeNumber' | 'seasonNumber' | 'state' | 'updatedAt' | 'voteAverage' | 'releaseDate' | 'createdAt'>
     & { tvShow: (
       { __typename?: 'TVShow' }
-      & Pick<TvShow, 'id' | 'title'>
+      & Pick<TvShow, 'id' | 'title' | 'tmdbId' | 'updatedAt' | 'createdAt'>
     ) }
   )> }
 );
@@ -957,7 +969,25 @@ export type SearchQuery = (
   ) }
 );
 
-
+export const MissingTvEpisodesFragmentDoc = gql`
+    fragment MissingTVEpisodes on EnrichedTVEpisode {
+  id
+  seasonNumber
+  episodeNumber
+  releaseDate
+  tvShow {
+    id
+    title
+  }
+}
+    `;
+export const MissingMoviesFragmentDoc = gql`
+    fragment MissingMovies on EnrichedMovie {
+  id
+  title
+  releaseDate
+}
+    `;
 export const ClearCacheDocument = gql`
     mutation clearCache {
   result: clearRedisCache {
@@ -1756,22 +1786,14 @@ export type GetLibraryTvShowsQueryResult = ApolloReactCommon.QueryResult<GetLibr
 export const GetMissingDocument = gql`
     query getMissing {
   tvEpisodes: getMissingTVEpisodes {
-    id
-    seasonNumber
-    episodeNumber
-    releaseDate
-    tvShow {
-      id
-      title
-    }
+    ...MissingTVEpisodes
   }
   movies: getMissingMovies {
-    id
-    title
-    releaseDate
+    ...MissingMovies
   }
 }
-    `;
+    ${MissingTvEpisodesFragmentDoc}
+${MissingMoviesFragmentDoc}`;
 
 /**
  * __useGetMissingQuery__
@@ -2102,6 +2124,9 @@ export const GetTvSeasonDetailsDocument = gql`
     tvShow {
       id
       title
+      tmdbId
+      updatedAt
+      createdAt
     }
   }
 }
