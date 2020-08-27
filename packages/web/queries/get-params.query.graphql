@@ -6,5 +6,6 @@ query getParams {
     jackett_api_key
     max_movie_download_size
     max_tvshow_episode_download_size
+    organize_library_strategy
   }
 }
