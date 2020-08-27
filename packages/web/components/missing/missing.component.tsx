@@ -10,8 +10,8 @@ import { availableIn } from '../../utils/available-in';
 
 import {
   useGetMissingQuery,
-  EnrichedMovie,
-  EnrichedTvEpisode,
+  MissingTvEpisodesFragment,
+  MissingMoviesFragment,
 } from '../../utils/graphql';
 
 import { ManualSearchComponent } from '../manual-search/manual-search.component';
@@ -25,11 +25,11 @@ export function MissingComponent() {
   });
 
   const [manualSearch, setManualSearch] = useState<
-    Partial<EnrichedMovie> | Partial<EnrichedTvEpisode> | null
+    MissingTvEpisodesFragment | MissingMoviesFragment | null
   >(null);
 
   const isMovies = pathname.includes('movies');
-  const rows: Array<Partial<EnrichedMovie> | Partial<EnrichedTvEpisode>> =
+  const rows: Array<MissingTvEpisodesFragment | MissingMoviesFragment> =
     (isMovies ? data?.movies : data?.tvEpisodes) || [];
 
   if (rows.length > 0) {

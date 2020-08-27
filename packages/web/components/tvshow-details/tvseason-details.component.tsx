@@ -16,8 +16,6 @@ import {
 import { availableIn } from '../../utils/available-in';
 import { ManualSearchComponent } from '../manual-search/manual-search.component';
 
-type TvEpisode = Omit<EnrichedTvEpisode, 'tvShow'>;
-
 interface TVSeasonDetailsProps {
   tvShowTMDBId: number;
   season: TmdbFormattedTvSeason;
@@ -28,7 +26,9 @@ export function TVSeasonDetailsComponent({
   season,
 }: TVSeasonDetailsProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [manualSearch, setManualSearch] = useState<TvEpisode | null>(null);
+  const [manualSearch, setManualSearch] = useState<EnrichedTvEpisode | null>(
+    null
+  );
 
   const { data, loading } = useGetTvSeasonDetailsQuery({
     pollInterval: 5000,
@@ -40,20 +40,20 @@ export function TVSeasonDetailsComponent({
     setIsOpen(!isOpen);
   };
 
-  const columns: ColumnsType<TvEpisode> = [
+  const columns: ColumnsType<EnrichedTvEpisode> = [
     {
       title: 'Title',
-      render: (row: TvEpisode) => `Episode ${row.episodeNumber}`,
+      render: (row: EnrichedTvEpisode) => `Episode ${row.episodeNumber}`,
       width: 100,
     },
     {
       title: 'Air date',
-      render: (row: TvEpisode) => availableIn(dayjs(row.releaseDate)),
+      render: (row: EnrichedTvEpisode) => availableIn(dayjs(row.releaseDate)),
     },
     {
       title: 'Status',
       align: 'right',
-      render: (row: TvEpisode) => {
+      render: (row: EnrichedTvEpisode) => {
         let color: string | undefined = undefined;
         let label = 'Missing';
 
@@ -84,7 +84,7 @@ export function TVSeasonDetailsComponent({
       title: 'Actions',
       align: 'right',
       width: 100,
-      render: (row: TvEpisode) => {
+      render: (row: EnrichedTvEpisode) => {
         const inLibrary = row.state !== DownloadableMediaState.Missing;
         return (
           <Tag
@@ -134,7 +134,7 @@ export function TVSeasonDetailsComponent({
           )}
         </div>
         {isOpen && (
-          <Table<TvEpisode>
+          <Table<EnrichedTvEpisode>
             rowKey="id"
             size="small"
             dataSource={data?.episodes || []}

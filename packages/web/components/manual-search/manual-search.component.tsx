@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { PureQueryOptions } from 'apollo-client';
+import { PureQueryOptions } from '@apollo/client';
 import { Modal, Button, Skeleton, Input, notification } from 'antd';
 
 import {
@@ -113,8 +113,10 @@ export function ManualSearchComponent(props: ManualSearchProps) {
     return setUploadTorrentLoading(false);
   };
 
-  /* eslint-disable-next-line */
-  useEffect(() => { search(); }, []);
+  useEffect(() => {
+    search();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Modal

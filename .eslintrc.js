@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-commonjs
 module.exports = {
   extends: ['algolia', 'algolia/react', 'algolia/typescript'],
   rules: {
@@ -9,6 +10,6 @@ module.exports = {
     'import/no-unresolved': 'off',
 
     'new-cap': 'off',
-    'no-console': 'warn'
-  }
+    'no-console': 'warn',
+  },
 };

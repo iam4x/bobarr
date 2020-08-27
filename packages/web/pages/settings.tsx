@@ -18,4 +18,4 @@ function SettingsPage() {
   );
 }
 
-export default withApollo({ ssr: false })(SettingsPage);
+export default withApollo(SettingsPage);

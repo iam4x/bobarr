@@ -129,7 +129,7 @@ export function ActionsComponents() {
       >
         Clear cache
       </Button>
-      <Button size="large" type="danger" onClick={handleResetClick}>
+      <Button size="large" danger={true} onClick={handleResetClick}>
         Reset bobarr
       </Button>
     </Card>

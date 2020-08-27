@@ -18,4 +18,4 @@ function SuggestionsPage() {
   );
 }
 
-export default withApollo({ ssr: false })(SuggestionsPage);
+export default withApollo(SuggestionsPage);

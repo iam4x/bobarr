@@ -14,6 +14,9 @@ query getTVSeasonDetails($tvShowTMDBId: Int!, $seasonNumber: Int!) {
     tvShow {
       id
       title
+      tmdbId
+      updatedAt
+      createdAt
     }
   }
 }

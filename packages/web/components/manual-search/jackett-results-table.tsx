@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import prettySize from 'prettysize';
 import { truncate, pick } from 'lodash';
-import { PureQueryOptions } from 'apollo-client';
+import { PureQueryOptions } from '@apollo/client';
 
 import { Table, Popover, Tag, notification } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
@@ -75,9 +75,7 @@ export function JackettResultsTable(props: JackettResultTableProps) {
       render: (row: JackettFormattedResult) => (
         <ManualDownloadMedia
           jackettResult={row}
-          // eslint-disable-next-line react/prop-types
           media={props.media}
-          // eslint-disable-next-line react/prop-types
           refetchQueries={props.refetchQueries || []}
         />
       ),

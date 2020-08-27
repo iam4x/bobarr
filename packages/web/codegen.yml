@@ -2,19 +2,19 @@ overwrite: true
 schema: "http://api:4000/graphql"
 documents: "{queries,mutations}/**/*.graphql"
 generates:
-  utils/introspection-result.ts:
-    plugins:
-      - fragment-matcher
-    config:
-      apolloClientVersion: 2
-
   utils/graphql.tsx:
-    plugins:
-      - "typescript"
-      - "typescript-operations"
-      - "typescript-react-apollo"
     config:
-      withHOC: false
-      avoidOptionals: false
       withHooks: true
       withComponent: false
+      withHOC: false
+      withMutationFn: false
+      addDocBlocks: false
+      reactApolloVersion: 3
+    plugins:
+      - add:
+          content: '/* eslint-disable */'
+      - add:
+          content: '/* this is a generated file, do not edit */'
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo

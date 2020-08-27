@@ -18,4 +18,4 @@ function CalendarPage() {
   );
 }
 
-export default withApollo({ ssr: false })(CalendarPage);
+export default withApollo(CalendarPage);
