@@ -162,4 +162,24 @@ export const MovieDetailsStyles = styled.div`
       margin-right: 12px;
     }
   }
+
+  .file-details {
+    margin-top: 12px;
+
+    li {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 570px;
+    }
+
+    strong {
+      font-weight: bold;
+    }
+
+    em {
+      margin-left: 8px;
+      font-family: monospace;
+    }
+  }
 `;

@@ -131,6 +131,14 @@ export type LibraryCalendar = {
   tvEpisodes: Array<EnrichedTvEpisode>;
 };
 
+export type LibraryFileDetails = {
+   __typename?: 'LibraryFileDetails';
+  id: Scalars['Float'];
+  libraryPath: Scalars['String'];
+  torrentFileName?: Maybe<Scalars['String']>;
+  libraryFileSize?: Maybe<Scalars['BigInt']>;
+};
+
 export type Movie = {
    __typename?: 'Movie';
   id: Scalars['Float'];
@@ -277,6 +285,7 @@ export type Query = {
   getMissingMovies: Array<EnrichedMovie>;
   getTVSeasonDetails: Array<EnrichedTvEpisode>;
   getCalendar: LibraryCalendar;
+  getMovieFileDetails: LibraryFileDetails;
   omdbSearch: OmdbInfo;
 };
 
@@ -319,6 +328,11 @@ export type QueryGetTorrentStatusArgs = {
 export type QueryGetTvSeasonDetailsArgs = {
   seasonNumber: Scalars['Int'];
   tvShowTMDBId: Scalars['Int'];
+};
+
+
+export type QueryGetMovieFileDetailsArgs = {
+  tmdbId: Scalars['Int'];
 };
 
 
@@ -770,6 +784,19 @@ export type GetMissingQuery = (
     { __typename?: 'EnrichedMovie' }
     & Pick<EnrichedMovie, 'id' | 'title' | 'releaseDate'>
   )> }
+);
+
+export type GetMovieFileDetailsQueryVariables = {
+  tmdbId: Scalars['Int'];
+};
+
+
+export type GetMovieFileDetailsQuery = (
+  { __typename?: 'Query' }
+  & { details: (
+    { __typename?: 'LibraryFileDetails' }
+    & Pick<LibraryFileDetails, 'id' | 'libraryPath' | 'libraryFileSize' | 'torrentFileName'>
+  ) }
 );
 
 export type GetParamsQueryVariables = {};
@@ -1770,6 +1797,42 @@ export function useGetMissingLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryH
 export type GetMissingQueryHookResult = ReturnType<typeof useGetMissingQuery>;
 export type GetMissingLazyQueryHookResult = ReturnType<typeof useGetMissingLazyQuery>;
 export type GetMissingQueryResult = ApolloReactCommon.QueryResult<GetMissingQuery, GetMissingQueryVariables>;
+export const GetMovieFileDetailsDocument = gql`
+    query getMovieFileDetails($tmdbId: Int!) {
+  details: getMovieFileDetails(tmdbId: $tmdbId) {
+    id
+    libraryPath
+    libraryFileSize
+    torrentFileName
+  }
+}
+    `;
+
+/**
+ * __useGetMovieFileDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetMovieFileDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMovieFileDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMovieFileDetailsQuery({
+ *   variables: {
+ *      tmdbId: // value for 'tmdbId'
+ *   },
+ * });
+ */
+export function useGetMovieFileDetailsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>(GetMovieFileDetailsDocument, baseOptions);
+      }
+export function useGetMovieFileDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>(GetMovieFileDetailsDocument, baseOptions);
+        }
+export type GetMovieFileDetailsQueryHookResult = ReturnType<typeof useGetMovieFileDetailsQuery>;
+export type GetMovieFileDetailsLazyQueryHookResult = ReturnType<typeof useGetMovieFileDetailsLazyQuery>;
+export type GetMovieFileDetailsQueryResult = ApolloReactCommon.QueryResult<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>;
 export const GetParamsDocument = gql`
     query getParams {
   params: getParams {

@@ -1,4 +1,5 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
+import BigInt from 'graphql-bigint';
 
 import { Movie } from 'src/entities/movie.entity';
 import { TVShow } from 'src/entities/tvshow.entity';
@@ -63,4 +64,12 @@ export class LibraryCalendar {
   @Field((_type) => [EnrichedMovie]) public movies!: EnrichedMovie[];
   @Field((_type) => [EnrichedTVEpisode])
   public tvEpisodes!: EnrichedTVEpisode[];
+}
+
+@ObjectType()
+export class LibraryFileDetails {
+  @Field() public id!: number;
+  @Field() public libraryPath!: string;
+  @Field({ nullable: true }) public torrentFileName?: string;
+  @Field((_type) => BigInt, { nullable: true }) public libraryFileSize?: number;
 }

@@ -47,7 +47,8 @@ export class LibraryService {
     private readonly jobsService: JobsService,
     private readonly transmissionService: TransmissionService,
     private readonly mediaViewDAO: MediaViewDAO,
-    private readonly paramsService: ParamsService
+    private readonly paramsService: ParamsService,
+    private readonly torrentDAO: TorrentDAO
   ) {
     this.logger = logger.child({ context: 'LibraryService' });
 
@@ -157,6 +158,29 @@ export class LibraryService {
     );
 
     return { movies, tvEpisodes };
+  }
+
+  public async getMovieFileDetails(tmdbId: number) {
+    const movie = await this.movieDAO
+      .findOneOrFail({ where: { tmdbId } })
+      .then(this.enrichMovie);
+
+    const torrentEntity = await this.torrentDAO.findOne({
+      where: { resourceType: FileType.MOVIE, resourceId: movie.id },
+    });
+
+    const transmissionTorrent = torrentEntity
+      ? await this.transmissionService.getTorrent(torrentEntity.torrentHash)
+      : null;
+
+    const year = dayjs(movie.releaseDate).format('YYYY');
+
+    return {
+      id: tmdbId,
+      libraryPath: `library/movies/${movie.title} (${year})`,
+      libraryFileSize: transmissionTorrent?.totalSize,
+      torrentFileName: transmissionTorrent?.name,
+    };
   }
 
   @LazyTransaction()
