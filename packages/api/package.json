@@ -9,7 +9,7 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "start": "nest start",
-    "dev": "yarn && yarn ts-node-dev --respawn --transpileOnly -r tsconfig-paths/register --ignore-watch node_modules src/main.ts",
+    "dev": "yarn && yarn ts-node-dev --interval 1000 --respawn --transpileOnly -r tsconfig-paths/register --ignore-watch node_modules src/main.ts",
     "start:debug": "nest start --debug --watch",
     "start:prod": "ENV=production node dist/main"
   },
