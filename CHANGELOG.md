@@ -12,6 +12,7 @@
 
 ### Fixes
 
+- handle multiple files with same extensions, like a sample of the movie downloaded
 - cache requests to tmdb api (perf)
 - fix discover download tvshow fails (https://github.com/iam4x/bobarr/issues/104)
 - enable firewall in vpn container, this will prevent download starts before vpn is connected (https://github.com/iam4x/bobarr/issues/132)
