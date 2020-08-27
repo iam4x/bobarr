@@ -18,4 +18,4 @@ function DiscoverPage() {
   );
 }
 
-export default withApollo({ ssr: false })(DiscoverPage);
+export default withApollo(DiscoverPage);

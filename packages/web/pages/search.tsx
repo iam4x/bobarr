@@ -18,4 +18,4 @@ function SearchPage() {
   );
 }
 
-export default withApollo({ ssr: false })(SearchPage);
+export default withApollo(SearchPage);

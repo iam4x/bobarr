@@ -1,7 +1,7 @@
-import gql from 'graphql-tag';
-import * as ApolloReactCommon from '@apollo/react-common';
-import * as ApolloReactHooks from '@apollo/react-hooks';
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -15,7 +15,21 @@ export type Scalars = {
   BigInt: any;
 };
 
+export type GraphQlCommonResponse = {
+  __typename?: 'GraphQLCommonResponse';
+  success: Scalars['Boolean'];
+  message?: Maybe<Scalars['String']>;
+};
 
+export type Movie = {
+  __typename?: 'Movie';
+  id: Scalars['Float'];
+  tmdbId: Scalars['Float'];
+  title: Scalars['String'];
+  state: DownloadableMediaState;
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
 
 export enum DownloadableMediaState {
   Searching = 'SEARCHING',
@@ -25,23 +39,143 @@ export enum DownloadableMediaState {
   Processed = 'PROCESSED'
 }
 
-export type DownloadingMedia = {
-   __typename?: 'DownloadingMedia';
-  id: Scalars['String'];
+
+export type TvShow = {
+  __typename?: 'TVShow';
+  id: Scalars['Float'];
+  tmdbId: Scalars['Float'];
   title: Scalars['String'];
-  tag: Scalars['String'];
-  resourceId: Scalars['Float'];
-  resourceType: FileType;
-  quality: Scalars['String'];
-  torrent: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type TmdbFormattedTvEpisode = {
+  __typename?: 'TMDBFormattedTVEpisode';
+  id: Scalars['Float'];
+  episodeNumber: Scalars['Float'];
+  name: Scalars['String'];
+  overview: Scalars['String'];
+  seasonNumber: Scalars['Float'];
+  voteCount?: Maybe<Scalars['Float']>;
+  voteAverage?: Maybe<Scalars['Float']>;
+  airDate?: Maybe<Scalars['String']>;
+  stillPath?: Maybe<Scalars['String']>;
+};
+
+export type TmdbFormattedTvSeason = {
+  __typename?: 'TMDBFormattedTVSeason';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  seasonNumber: Scalars['Float'];
+  inLibrary: Scalars['Boolean'];
+  overview?: Maybe<Scalars['String']>;
+  airDate?: Maybe<Scalars['String']>;
+  episodeCount?: Maybe<Scalars['Float']>;
+  posterPath?: Maybe<Scalars['String']>;
+  episodes?: Maybe<Array<TmdbFormattedTvEpisode>>;
+};
+
+export type TmdbSearchResult = {
+  __typename?: 'TMDBSearchResult';
+  id: Scalars['Float'];
+  tmdbId: Scalars['Float'];
+  title: Scalars['String'];
+  voteAverage: Scalars['Float'];
+  overview: Scalars['String'];
+  runtime?: Maybe<Scalars['Float']>;
+  posterPath?: Maybe<Scalars['String']>;
+  releaseDate?: Maybe<Scalars['String']>;
+};
+
+export type TmdbSearchResults = {
+  __typename?: 'TMDBSearchResults';
+  movies: Array<TmdbSearchResult>;
+  tvShows: Array<TmdbSearchResult>;
+};
+
+export type TmdbPaginatedResult = {
+  __typename?: 'TMDBPaginatedResult';
+  page: Scalars['Float'];
+  totalResults: Scalars['Float'];
+  totalPages: Scalars['Float'];
+  results: Array<TmdbSearchResult>;
+};
+
+export type TmdbLanguagesResult = {
+  __typename?: 'TMDBLanguagesResult';
+  code: Scalars['String'];
+  language: Scalars['String'];
+};
+
+export type TmdbGenresResult = {
+  __typename?: 'TMDBGenresResult';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+};
+
+export type TmdbGenresResults = {
+  __typename?: 'TMDBGenresResults';
+  movieGenres: Array<TmdbGenresResult>;
+  tvShowGenres: Array<TmdbGenresResult>;
+};
+
+export type Quality = {
+  __typename?: 'Quality';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  match: Array<Scalars['String']>;
+  score: Scalars['Float'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  type: Entertainment;
+};
+
+export enum Entertainment {
+  TvShow = 'TvShow',
+  Movie = 'Movie'
+}
+
+export type Tag = {
+  __typename?: 'Tag';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  score: Scalars['Float'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type ParamsHash = {
+  __typename?: 'ParamsHash';
+  region: Scalars['String'];
+  language: Scalars['String'];
+  tmdb_api_key: Scalars['String'];
+  jackett_api_key: Scalars['String'];
+  max_movie_download_size: Scalars['String'];
+  max_tvshow_episode_download_size: Scalars['String'];
+  organize_library_strategy: Scalars['String'];
 };
 
 export type EnrichedMovie = {
-   __typename?: 'EnrichedMovie';
+  __typename?: 'EnrichedMovie';
   id: Scalars['Float'];
   tmdbId: Scalars['Float'];
   title: Scalars['String'];
   state: DownloadableMediaState;
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  overview: Scalars['String'];
+  voteAverage: Scalars['Float'];
+  releaseDate: Scalars['String'];
+  originalTitle?: Maybe<Scalars['String']>;
+  posterPath?: Maybe<Scalars['String']>;
+  runtime?: Maybe<Scalars['Float']>;
+};
+
+export type EnrichedTvShow = {
+  __typename?: 'EnrichedTVShow';
+  id: Scalars['Float'];
+  tmdbId: Scalars['Float'];
+  title: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   overview: Scalars['String'];
@@ -53,7 +187,7 @@ export type EnrichedMovie = {
 };
 
 export type EnrichedTvEpisode = {
-   __typename?: 'EnrichedTVEpisode';
+  __typename?: 'EnrichedTVEpisode';
   id: Scalars['Float'];
   episodeNumber: Scalars['Float'];
   seasonNumber: Scalars['Float'];
@@ -65,25 +199,16 @@ export type EnrichedTvEpisode = {
   voteAverage?: Maybe<Scalars['Float']>;
 };
 
-export type EnrichedTvShow = {
-   __typename?: 'EnrichedTVShow';
-  id: Scalars['Float'];
-  tmdbId: Scalars['Float'];
+export type DownloadingMedia = {
+  __typename?: 'DownloadingMedia';
+  id: Scalars['String'];
   title: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-  overview: Scalars['String'];
-  voteAverage: Scalars['Float'];
-  releaseDate: Scalars['String'];
-  originalTitle?: Maybe<Scalars['String']>;
-  posterPath?: Maybe<Scalars['String']>;
-  runtime?: Maybe<Scalars['Float']>;
+  tag: Scalars['String'];
+  resourceId: Scalars['Float'];
+  resourceType: FileType;
+  quality: Scalars['String'];
+  torrent: Scalars['String'];
 };
-
-export enum Entertainment {
-  TvShow = 'TvShow',
-  Movie = 'Movie'
-}
 
 export enum FileType {
   Episode = 'EPISODE',
@@ -91,19 +216,31 @@ export enum FileType {
   Movie = 'MOVIE'
 }
 
-export type GetTorrentStatusInput = {
-  resourceId: Scalars['Int'];
+export type SearchingMedia = {
+  __typename?: 'SearchingMedia';
+  id: Scalars['String'];
+  title: Scalars['String'];
+  resourceId: Scalars['Float'];
   resourceType: FileType;
 };
 
-export type GraphQlCommonResponse = {
-   __typename?: 'GraphQLCommonResponse';
-  success: Scalars['Boolean'];
-  message?: Maybe<Scalars['String']>;
+export type LibraryCalendar = {
+  __typename?: 'LibraryCalendar';
+  movies: Array<EnrichedMovie>;
+  tvEpisodes: Array<EnrichedTvEpisode>;
 };
 
+export type LibraryFileDetails = {
+  __typename?: 'LibraryFileDetails';
+  id: Scalars['Float'];
+  libraryPath: Scalars['String'];
+  torrentFileName?: Maybe<Scalars['String']>;
+  libraryFileSize?: Maybe<Scalars['BigInt']>;
+};
+
+
 export type JackettFormattedResult = {
-   __typename?: 'JackettFormattedResult';
+  __typename?: 'JackettFormattedResult';
   id: Scalars['String'];
   title: Scalars['String'];
   quality: Scalars['String'];
@@ -120,39 +257,117 @@ export type JackettFormattedResult = {
   size: Scalars['BigInt'];
 };
 
-export type JackettInput = {
+export type TorrentStatus = {
+  __typename?: 'TorrentStatus';
+  id: Scalars['Int'];
+  resourceId: Scalars['Int'];
+  resourceType: FileType;
+  percentDone: Scalars['Float'];
+  rateDownload: Scalars['Int'];
+  rateUpload: Scalars['Int'];
+  uploadRatio: Scalars['Float'];
+  uploadedEver: Scalars['BigInt'];
+  totalSize: Scalars['BigInt'];
+  status: Scalars['Int'];
+};
+
+export type Ratings = {
+  __typename?: 'Ratings';
+  IMDB?: Maybe<Scalars['String']>;
+  rottenTomatoes?: Maybe<Scalars['String']>;
+  metaCritic?: Maybe<Scalars['String']>;
+};
+
+export type OmdbInfo = {
+  __typename?: 'OMDBInfo';
+  ratings: Ratings;
+};
+
+export type Query = {
+  __typename?: 'Query';
+  getQualityParams: Array<Quality>;
+  getTags: Array<Tag>;
+  getParams: ParamsHash;
+  search: TmdbSearchResults;
+  getPopular: TmdbSearchResults;
+  getTVShowSeasons: Array<TmdbFormattedTvSeason>;
+  getRecommendedTVShows: Array<TmdbSearchResult>;
+  getRecommendedMovies: Array<TmdbSearchResult>;
+  discover: TmdbPaginatedResult;
+  getLanguages: Array<TmdbLanguagesResult>;
+  getGenres: TmdbGenresResults;
+  searchJackett: Array<JackettFormattedResult>;
+  getTorrentStatus: Array<TorrentStatus>;
+  getDownloadingMedias: Array<DownloadingMedia>;
+  getSearchingMedias: Array<SearchingMedia>;
+  getMovies: Array<EnrichedMovie>;
+  getTVShows: Array<EnrichedTvShow>;
+  getMissingTVEpisodes: Array<EnrichedTvEpisode>;
+  getMissingMovies: Array<EnrichedMovie>;
+  getTVSeasonDetails: Array<EnrichedTvEpisode>;
+  getCalendar: LibraryCalendar;
+  getMovieFileDetails: LibraryFileDetails;
+  omdbSearch: OmdbInfo;
+};
+
+
+export type QueryGetQualityParamsArgs = {
+  type: Entertainment;
+};
+
+
+export type QuerySearchArgs = {
+  query: Scalars['String'];
+};
+
+
+export type QueryGetTvShowSeasonsArgs = {
+  tvShowTMDBId: Scalars['Int'];
+};
+
+
+export type QueryDiscoverArgs = {
+  originLanguage?: Maybe<Scalars['String']>;
+  primaryReleaseYear?: Maybe<Scalars['String']>;
+  score?: Maybe<Scalars['Float']>;
+  genres?: Maybe<Array<Scalars['Float']>>;
+  page?: Maybe<Scalars['Float']>;
+  entertainment?: Maybe<Entertainment>;
+};
+
+
+export type QuerySearchJackettArgs = {
+  query: Scalars['String'];
+};
+
+
+export type QueryGetTorrentStatusArgs = {
+  torrents: Array<GetTorrentStatusInput>;
+};
+
+
+export type QueryGetTvSeasonDetailsArgs = {
+  seasonNumber: Scalars['Int'];
+  tvShowTMDBId: Scalars['Int'];
+};
+
+
+export type QueryGetMovieFileDetailsArgs = {
+  tmdbId: Scalars['Int'];
+};
+
+
+export type QueryOmdbSearchArgs = {
   title: Scalars['String'];
-  downloadLink: Scalars['String'];
-  quality: Scalars['String'];
-  tag: Scalars['String'];
 };
 
-export type LibraryCalendar = {
-   __typename?: 'LibraryCalendar';
-  movies: Array<EnrichedMovie>;
-  tvEpisodes: Array<EnrichedTvEpisode>;
-};
-
-export type LibraryFileDetails = {
-   __typename?: 'LibraryFileDetails';
-  id: Scalars['Float'];
-  libraryPath: Scalars['String'];
-  torrentFileName?: Maybe<Scalars['String']>;
-  libraryFileSize?: Maybe<Scalars['BigInt']>;
-};
-
-export type Movie = {
-   __typename?: 'Movie';
-  id: Scalars['Float'];
-  tmdbId: Scalars['Float'];
-  title: Scalars['String'];
-  state: DownloadableMediaState;
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
+export type GetTorrentStatusInput = {
+  resourceId: Scalars['Int'];
+  resourceType: FileType;
 };
 
 export type Mutation = {
-   __typename?: 'Mutation';
+  __typename?: 'Mutation';
   saveQualityParams: GraphQlCommonResponse;
   saveTags: GraphQlCommonResponse;
   clearRedisCache: GraphQlCommonResponse;
@@ -232,138 +447,9 @@ export type MutationDownloadOwnTorrentArgs = {
   mediaId: Scalars['Int'];
 };
 
-export type OmdbInfo = {
-   __typename?: 'OMDBInfo';
-  ratings: Ratings;
-};
-
-export type ParamsHash = {
-   __typename?: 'ParamsHash';
-  region: Scalars['String'];
-  language: Scalars['String'];
-  tmdb_api_key: Scalars['String'];
-  jackett_api_key: Scalars['String'];
-  max_movie_download_size: Scalars['String'];
-  max_tvshow_episode_download_size: Scalars['String'];
-  organize_library_strategy: Scalars['String'];
-};
-
-export type Quality = {
-   __typename?: 'Quality';
-  id: Scalars['Float'];
-  name: Scalars['String'];
-  match: Array<Scalars['String']>;
-  score: Scalars['Float'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-  type: Entertainment;
-};
-
 export type QualityInput = {
   id: Scalars['Float'];
   score: Scalars['Float'];
-};
-
-export type Query = {
-   __typename?: 'Query';
-  getQualityParams: Array<Quality>;
-  getTags: Array<Tag>;
-  getParams: ParamsHash;
-  search: TmdbSearchResults;
-  getPopular: TmdbSearchResults;
-  getTVShowSeasons: Array<TmdbFormattedTvSeason>;
-  getRecommendedTVShows: Array<TmdbSearchResult>;
-  getRecommendedMovies: Array<TmdbSearchResult>;
-  discover: TmdbPaginatedResult;
-  getLanguages: Array<TmdbLanguagesResult>;
-  getGenres: TmdbGenresResults;
-  searchJackett: Array<JackettFormattedResult>;
-  getTorrentStatus: Array<TorrentStatus>;
-  getDownloadingMedias: Array<DownloadingMedia>;
-  getSearchingMedias: Array<SearchingMedia>;
-  getMovies: Array<EnrichedMovie>;
-  getTVShows: Array<EnrichedTvShow>;
-  getMissingTVEpisodes: Array<EnrichedTvEpisode>;
-  getMissingMovies: Array<EnrichedMovie>;
-  getTVSeasonDetails: Array<EnrichedTvEpisode>;
-  getCalendar: LibraryCalendar;
-  getMovieFileDetails: LibraryFileDetails;
-  omdbSearch: OmdbInfo;
-};
-
-
-export type QueryGetQualityParamsArgs = {
-  type: Entertainment;
-};
-
-
-export type QuerySearchArgs = {
-  query: Scalars['String'];
-};
-
-
-export type QueryGetTvShowSeasonsArgs = {
-  tvShowTMDBId: Scalars['Int'];
-};
-
-
-export type QueryDiscoverArgs = {
-  originLanguage?: Maybe<Scalars['String']>;
-  primaryReleaseYear?: Maybe<Scalars['String']>;
-  score?: Maybe<Scalars['Float']>;
-  genres?: Maybe<Array<Scalars['Float']>>;
-  page?: Maybe<Scalars['Float']>;
-  entertainment?: Maybe<Entertainment>;
-};
-
-
-export type QuerySearchJackettArgs = {
-  query: Scalars['String'];
-};
-
-
-export type QueryGetTorrentStatusArgs = {
-  torrents: Array<GetTorrentStatusInput>;
-};
-
-
-export type QueryGetTvSeasonDetailsArgs = {
-  seasonNumber: Scalars['Int'];
-  tvShowTMDBId: Scalars['Int'];
-};
-
-
-export type QueryGetMovieFileDetailsArgs = {
-  tmdbId: Scalars['Int'];
-};
-
-
-export type QueryOmdbSearchArgs = {
-  title: Scalars['String'];
-};
-
-export type Ratings = {
-   __typename?: 'Ratings';
-  IMDB?: Maybe<Scalars['String']>;
-  rottenTomatoes?: Maybe<Scalars['String']>;
-  metaCritic?: Maybe<Scalars['String']>;
-};
-
-export type SearchingMedia = {
-   __typename?: 'SearchingMedia';
-  id: Scalars['String'];
-  title: Scalars['String'];
-  resourceId: Scalars['Float'];
-  resourceType: FileType;
-};
-
-export type Tag = {
-   __typename?: 'Tag';
-  id: Scalars['Float'];
-  name: Scalars['String'];
-  score: Scalars['Float'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
 };
 
 export type TagInput = {
@@ -371,105 +457,19 @@ export type TagInput = {
   score: Scalars['Float'];
 };
 
-export type TmdbFormattedTvEpisode = {
-   __typename?: 'TMDBFormattedTVEpisode';
-  id: Scalars['Float'];
-  episodeNumber: Scalars['Float'];
-  name: Scalars['String'];
-  overview: Scalars['String'];
-  seasonNumber: Scalars['Float'];
-  voteCount?: Maybe<Scalars['Float']>;
-  voteAverage?: Maybe<Scalars['Float']>;
-  airDate?: Maybe<Scalars['String']>;
-  stillPath?: Maybe<Scalars['String']>;
-};
-
-export type TmdbFormattedTvSeason = {
-   __typename?: 'TMDBFormattedTVSeason';
-  id: Scalars['Float'];
-  name: Scalars['String'];
-  seasonNumber: Scalars['Float'];
-  inLibrary: Scalars['Boolean'];
-  overview?: Maybe<Scalars['String']>;
-  airDate?: Maybe<Scalars['String']>;
-  episodeCount?: Maybe<Scalars['Float']>;
-  posterPath?: Maybe<Scalars['String']>;
-  episodes?: Maybe<Array<TmdbFormattedTvEpisode>>;
-};
-
-export type TmdbGenresResult = {
-   __typename?: 'TMDBGenresResult';
-  id: Scalars['Float'];
-  name: Scalars['String'];
-};
-
-export type TmdbGenresResults = {
-   __typename?: 'TMDBGenresResults';
-  movieGenres: Array<TmdbGenresResult>;
-  tvShowGenres: Array<TmdbGenresResult>;
-};
-
-export type TmdbLanguagesResult = {
-   __typename?: 'TMDBLanguagesResult';
-  code: Scalars['String'];
-  language: Scalars['String'];
-};
-
-export type TmdbPaginatedResult = {
-   __typename?: 'TMDBPaginatedResult';
-  page: Scalars['Float'];
-  totalResults: Scalars['Float'];
-  totalPages: Scalars['Float'];
-  results: Array<TmdbSearchResult>;
-};
-
-export type TmdbSearchResult = {
-   __typename?: 'TMDBSearchResult';
-  id: Scalars['Float'];
-  tmdbId: Scalars['Float'];
-  title: Scalars['String'];
-  voteAverage: Scalars['Float'];
-  overview: Scalars['String'];
-  runtime?: Maybe<Scalars['Float']>;
-  posterPath?: Maybe<Scalars['String']>;
-  releaseDate?: Maybe<Scalars['String']>;
-};
-
-export type TmdbSearchResults = {
-   __typename?: 'TMDBSearchResults';
-  movies: Array<TmdbSearchResult>;
-  tvShows: Array<TmdbSearchResult>;
-};
-
-export type TorrentStatus = {
-   __typename?: 'TorrentStatus';
-  id: Scalars['Int'];
-  resourceId: Scalars['Int'];
-  resourceType: FileType;
-  percentDone: Scalars['Float'];
-  rateDownload: Scalars['Int'];
-  rateUpload: Scalars['Int'];
-  uploadRatio: Scalars['Float'];
-  uploadedEver: Scalars['BigInt'];
-  totalSize: Scalars['BigInt'];
-  status: Scalars['Int'];
-};
-
-export type TvShow = {
-   __typename?: 'TVShow';
-  id: Scalars['Float'];
-  tmdbId: Scalars['Float'];
-  title: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-};
-
 export type UpdateParamsInput = {
   key: Scalars['String'];
   value: Scalars['String'];
 };
 
-export type ClearCacheMutationVariables = {};
+export type JackettInput = {
+  title: Scalars['String'];
+  downloadLink: Scalars['String'];
+  quality: Scalars['String'];
+  tag: Scalars['String'];
+};
+
+export type ClearCacheMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ClearCacheMutation = (
@@ -480,11 +480,11 @@ export type ClearCacheMutation = (
   ) }
 );
 
-export type DownloadOwnTorrentMutationVariables = {
+export type DownloadOwnTorrentMutationVariables = Exact<{
   mediaId: Scalars['Int'];
   mediaType: FileType;
   torrent: Scalars['String'];
-};
+}>;
 
 
 export type DownloadOwnTorrentMutation = (
@@ -495,7 +495,7 @@ export type DownloadOwnTorrentMutation = (
   ) }
 );
 
-export type StartScanLibraryMutationVariables = {};
+export type StartScanLibraryMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type StartScanLibraryMutation = (
@@ -506,7 +506,7 @@ export type StartScanLibraryMutation = (
   ) }
 );
 
-export type StartFindNewEpisodesMutationVariables = {};
+export type StartFindNewEpisodesMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type StartFindNewEpisodesMutation = (
@@ -517,7 +517,7 @@ export type StartFindNewEpisodesMutation = (
   ) }
 );
 
-export type StartDownloadMissingMutationVariables = {};
+export type StartDownloadMissingMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type StartDownloadMissingMutation = (
@@ -528,10 +528,10 @@ export type StartDownloadMissingMutation = (
   ) }
 );
 
-export type DownloadMovieMutationVariables = {
+export type DownloadMovieMutationVariables = Exact<{
   movieId: Scalars['Int'];
   jackettResult: JackettInput;
-};
+}>;
 
 
 export type DownloadMovieMutation = (
@@ -542,10 +542,10 @@ export type DownloadMovieMutation = (
   ) }
 );
 
-export type DownloadTvEpisodeMutationVariables = {
+export type DownloadTvEpisodeMutationVariables = Exact<{
   episodeId: Scalars['Int'];
   jackettResult: JackettInput;
-};
+}>;
 
 
 export type DownloadTvEpisodeMutation = (
@@ -556,9 +556,9 @@ export type DownloadTvEpisodeMutation = (
   ) }
 );
 
-export type RemoveMovieMutationVariables = {
+export type RemoveMovieMutationVariables = Exact<{
   tmdbId: Scalars['Int'];
-};
+}>;
 
 
 export type RemoveMovieMutation = (
@@ -569,9 +569,9 @@ export type RemoveMovieMutation = (
   ) }
 );
 
-export type RemoveTvShowMutationVariables = {
+export type RemoveTvShowMutationVariables = Exact<{
   tmdbId: Scalars['Int'];
-};
+}>;
 
 
 export type RemoveTvShowMutation = (
@@ -582,10 +582,10 @@ export type RemoveTvShowMutation = (
   ) }
 );
 
-export type ResetLibraryMutationVariables = {
+export type ResetLibraryMutationVariables = Exact<{
   deleteFiles: Scalars['Boolean'];
   resetSettings: Scalars['Boolean'];
-};
+}>;
 
 
 export type ResetLibraryMutation = (
@@ -596,9 +596,9 @@ export type ResetLibraryMutation = (
   ) }
 );
 
-export type SaveQualityMutationVariables = {
+export type SaveQualityMutationVariables = Exact<{
   qualities: Array<QualityInput>;
-};
+}>;
 
 
 export type SaveQualityMutation = (
@@ -609,9 +609,9 @@ export type SaveQualityMutation = (
   ) }
 );
 
-export type SaveTagsMutationVariables = {
+export type SaveTagsMutationVariables = Exact<{
   tags: Array<TagInput>;
-};
+}>;
 
 
 export type SaveTagsMutation = (
@@ -622,10 +622,10 @@ export type SaveTagsMutation = (
   ) }
 );
 
-export type TrackMovieMutationVariables = {
+export type TrackMovieMutationVariables = Exact<{
   title: Scalars['String'];
   tmdbId: Scalars['Int'];
-};
+}>;
 
 
 export type TrackMovieMutation = (
@@ -636,10 +636,10 @@ export type TrackMovieMutation = (
   ) }
 );
 
-export type TrackTvShowMutationVariables = {
+export type TrackTvShowMutationVariables = Exact<{
   tmdbId: Scalars['Int'];
   seasonNumbers: Array<Scalars['Int']>;
-};
+}>;
 
 
 export type TrackTvShowMutation = (
@@ -650,9 +650,9 @@ export type TrackTvShowMutation = (
   ) }
 );
 
-export type UpdateParamsMutationVariables = {
+export type UpdateParamsMutationVariables = Exact<{
   params: Array<UpdateParamsInput>;
-};
+}>;
 
 
 export type UpdateParamsMutation = (
@@ -663,7 +663,7 @@ export type UpdateParamsMutation = (
   ) }
 );
 
-export type GetCalendarQueryVariables = {};
+export type GetCalendarQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetCalendarQuery = (
@@ -684,14 +684,14 @@ export type GetCalendarQuery = (
   ) }
 );
 
-export type GetDiscoverQueryVariables = {
+export type GetDiscoverQueryVariables = Exact<{
   entertainment?: Maybe<Entertainment>;
   originLanguage?: Maybe<Scalars['String']>;
   primaryReleaseYear?: Maybe<Scalars['String']>;
   score?: Maybe<Scalars['Float']>;
   genres?: Maybe<Array<Scalars['Float']>>;
   page?: Maybe<Scalars['Float']>;
-};
+}>;
 
 
 export type GetDiscoverQuery = (
@@ -706,7 +706,7 @@ export type GetDiscoverQuery = (
   ) }
 );
 
-export type GetDownloadingQueryVariables = {};
+export type GetDownloadingQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetDownloadingQuery = (
@@ -720,7 +720,7 @@ export type GetDownloadingQuery = (
   )> }
 );
 
-export type GetGenresQueryVariables = {};
+export type GetGenresQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetGenresQuery = (
@@ -737,7 +737,7 @@ export type GetGenresQuery = (
   ) }
 );
 
-export type GetLanguagesQueryVariables = {};
+export type GetLanguagesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetLanguagesQuery = (
@@ -748,7 +748,7 @@ export type GetLanguagesQuery = (
   )> }
 );
 
-export type GetLibraryMoviesQueryVariables = {};
+export type GetLibraryMoviesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetLibraryMoviesQuery = (
@@ -759,7 +759,7 @@ export type GetLibraryMoviesQuery = (
   )> }
 );
 
-export type GetLibraryTvShowsQueryVariables = {};
+export type GetLibraryTvShowsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetLibraryTvShowsQuery = (
@@ -784,7 +784,7 @@ export type MissingMoviesFragment = (
   & Pick<EnrichedMovie, 'id' | 'title' | 'releaseDate'>
 );
 
-export type GetMissingQueryVariables = {};
+export type GetMissingQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetMissingQuery = (
@@ -798,9 +798,9 @@ export type GetMissingQuery = (
   )> }
 );
 
-export type GetMovieFileDetailsQueryVariables = {
+export type GetMovieFileDetailsQueryVariables = Exact<{
   tmdbId: Scalars['Int'];
-};
+}>;
 
 
 export type GetMovieFileDetailsQuery = (
@@ -811,7 +811,7 @@ export type GetMovieFileDetailsQuery = (
   ) }
 );
 
-export type GetParamsQueryVariables = {};
+export type GetParamsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetParamsQuery = (
@@ -822,7 +822,7 @@ export type GetParamsQuery = (
   ) }
 );
 
-export type GetPopularQueryVariables = {};
+export type GetPopularQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetPopularQuery = (
@@ -839,9 +839,9 @@ export type GetPopularQuery = (
   ) }
 );
 
-export type GetQualityQueryVariables = {
+export type GetQualityQueryVariables = Exact<{
   type: Entertainment;
-};
+}>;
 
 
 export type GetQualityQuery = (
@@ -852,7 +852,7 @@ export type GetQualityQuery = (
   )> }
 );
 
-export type GetRecommendedQueryVariables = {};
+export type GetRecommendedQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetRecommendedQuery = (
@@ -866,7 +866,7 @@ export type GetRecommendedQuery = (
   )> }
 );
 
-export type GetTagsQueryVariables = {};
+export type GetTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetTagsQuery = (
@@ -877,9 +877,9 @@ export type GetTagsQuery = (
   )> }
 );
 
-export type GetTorrentStatusQueryVariables = {
+export type GetTorrentStatusQueryVariables = Exact<{
   torrents: Array<GetTorrentStatusInput>;
-};
+}>;
 
 
 export type GetTorrentStatusQuery = (
@@ -890,10 +890,10 @@ export type GetTorrentStatusQuery = (
   )> }
 );
 
-export type GetTvSeasonDetailsQueryVariables = {
+export type GetTvSeasonDetailsQueryVariables = Exact<{
   tvShowTMDBId: Scalars['Int'];
   seasonNumber: Scalars['Int'];
-};
+}>;
 
 
 export type GetTvSeasonDetailsQuery = (
@@ -908,9 +908,9 @@ export type GetTvSeasonDetailsQuery = (
   )> }
 );
 
-export type GetTvShowSeasonsQueryVariables = {
+export type GetTvShowSeasonsQueryVariables = Exact<{
   tvShowTMDBId: Scalars['Int'];
-};
+}>;
 
 
 export type GetTvShowSeasonsQuery = (
@@ -921,9 +921,9 @@ export type GetTvShowSeasonsQuery = (
   )> }
 );
 
-export type OmdbSearchQueryVariables = {
+export type OmdbSearchQueryVariables = Exact<{
   title: Scalars['String'];
-};
+}>;
 
 
 export type OmdbSearchQuery = (
@@ -937,9 +937,9 @@ export type OmdbSearchQuery = (
   ) }
 );
 
-export type SearchTorrentQueryVariables = {
+export type SearchTorrentQueryVariables = Exact<{
   query: Scalars['String'];
-};
+}>;
 
 
 export type SearchTorrentQuery = (
@@ -950,9 +950,9 @@ export type SearchTorrentQuery = (
   )> }
 );
 
-export type SearchQueryVariables = {
+export type SearchQueryVariables = Exact<{
   query: Scalars['String'];
-};
+}>;
 
 
 export type SearchQuery = (
@@ -996,7 +996,7 @@ export const ClearCacheDocument = gql`
   }
 }
     `;
-export type ClearCacheMutationFn = ApolloReactCommon.MutationFunction<ClearCacheMutation, ClearCacheMutationVariables>;
+export type ClearCacheMutationFn = Apollo.MutationFunction<ClearCacheMutation, ClearCacheMutationVariables>;
 
 /**
  * __useClearCacheMutation__
@@ -1014,12 +1014,12 @@ export type ClearCacheMutationFn = ApolloReactCommon.MutationFunction<ClearCache
  *   },
  * });
  */
-export function useClearCacheMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ClearCacheMutation, ClearCacheMutationVariables>) {
-        return ApolloReactHooks.useMutation<ClearCacheMutation, ClearCacheMutationVariables>(ClearCacheDocument, baseOptions);
+export function useClearCacheMutation(baseOptions?: Apollo.MutationHookOptions<ClearCacheMutation, ClearCacheMutationVariables>) {
+        return Apollo.useMutation<ClearCacheMutation, ClearCacheMutationVariables>(ClearCacheDocument, baseOptions);
       }
 export type ClearCacheMutationHookResult = ReturnType<typeof useClearCacheMutation>;
-export type ClearCacheMutationResult = ApolloReactCommon.MutationResult<ClearCacheMutation>;
-export type ClearCacheMutationOptions = ApolloReactCommon.BaseMutationOptions<ClearCacheMutation, ClearCacheMutationVariables>;
+export type ClearCacheMutationResult = Apollo.MutationResult<ClearCacheMutation>;
+export type ClearCacheMutationOptions = Apollo.BaseMutationOptions<ClearCacheMutation, ClearCacheMutationVariables>;
 export const DownloadOwnTorrentDocument = gql`
     mutation downloadOwnTorrent($mediaId: Int!, $mediaType: FileType!, $torrent: String!) {
   downloadOwnTorrent(mediaId: $mediaId, mediaType: $mediaType, torrent: $torrent) {
@@ -1028,7 +1028,7 @@ export const DownloadOwnTorrentDocument = gql`
   }
 }
     `;
-export type DownloadOwnTorrentMutationFn = ApolloReactCommon.MutationFunction<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>;
+export type DownloadOwnTorrentMutationFn = Apollo.MutationFunction<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>;
 
 /**
  * __useDownloadOwnTorrentMutation__
@@ -1049,12 +1049,12 @@ export type DownloadOwnTorrentMutationFn = ApolloReactCommon.MutationFunction<Do
  *   },
  * });
  */
-export function useDownloadOwnTorrentMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>) {
-        return ApolloReactHooks.useMutation<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>(DownloadOwnTorrentDocument, baseOptions);
+export function useDownloadOwnTorrentMutation(baseOptions?: Apollo.MutationHookOptions<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>) {
+        return Apollo.useMutation<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>(DownloadOwnTorrentDocument, baseOptions);
       }
 export type DownloadOwnTorrentMutationHookResult = ReturnType<typeof useDownloadOwnTorrentMutation>;
-export type DownloadOwnTorrentMutationResult = ApolloReactCommon.MutationResult<DownloadOwnTorrentMutation>;
-export type DownloadOwnTorrentMutationOptions = ApolloReactCommon.BaseMutationOptions<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>;
+export type DownloadOwnTorrentMutationResult = Apollo.MutationResult<DownloadOwnTorrentMutation>;
+export type DownloadOwnTorrentMutationOptions = Apollo.BaseMutationOptions<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>;
 export const StartScanLibraryDocument = gql`
     mutation startScanLibrary {
   result: startScanLibraryJob {
@@ -1063,7 +1063,7 @@ export const StartScanLibraryDocument = gql`
   }
 }
     `;
-export type StartScanLibraryMutationFn = ApolloReactCommon.MutationFunction<StartScanLibraryMutation, StartScanLibraryMutationVariables>;
+export type StartScanLibraryMutationFn = Apollo.MutationFunction<StartScanLibraryMutation, StartScanLibraryMutationVariables>;
 
 /**
  * __useStartScanLibraryMutation__
@@ -1081,12 +1081,12 @@ export type StartScanLibraryMutationFn = ApolloReactCommon.MutationFunction<Star
  *   },
  * });
  */
-export function useStartScanLibraryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<StartScanLibraryMutation, StartScanLibraryMutationVariables>) {
-        return ApolloReactHooks.useMutation<StartScanLibraryMutation, StartScanLibraryMutationVariables>(StartScanLibraryDocument, baseOptions);
+export function useStartScanLibraryMutation(baseOptions?: Apollo.MutationHookOptions<StartScanLibraryMutation, StartScanLibraryMutationVariables>) {
+        return Apollo.useMutation<StartScanLibraryMutation, StartScanLibraryMutationVariables>(StartScanLibraryDocument, baseOptions);
       }
 export type StartScanLibraryMutationHookResult = ReturnType<typeof useStartScanLibraryMutation>;
-export type StartScanLibraryMutationResult = ApolloReactCommon.MutationResult<StartScanLibraryMutation>;
-export type StartScanLibraryMutationOptions = ApolloReactCommon.BaseMutationOptions<StartScanLibraryMutation, StartScanLibraryMutationVariables>;
+export type StartScanLibraryMutationResult = Apollo.MutationResult<StartScanLibraryMutation>;
+export type StartScanLibraryMutationOptions = Apollo.BaseMutationOptions<StartScanLibraryMutation, StartScanLibraryMutationVariables>;
 export const StartFindNewEpisodesDocument = gql`
     mutation startFindNewEpisodes {
   result: startFindNewEpisodesJob {
@@ -1095,7 +1095,7 @@ export const StartFindNewEpisodesDocument = gql`
   }
 }
     `;
-export type StartFindNewEpisodesMutationFn = ApolloReactCommon.MutationFunction<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>;
+export type StartFindNewEpisodesMutationFn = Apollo.MutationFunction<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>;
 
 /**
  * __useStartFindNewEpisodesMutation__
@@ -1113,12 +1113,12 @@ export type StartFindNewEpisodesMutationFn = ApolloReactCommon.MutationFunction<
  *   },
  * });
  */
-export function useStartFindNewEpisodesMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>) {
-        return ApolloReactHooks.useMutation<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>(StartFindNewEpisodesDocument, baseOptions);
+export function useStartFindNewEpisodesMutation(baseOptions?: Apollo.MutationHookOptions<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>) {
+        return Apollo.useMutation<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>(StartFindNewEpisodesDocument, baseOptions);
       }
 export type StartFindNewEpisodesMutationHookResult = ReturnType<typeof useStartFindNewEpisodesMutation>;
-export type StartFindNewEpisodesMutationResult = ApolloReactCommon.MutationResult<StartFindNewEpisodesMutation>;
-export type StartFindNewEpisodesMutationOptions = ApolloReactCommon.BaseMutationOptions<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>;
+export type StartFindNewEpisodesMutationResult = Apollo.MutationResult<StartFindNewEpisodesMutation>;
+export type StartFindNewEpisodesMutationOptions = Apollo.BaseMutationOptions<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>;
 export const StartDownloadMissingDocument = gql`
     mutation startDownloadMissing {
   result: startDownloadMissingJob {
@@ -1127,7 +1127,7 @@ export const StartDownloadMissingDocument = gql`
   }
 }
     `;
-export type StartDownloadMissingMutationFn = ApolloReactCommon.MutationFunction<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>;
+export type StartDownloadMissingMutationFn = Apollo.MutationFunction<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>;
 
 /**
  * __useStartDownloadMissingMutation__
@@ -1145,12 +1145,12 @@ export type StartDownloadMissingMutationFn = ApolloReactCommon.MutationFunction<
  *   },
  * });
  */
-export function useStartDownloadMissingMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>) {
-        return ApolloReactHooks.useMutation<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>(StartDownloadMissingDocument, baseOptions);
+export function useStartDownloadMissingMutation(baseOptions?: Apollo.MutationHookOptions<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>) {
+        return Apollo.useMutation<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>(StartDownloadMissingDocument, baseOptions);
       }
 export type StartDownloadMissingMutationHookResult = ReturnType<typeof useStartDownloadMissingMutation>;
-export type StartDownloadMissingMutationResult = ApolloReactCommon.MutationResult<StartDownloadMissingMutation>;
-export type StartDownloadMissingMutationOptions = ApolloReactCommon.BaseMutationOptions<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>;
+export type StartDownloadMissingMutationResult = Apollo.MutationResult<StartDownloadMissingMutation>;
+export type StartDownloadMissingMutationOptions = Apollo.BaseMutationOptions<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>;
 export const DownloadMovieDocument = gql`
     mutation downloadMovie($movieId: Int!, $jackettResult: JackettInput!) {
   result: downloadMovie(movieId: $movieId, jackettResult: $jackettResult) {
@@ -1159,7 +1159,7 @@ export const DownloadMovieDocument = gql`
   }
 }
     `;
-export type DownloadMovieMutationFn = ApolloReactCommon.MutationFunction<DownloadMovieMutation, DownloadMovieMutationVariables>;
+export type DownloadMovieMutationFn = Apollo.MutationFunction<DownloadMovieMutation, DownloadMovieMutationVariables>;
 
 /**
  * __useDownloadMovieMutation__
@@ -1179,12 +1179,12 @@ export type DownloadMovieMutationFn = ApolloReactCommon.MutationFunction<Downloa
  *   },
  * });
  */
-export function useDownloadMovieMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DownloadMovieMutation, DownloadMovieMutationVariables>) {
-        return ApolloReactHooks.useMutation<DownloadMovieMutation, DownloadMovieMutationVariables>(DownloadMovieDocument, baseOptions);
+export function useDownloadMovieMutation(baseOptions?: Apollo.MutationHookOptions<DownloadMovieMutation, DownloadMovieMutationVariables>) {
+        return Apollo.useMutation<DownloadMovieMutation, DownloadMovieMutationVariables>(DownloadMovieDocument, baseOptions);
       }
 export type DownloadMovieMutationHookResult = ReturnType<typeof useDownloadMovieMutation>;
-export type DownloadMovieMutationResult = ApolloReactCommon.MutationResult<DownloadMovieMutation>;
-export type DownloadMovieMutationOptions = ApolloReactCommon.BaseMutationOptions<DownloadMovieMutation, DownloadMovieMutationVariables>;
+export type DownloadMovieMutationResult = Apollo.MutationResult<DownloadMovieMutation>;
+export type DownloadMovieMutationOptions = Apollo.BaseMutationOptions<DownloadMovieMutation, DownloadMovieMutationVariables>;
 export const DownloadTvEpisodeDocument = gql`
     mutation downloadTVEpisode($episodeId: Int!, $jackettResult: JackettInput!) {
   result: downloadTVEpisode(episodeId: $episodeId, jackettResult: $jackettResult) {
@@ -1193,7 +1193,7 @@ export const DownloadTvEpisodeDocument = gql`
   }
 }
     `;
-export type DownloadTvEpisodeMutationFn = ApolloReactCommon.MutationFunction<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>;
+export type DownloadTvEpisodeMutationFn = Apollo.MutationFunction<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>;
 
 /**
  * __useDownloadTvEpisodeMutation__
@@ -1213,12 +1213,12 @@ export type DownloadTvEpisodeMutationFn = ApolloReactCommon.MutationFunction<Dow
  *   },
  * });
  */
-export function useDownloadTvEpisodeMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>) {
-        return ApolloReactHooks.useMutation<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>(DownloadTvEpisodeDocument, baseOptions);
+export function useDownloadTvEpisodeMutation(baseOptions?: Apollo.MutationHookOptions<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>) {
+        return Apollo.useMutation<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>(DownloadTvEpisodeDocument, baseOptions);
       }
 export type DownloadTvEpisodeMutationHookResult = ReturnType<typeof useDownloadTvEpisodeMutation>;
-export type DownloadTvEpisodeMutationResult = ApolloReactCommon.MutationResult<DownloadTvEpisodeMutation>;
-export type DownloadTvEpisodeMutationOptions = ApolloReactCommon.BaseMutationOptions<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>;
+export type DownloadTvEpisodeMutationResult = Apollo.MutationResult<DownloadTvEpisodeMutation>;
+export type DownloadTvEpisodeMutationOptions = Apollo.BaseMutationOptions<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>;
 export const RemoveMovieDocument = gql`
     mutation removeMovie($tmdbId: Int!) {
   result: removeMovie(tmdbId: $tmdbId) {
@@ -1227,7 +1227,7 @@ export const RemoveMovieDocument = gql`
   }
 }
     `;
-export type RemoveMovieMutationFn = ApolloReactCommon.MutationFunction<RemoveMovieMutation, RemoveMovieMutationVariables>;
+export type RemoveMovieMutationFn = Apollo.MutationFunction<RemoveMovieMutation, RemoveMovieMutationVariables>;
 
 /**
  * __useRemoveMovieMutation__
@@ -1246,12 +1246,12 @@ export type RemoveMovieMutationFn = ApolloReactCommon.MutationFunction<RemoveMov
  *   },
  * });
  */
-export function useRemoveMovieMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RemoveMovieMutation, RemoveMovieMutationVariables>) {
-        return ApolloReactHooks.useMutation<RemoveMovieMutation, RemoveMovieMutationVariables>(RemoveMovieDocument, baseOptions);
+export function useRemoveMovieMutation(baseOptions?: Apollo.MutationHookOptions<RemoveMovieMutation, RemoveMovieMutationVariables>) {
+        return Apollo.useMutation<RemoveMovieMutation, RemoveMovieMutationVariables>(RemoveMovieDocument, baseOptions);
       }
 export type RemoveMovieMutationHookResult = ReturnType<typeof useRemoveMovieMutation>;
-export type RemoveMovieMutationResult = ApolloReactCommon.MutationResult<RemoveMovieMutation>;
-export type RemoveMovieMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveMovieMutation, RemoveMovieMutationVariables>;
+export type RemoveMovieMutationResult = Apollo.MutationResult<RemoveMovieMutation>;
+export type RemoveMovieMutationOptions = Apollo.BaseMutationOptions<RemoveMovieMutation, RemoveMovieMutationVariables>;
 export const RemoveTvShowDocument = gql`
     mutation removeTVShow($tmdbId: Int!) {
   result: removeTVShow(tmdbId: $tmdbId) {
@@ -1260,7 +1260,7 @@ export const RemoveTvShowDocument = gql`
   }
 }
     `;
-export type RemoveTvShowMutationFn = ApolloReactCommon.MutationFunction<RemoveTvShowMutation, RemoveTvShowMutationVariables>;
+export type RemoveTvShowMutationFn = Apollo.MutationFunction<RemoveTvShowMutation, RemoveTvShowMutationVariables>;
 
 /**
  * __useRemoveTvShowMutation__
@@ -1279,12 +1279,12 @@ export type RemoveTvShowMutationFn = ApolloReactCommon.MutationFunction<RemoveTv
  *   },
  * });
  */
-export function useRemoveTvShowMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RemoveTvShowMutation, RemoveTvShowMutationVariables>) {
-        return ApolloReactHooks.useMutation<RemoveTvShowMutation, RemoveTvShowMutationVariables>(RemoveTvShowDocument, baseOptions);
+export function useRemoveTvShowMutation(baseOptions?: Apollo.MutationHookOptions<RemoveTvShowMutation, RemoveTvShowMutationVariables>) {
+        return Apollo.useMutation<RemoveTvShowMutation, RemoveTvShowMutationVariables>(RemoveTvShowDocument, baseOptions);
       }
 export type RemoveTvShowMutationHookResult = ReturnType<typeof useRemoveTvShowMutation>;
-export type RemoveTvShowMutationResult = ApolloReactCommon.MutationResult<RemoveTvShowMutation>;
-export type RemoveTvShowMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveTvShowMutation, RemoveTvShowMutationVariables>;
+export type RemoveTvShowMutationResult = Apollo.MutationResult<RemoveTvShowMutation>;
+export type RemoveTvShowMutationOptions = Apollo.BaseMutationOptions<RemoveTvShowMutation, RemoveTvShowMutationVariables>;
 export const ResetLibraryDocument = gql`
     mutation resetLibrary($deleteFiles: Boolean!, $resetSettings: Boolean!) {
   result: resetLibrary(deleteFiles: $deleteFiles, resetSettings: $resetSettings) {
@@ -1293,7 +1293,7 @@ export const ResetLibraryDocument = gql`
   }
 }
     `;
-export type ResetLibraryMutationFn = ApolloReactCommon.MutationFunction<ResetLibraryMutation, ResetLibraryMutationVariables>;
+export type ResetLibraryMutationFn = Apollo.MutationFunction<ResetLibraryMutation, ResetLibraryMutationVariables>;
 
 /**
  * __useResetLibraryMutation__
@@ -1313,12 +1313,12 @@ export type ResetLibraryMutationFn = ApolloReactCommon.MutationFunction<ResetLib
  *   },
  * });
  */
-export function useResetLibraryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ResetLibraryMutation, ResetLibraryMutationVariables>) {
-        return ApolloReactHooks.useMutation<ResetLibraryMutation, ResetLibraryMutationVariables>(ResetLibraryDocument, baseOptions);
+export function useResetLibraryMutation(baseOptions?: Apollo.MutationHookOptions<ResetLibraryMutation, ResetLibraryMutationVariables>) {
+        return Apollo.useMutation<ResetLibraryMutation, ResetLibraryMutationVariables>(ResetLibraryDocument, baseOptions);
       }
 export type ResetLibraryMutationHookResult = ReturnType<typeof useResetLibraryMutation>;
-export type ResetLibraryMutationResult = ApolloReactCommon.MutationResult<ResetLibraryMutation>;
-export type ResetLibraryMutationOptions = ApolloReactCommon.BaseMutationOptions<ResetLibraryMutation, ResetLibraryMutationVariables>;
+export type ResetLibraryMutationResult = Apollo.MutationResult<ResetLibraryMutation>;
+export type ResetLibraryMutationOptions = Apollo.BaseMutationOptions<ResetLibraryMutation, ResetLibraryMutationVariables>;
 export const SaveQualityDocument = gql`
     mutation saveQuality($qualities: [QualityInput!]!) {
   result: saveQualityParams(qualities: $qualities) {
@@ -1327,7 +1327,7 @@ export const SaveQualityDocument = gql`
   }
 }
     `;
-export type SaveQualityMutationFn = ApolloReactCommon.MutationFunction<SaveQualityMutation, SaveQualityMutationVariables>;
+export type SaveQualityMutationFn = Apollo.MutationFunction<SaveQualityMutation, SaveQualityMutationVariables>;
 
 /**
  * __useSaveQualityMutation__
@@ -1346,12 +1346,12 @@ export type SaveQualityMutationFn = ApolloReactCommon.MutationFunction<SaveQuali
  *   },
  * });
  */
-export function useSaveQualityMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SaveQualityMutation, SaveQualityMutationVariables>) {
-        return ApolloReactHooks.useMutation<SaveQualityMutation, SaveQualityMutationVariables>(SaveQualityDocument, baseOptions);
+export function useSaveQualityMutation(baseOptions?: Apollo.MutationHookOptions<SaveQualityMutation, SaveQualityMutationVariables>) {
+        return Apollo.useMutation<SaveQualityMutation, SaveQualityMutationVariables>(SaveQualityDocument, baseOptions);
       }
 export type SaveQualityMutationHookResult = ReturnType<typeof useSaveQualityMutation>;
-export type SaveQualityMutationResult = ApolloReactCommon.MutationResult<SaveQualityMutation>;
-export type SaveQualityMutationOptions = ApolloReactCommon.BaseMutationOptions<SaveQualityMutation, SaveQualityMutationVariables>;
+export type SaveQualityMutationResult = Apollo.MutationResult<SaveQualityMutation>;
+export type SaveQualityMutationOptions = Apollo.BaseMutationOptions<SaveQualityMutation, SaveQualityMutationVariables>;
 export const SaveTagsDocument = gql`
     mutation saveTags($tags: [TagInput!]!) {
   result: saveTags(tags: $tags) {
@@ -1360,7 +1360,7 @@ export const SaveTagsDocument = gql`
   }
 }
     `;
-export type SaveTagsMutationFn = ApolloReactCommon.MutationFunction<SaveTagsMutation, SaveTagsMutationVariables>;
+export type SaveTagsMutationFn = Apollo.MutationFunction<SaveTagsMutation, SaveTagsMutationVariables>;
 
 /**
  * __useSaveTagsMutation__
@@ -1379,12 +1379,12 @@ export type SaveTagsMutationFn = ApolloReactCommon.MutationFunction<SaveTagsMuta
  *   },
  * });
  */
-export function useSaveTagsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SaveTagsMutation, SaveTagsMutationVariables>) {
-        return ApolloReactHooks.useMutation<SaveTagsMutation, SaveTagsMutationVariables>(SaveTagsDocument, baseOptions);
+export function useSaveTagsMutation(baseOptions?: Apollo.MutationHookOptions<SaveTagsMutation, SaveTagsMutationVariables>) {
+        return Apollo.useMutation<SaveTagsMutation, SaveTagsMutationVariables>(SaveTagsDocument, baseOptions);
       }
 export type SaveTagsMutationHookResult = ReturnType<typeof useSaveTagsMutation>;
-export type SaveTagsMutationResult = ApolloReactCommon.MutationResult<SaveTagsMutation>;
-export type SaveTagsMutationOptions = ApolloReactCommon.BaseMutationOptions<SaveTagsMutation, SaveTagsMutationVariables>;
+export type SaveTagsMutationResult = Apollo.MutationResult<SaveTagsMutation>;
+export type SaveTagsMutationOptions = Apollo.BaseMutationOptions<SaveTagsMutation, SaveTagsMutationVariables>;
 export const TrackMovieDocument = gql`
     mutation trackMovie($title: String!, $tmdbId: Int!) {
   movie: trackMovie(title: $title, tmdbId: $tmdbId) {
@@ -1392,7 +1392,7 @@ export const TrackMovieDocument = gql`
   }
 }
     `;
-export type TrackMovieMutationFn = ApolloReactCommon.MutationFunction<TrackMovieMutation, TrackMovieMutationVariables>;
+export type TrackMovieMutationFn = Apollo.MutationFunction<TrackMovieMutation, TrackMovieMutationVariables>;
 
 /**
  * __useTrackMovieMutation__
@@ -1412,12 +1412,12 @@ export type TrackMovieMutationFn = ApolloReactCommon.MutationFunction<TrackMovie
  *   },
  * });
  */
-export function useTrackMovieMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<TrackMovieMutation, TrackMovieMutationVariables>) {
-        return ApolloReactHooks.useMutation<TrackMovieMutation, TrackMovieMutationVariables>(TrackMovieDocument, baseOptions);
+export function useTrackMovieMutation(baseOptions?: Apollo.MutationHookOptions<TrackMovieMutation, TrackMovieMutationVariables>) {
+        return Apollo.useMutation<TrackMovieMutation, TrackMovieMutationVariables>(TrackMovieDocument, baseOptions);
       }
 export type TrackMovieMutationHookResult = ReturnType<typeof useTrackMovieMutation>;
-export type TrackMovieMutationResult = ApolloReactCommon.MutationResult<TrackMovieMutation>;
-export type TrackMovieMutationOptions = ApolloReactCommon.BaseMutationOptions<TrackMovieMutation, TrackMovieMutationVariables>;
+export type TrackMovieMutationResult = Apollo.MutationResult<TrackMovieMutation>;
+export type TrackMovieMutationOptions = Apollo.BaseMutationOptions<TrackMovieMutation, TrackMovieMutationVariables>;
 export const TrackTvShowDocument = gql`
     mutation trackTVShow($tmdbId: Int!, $seasonNumbers: [Int!]!) {
   tvShow: trackTVShow(tmdbId: $tmdbId, seasonNumbers: $seasonNumbers) {
@@ -1425,7 +1425,7 @@ export const TrackTvShowDocument = gql`
   }
 }
     `;
-export type TrackTvShowMutationFn = ApolloReactCommon.MutationFunction<TrackTvShowMutation, TrackTvShowMutationVariables>;
+export type TrackTvShowMutationFn = Apollo.MutationFunction<TrackTvShowMutation, TrackTvShowMutationVariables>;
 
 /**
  * __useTrackTvShowMutation__
@@ -1445,12 +1445,12 @@ export type TrackTvShowMutationFn = ApolloReactCommon.MutationFunction<TrackTvSh
  *   },
  * });
  */
-export function useTrackTvShowMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<TrackTvShowMutation, TrackTvShowMutationVariables>) {
-        return ApolloReactHooks.useMutation<TrackTvShowMutation, TrackTvShowMutationVariables>(TrackTvShowDocument, baseOptions);
+export function useTrackTvShowMutation(baseOptions?: Apollo.MutationHookOptions<TrackTvShowMutation, TrackTvShowMutationVariables>) {
+        return Apollo.useMutation<TrackTvShowMutation, TrackTvShowMutationVariables>(TrackTvShowDocument, baseOptions);
       }
 export type TrackTvShowMutationHookResult = ReturnType<typeof useTrackTvShowMutation>;
-export type TrackTvShowMutationResult = ApolloReactCommon.MutationResult<TrackTvShowMutation>;
-export type TrackTvShowMutationOptions = ApolloReactCommon.BaseMutationOptions<TrackTvShowMutation, TrackTvShowMutationVariables>;
+export type TrackTvShowMutationResult = Apollo.MutationResult<TrackTvShowMutation>;
+export type TrackTvShowMutationOptions = Apollo.BaseMutationOptions<TrackTvShowMutation, TrackTvShowMutationVariables>;
 export const UpdateParamsDocument = gql`
     mutation updateParams($params: [UpdateParamsInput!]!) {
   result: updateParams(params: $params) {
@@ -1459,7 +1459,7 @@ export const UpdateParamsDocument = gql`
   }
 }
     `;
-export type UpdateParamsMutationFn = ApolloReactCommon.MutationFunction<UpdateParamsMutation, UpdateParamsMutationVariables>;
+export type UpdateParamsMutationFn = Apollo.MutationFunction<UpdateParamsMutation, UpdateParamsMutationVariables>;
 
 /**
  * __useUpdateParamsMutation__
@@ -1478,12 +1478,12 @@ export type UpdateParamsMutationFn = ApolloReactCommon.MutationFunction<UpdatePa
  *   },
  * });
  */
-export function useUpdateParamsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateParamsMutation, UpdateParamsMutationVariables>) {
-        return ApolloReactHooks.useMutation<UpdateParamsMutation, UpdateParamsMutationVariables>(UpdateParamsDocument, baseOptions);
+export function useUpdateParamsMutation(baseOptions?: Apollo.MutationHookOptions<UpdateParamsMutation, UpdateParamsMutationVariables>) {
+        return Apollo.useMutation<UpdateParamsMutation, UpdateParamsMutationVariables>(UpdateParamsDocument, baseOptions);
       }
 export type UpdateParamsMutationHookResult = ReturnType<typeof useUpdateParamsMutation>;
-export type UpdateParamsMutationResult = ApolloReactCommon.MutationResult<UpdateParamsMutation>;
-export type UpdateParamsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
+export type UpdateParamsMutationResult = Apollo.MutationResult<UpdateParamsMutation>;
+export type UpdateParamsMutationOptions = Apollo.BaseMutationOptions<UpdateParamsMutation, UpdateParamsMutationVariables>;
 export const GetCalendarDocument = gql`
     query getCalendar {
   calendar: getCalendar {
@@ -1512,7 +1512,7 @@ export const GetCalendarDocument = gql`
  * __useGetCalendarQuery__
  *
  * To run a query within a React component, call `useGetCalendarQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCalendarQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetCalendarQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1523,15 +1523,15 @@ export const GetCalendarDocument = gql`
  *   },
  * });
  */
-export function useGetCalendarQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetCalendarQuery, GetCalendarQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetCalendarQuery, GetCalendarQueryVariables>(GetCalendarDocument, baseOptions);
+export function useGetCalendarQuery(baseOptions?: Apollo.QueryHookOptions<GetCalendarQuery, GetCalendarQueryVariables>) {
+        return Apollo.useQuery<GetCalendarQuery, GetCalendarQueryVariables>(GetCalendarDocument, baseOptions);
       }
-export function useGetCalendarLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetCalendarQuery, GetCalendarQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetCalendarQuery, GetCalendarQueryVariables>(GetCalendarDocument, baseOptions);
+export function useGetCalendarLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCalendarQuery, GetCalendarQueryVariables>) {
+          return Apollo.useLazyQuery<GetCalendarQuery, GetCalendarQueryVariables>(GetCalendarDocument, baseOptions);
         }
 export type GetCalendarQueryHookResult = ReturnType<typeof useGetCalendarQuery>;
 export type GetCalendarLazyQueryHookResult = ReturnType<typeof useGetCalendarLazyQuery>;
-export type GetCalendarQueryResult = ApolloReactCommon.QueryResult<GetCalendarQuery, GetCalendarQueryVariables>;
+export type GetCalendarQueryResult = Apollo.QueryResult<GetCalendarQuery, GetCalendarQueryVariables>;
 export const GetDiscoverDocument = gql`
     query getDiscover($entertainment: Entertainment, $originLanguage: String, $primaryReleaseYear: String, $score: Float, $genres: [Float!], $page: Float) {
   TMDBResults: discover(entertainment: $entertainment, originLanguage: $originLanguage, primaryReleaseYear: $primaryReleaseYear, score: $score, genres: $genres, page: $page) {
@@ -1556,7 +1556,7 @@ export const GetDiscoverDocument = gql`
  * __useGetDiscoverQuery__
  *
  * To run a query within a React component, call `useGetDiscoverQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetDiscoverQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetDiscoverQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1573,15 +1573,15 @@ export const GetDiscoverDocument = gql`
  *   },
  * });
  */
-export function useGetDiscoverQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetDiscoverQuery, GetDiscoverQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetDiscoverQuery, GetDiscoverQueryVariables>(GetDiscoverDocument, baseOptions);
+export function useGetDiscoverQuery(baseOptions?: Apollo.QueryHookOptions<GetDiscoverQuery, GetDiscoverQueryVariables>) {
+        return Apollo.useQuery<GetDiscoverQuery, GetDiscoverQueryVariables>(GetDiscoverDocument, baseOptions);
       }
-export function useGetDiscoverLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetDiscoverQuery, GetDiscoverQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetDiscoverQuery, GetDiscoverQueryVariables>(GetDiscoverDocument, baseOptions);
+export function useGetDiscoverLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDiscoverQuery, GetDiscoverQueryVariables>) {
+          return Apollo.useLazyQuery<GetDiscoverQuery, GetDiscoverQueryVariables>(GetDiscoverDocument, baseOptions);
         }
 export type GetDiscoverQueryHookResult = ReturnType<typeof useGetDiscoverQuery>;
 export type GetDiscoverLazyQueryHookResult = ReturnType<typeof useGetDiscoverLazyQuery>;
-export type GetDiscoverQueryResult = ApolloReactCommon.QueryResult<GetDiscoverQuery, GetDiscoverQueryVariables>;
+export type GetDiscoverQueryResult = Apollo.QueryResult<GetDiscoverQuery, GetDiscoverQueryVariables>;
 export const GetDownloadingDocument = gql`
     query getDownloading {
   searching: getSearchingMedias {
@@ -1606,7 +1606,7 @@ export const GetDownloadingDocument = gql`
  * __useGetDownloadingQuery__
  *
  * To run a query within a React component, call `useGetDownloadingQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetDownloadingQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetDownloadingQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1617,15 +1617,15 @@ export const GetDownloadingDocument = gql`
  *   },
  * });
  */
-export function useGetDownloadingQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetDownloadingQuery, GetDownloadingQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetDownloadingQuery, GetDownloadingQueryVariables>(GetDownloadingDocument, baseOptions);
+export function useGetDownloadingQuery(baseOptions?: Apollo.QueryHookOptions<GetDownloadingQuery, GetDownloadingQueryVariables>) {
+        return Apollo.useQuery<GetDownloadingQuery, GetDownloadingQueryVariables>(GetDownloadingDocument, baseOptions);
       }
-export function useGetDownloadingLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetDownloadingQuery, GetDownloadingQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetDownloadingQuery, GetDownloadingQueryVariables>(GetDownloadingDocument, baseOptions);
+export function useGetDownloadingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDownloadingQuery, GetDownloadingQueryVariables>) {
+          return Apollo.useLazyQuery<GetDownloadingQuery, GetDownloadingQueryVariables>(GetDownloadingDocument, baseOptions);
         }
 export type GetDownloadingQueryHookResult = ReturnType<typeof useGetDownloadingQuery>;
 export type GetDownloadingLazyQueryHookResult = ReturnType<typeof useGetDownloadingLazyQuery>;
-export type GetDownloadingQueryResult = ApolloReactCommon.QueryResult<GetDownloadingQuery, GetDownloadingQueryVariables>;
+export type GetDownloadingQueryResult = Apollo.QueryResult<GetDownloadingQuery, GetDownloadingQueryVariables>;
 export const GetGenresDocument = gql`
     query getGenres {
   genres: getGenres {
@@ -1645,7 +1645,7 @@ export const GetGenresDocument = gql`
  * __useGetGenresQuery__
  *
  * To run a query within a React component, call `useGetGenresQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetGenresQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetGenresQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1656,15 +1656,15 @@ export const GetGenresDocument = gql`
  *   },
  * });
  */
-export function useGetGenresQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetGenresQuery, GetGenresQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetGenresQuery, GetGenresQueryVariables>(GetGenresDocument, baseOptions);
+export function useGetGenresQuery(baseOptions?: Apollo.QueryHookOptions<GetGenresQuery, GetGenresQueryVariables>) {
+        return Apollo.useQuery<GetGenresQuery, GetGenresQueryVariables>(GetGenresDocument, baseOptions);
       }
-export function useGetGenresLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetGenresQuery, GetGenresQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetGenresQuery, GetGenresQueryVariables>(GetGenresDocument, baseOptions);
+export function useGetGenresLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetGenresQuery, GetGenresQueryVariables>) {
+          return Apollo.useLazyQuery<GetGenresQuery, GetGenresQueryVariables>(GetGenresDocument, baseOptions);
         }
 export type GetGenresQueryHookResult = ReturnType<typeof useGetGenresQuery>;
 export type GetGenresLazyQueryHookResult = ReturnType<typeof useGetGenresLazyQuery>;
-export type GetGenresQueryResult = ApolloReactCommon.QueryResult<GetGenresQuery, GetGenresQueryVariables>;
+export type GetGenresQueryResult = Apollo.QueryResult<GetGenresQuery, GetGenresQueryVariables>;
 export const GetLanguagesDocument = gql`
     query getLanguages {
   languages: getLanguages {
@@ -1678,7 +1678,7 @@ export const GetLanguagesDocument = gql`
  * __useGetLanguagesQuery__
  *
  * To run a query within a React component, call `useGetLanguagesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetLanguagesQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetLanguagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1689,15 +1689,15 @@ export const GetLanguagesDocument = gql`
  *   },
  * });
  */
-export function useGetLanguagesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetLanguagesQuery, GetLanguagesQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetLanguagesQuery, GetLanguagesQueryVariables>(GetLanguagesDocument, baseOptions);
+export function useGetLanguagesQuery(baseOptions?: Apollo.QueryHookOptions<GetLanguagesQuery, GetLanguagesQueryVariables>) {
+        return Apollo.useQuery<GetLanguagesQuery, GetLanguagesQueryVariables>(GetLanguagesDocument, baseOptions);
       }
-export function useGetLanguagesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetLanguagesQuery, GetLanguagesQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetLanguagesQuery, GetLanguagesQueryVariables>(GetLanguagesDocument, baseOptions);
+export function useGetLanguagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLanguagesQuery, GetLanguagesQueryVariables>) {
+          return Apollo.useLazyQuery<GetLanguagesQuery, GetLanguagesQueryVariables>(GetLanguagesDocument, baseOptions);
         }
 export type GetLanguagesQueryHookResult = ReturnType<typeof useGetLanguagesQuery>;
 export type GetLanguagesLazyQueryHookResult = ReturnType<typeof useGetLanguagesLazyQuery>;
-export type GetLanguagesQueryResult = ApolloReactCommon.QueryResult<GetLanguagesQuery, GetLanguagesQueryVariables>;
+export type GetLanguagesQueryResult = Apollo.QueryResult<GetLanguagesQuery, GetLanguagesQueryVariables>;
 export const GetLibraryMoviesDocument = gql`
     query getLibraryMovies {
   movies: getMovies {
@@ -1721,7 +1721,7 @@ export const GetLibraryMoviesDocument = gql`
  * __useGetLibraryMoviesQuery__
  *
  * To run a query within a React component, call `useGetLibraryMoviesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetLibraryMoviesQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetLibraryMoviesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1732,15 +1732,15 @@ export const GetLibraryMoviesDocument = gql`
  *   },
  * });
  */
-export function useGetLibraryMoviesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>(GetLibraryMoviesDocument, baseOptions);
+export function useGetLibraryMoviesQuery(baseOptions?: Apollo.QueryHookOptions<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>) {
+        return Apollo.useQuery<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>(GetLibraryMoviesDocument, baseOptions);
       }
-export function useGetLibraryMoviesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>(GetLibraryMoviesDocument, baseOptions);
+export function useGetLibraryMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>) {
+          return Apollo.useLazyQuery<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>(GetLibraryMoviesDocument, baseOptions);
         }
 export type GetLibraryMoviesQueryHookResult = ReturnType<typeof useGetLibraryMoviesQuery>;
 export type GetLibraryMoviesLazyQueryHookResult = ReturnType<typeof useGetLibraryMoviesLazyQuery>;
-export type GetLibraryMoviesQueryResult = ApolloReactCommon.QueryResult<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>;
+export type GetLibraryMoviesQueryResult = Apollo.QueryResult<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>;
 export const GetLibraryTvShowsDocument = gql`
     query getLibraryTVShows {
   tvShows: getTVShows {
@@ -1763,7 +1763,7 @@ export const GetLibraryTvShowsDocument = gql`
  * __useGetLibraryTvShowsQuery__
  *
  * To run a query within a React component, call `useGetLibraryTvShowsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetLibraryTvShowsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetLibraryTvShowsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1774,15 +1774,15 @@ export const GetLibraryTvShowsDocument = gql`
  *   },
  * });
  */
-export function useGetLibraryTvShowsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>(GetLibraryTvShowsDocument, baseOptions);
+export function useGetLibraryTvShowsQuery(baseOptions?: Apollo.QueryHookOptions<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>) {
+        return Apollo.useQuery<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>(GetLibraryTvShowsDocument, baseOptions);
       }
-export function useGetLibraryTvShowsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>(GetLibraryTvShowsDocument, baseOptions);
+export function useGetLibraryTvShowsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>) {
+          return Apollo.useLazyQuery<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>(GetLibraryTvShowsDocument, baseOptions);
         }
 export type GetLibraryTvShowsQueryHookResult = ReturnType<typeof useGetLibraryTvShowsQuery>;
 export type GetLibraryTvShowsLazyQueryHookResult = ReturnType<typeof useGetLibraryTvShowsLazyQuery>;
-export type GetLibraryTvShowsQueryResult = ApolloReactCommon.QueryResult<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>;
+export type GetLibraryTvShowsQueryResult = Apollo.QueryResult<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>;
 export const GetMissingDocument = gql`
     query getMissing {
   tvEpisodes: getMissingTVEpisodes {
@@ -1799,7 +1799,7 @@ ${MissingMoviesFragmentDoc}`;
  * __useGetMissingQuery__
  *
  * To run a query within a React component, call `useGetMissingQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetMissingQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetMissingQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1810,15 +1810,15 @@ ${MissingMoviesFragmentDoc}`;
  *   },
  * });
  */
-export function useGetMissingQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetMissingQuery, GetMissingQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetMissingQuery, GetMissingQueryVariables>(GetMissingDocument, baseOptions);
+export function useGetMissingQuery(baseOptions?: Apollo.QueryHookOptions<GetMissingQuery, GetMissingQueryVariables>) {
+        return Apollo.useQuery<GetMissingQuery, GetMissingQueryVariables>(GetMissingDocument, baseOptions);
       }
-export function useGetMissingLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetMissingQuery, GetMissingQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetMissingQuery, GetMissingQueryVariables>(GetMissingDocument, baseOptions);
+export function useGetMissingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMissingQuery, GetMissingQueryVariables>) {
+          return Apollo.useLazyQuery<GetMissingQuery, GetMissingQueryVariables>(GetMissingDocument, baseOptions);
         }
 export type GetMissingQueryHookResult = ReturnType<typeof useGetMissingQuery>;
 export type GetMissingLazyQueryHookResult = ReturnType<typeof useGetMissingLazyQuery>;
-export type GetMissingQueryResult = ApolloReactCommon.QueryResult<GetMissingQuery, GetMissingQueryVariables>;
+export type GetMissingQueryResult = Apollo.QueryResult<GetMissingQuery, GetMissingQueryVariables>;
 export const GetMovieFileDetailsDocument = gql`
     query getMovieFileDetails($tmdbId: Int!) {
   details: getMovieFileDetails(tmdbId: $tmdbId) {
@@ -1834,7 +1834,7 @@ export const GetMovieFileDetailsDocument = gql`
  * __useGetMovieFileDetailsQuery__
  *
  * To run a query within a React component, call `useGetMovieFileDetailsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetMovieFileDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetMovieFileDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1846,15 +1846,15 @@ export const GetMovieFileDetailsDocument = gql`
  *   },
  * });
  */
-export function useGetMovieFileDetailsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>(GetMovieFileDetailsDocument, baseOptions);
+export function useGetMovieFileDetailsQuery(baseOptions?: Apollo.QueryHookOptions<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>) {
+        return Apollo.useQuery<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>(GetMovieFileDetailsDocument, baseOptions);
       }
-export function useGetMovieFileDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>(GetMovieFileDetailsDocument, baseOptions);
+export function useGetMovieFileDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>) {
+          return Apollo.useLazyQuery<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>(GetMovieFileDetailsDocument, baseOptions);
         }
 export type GetMovieFileDetailsQueryHookResult = ReturnType<typeof useGetMovieFileDetailsQuery>;
 export type GetMovieFileDetailsLazyQueryHookResult = ReturnType<typeof useGetMovieFileDetailsLazyQuery>;
-export type GetMovieFileDetailsQueryResult = ApolloReactCommon.QueryResult<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>;
+export type GetMovieFileDetailsQueryResult = Apollo.QueryResult<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>;
 export const GetParamsDocument = gql`
     query getParams {
   params: getParams {
@@ -1873,7 +1873,7 @@ export const GetParamsDocument = gql`
  * __useGetParamsQuery__
  *
  * To run a query within a React component, call `useGetParamsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetParamsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetParamsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1884,15 +1884,15 @@ export const GetParamsDocument = gql`
  *   },
  * });
  */
-export function useGetParamsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetParamsQuery, GetParamsQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetParamsQuery, GetParamsQueryVariables>(GetParamsDocument, baseOptions);
+export function useGetParamsQuery(baseOptions?: Apollo.QueryHookOptions<GetParamsQuery, GetParamsQueryVariables>) {
+        return Apollo.useQuery<GetParamsQuery, GetParamsQueryVariables>(GetParamsDocument, baseOptions);
       }
-export function useGetParamsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetParamsQuery, GetParamsQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetParamsQuery, GetParamsQueryVariables>(GetParamsDocument, baseOptions);
+export function useGetParamsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetParamsQuery, GetParamsQueryVariables>) {
+          return Apollo.useLazyQuery<GetParamsQuery, GetParamsQueryVariables>(GetParamsDocument, baseOptions);
         }
 export type GetParamsQueryHookResult = ReturnType<typeof useGetParamsQuery>;
 export type GetParamsLazyQueryHookResult = ReturnType<typeof useGetParamsLazyQuery>;
-export type GetParamsQueryResult = ApolloReactCommon.QueryResult<GetParamsQuery, GetParamsQueryVariables>;
+export type GetParamsQueryResult = Apollo.QueryResult<GetParamsQuery, GetParamsQueryVariables>;
 export const GetPopularDocument = gql`
     query getPopular {
   results: getPopular {
@@ -1924,7 +1924,7 @@ export const GetPopularDocument = gql`
  * __useGetPopularQuery__
  *
  * To run a query within a React component, call `useGetPopularQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetPopularQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetPopularQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1935,15 +1935,15 @@ export const GetPopularDocument = gql`
  *   },
  * });
  */
-export function useGetPopularQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetPopularQuery, GetPopularQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetPopularQuery, GetPopularQueryVariables>(GetPopularDocument, baseOptions);
+export function useGetPopularQuery(baseOptions?: Apollo.QueryHookOptions<GetPopularQuery, GetPopularQueryVariables>) {
+        return Apollo.useQuery<GetPopularQuery, GetPopularQueryVariables>(GetPopularDocument, baseOptions);
       }
-export function useGetPopularLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetPopularQuery, GetPopularQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetPopularQuery, GetPopularQueryVariables>(GetPopularDocument, baseOptions);
+export function useGetPopularLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPopularQuery, GetPopularQueryVariables>) {
+          return Apollo.useLazyQuery<GetPopularQuery, GetPopularQueryVariables>(GetPopularDocument, baseOptions);
         }
 export type GetPopularQueryHookResult = ReturnType<typeof useGetPopularQuery>;
 export type GetPopularLazyQueryHookResult = ReturnType<typeof useGetPopularLazyQuery>;
-export type GetPopularQueryResult = ApolloReactCommon.QueryResult<GetPopularQuery, GetPopularQueryVariables>;
+export type GetPopularQueryResult = Apollo.QueryResult<GetPopularQuery, GetPopularQueryVariables>;
 export const GetQualityDocument = gql`
     query getQuality($type: Entertainment!) {
   qualities: getQualityParams(type: $type) {
@@ -1962,7 +1962,7 @@ export const GetQualityDocument = gql`
  * __useGetQualityQuery__
  *
  * To run a query within a React component, call `useGetQualityQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetQualityQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetQualityQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -1974,15 +1974,15 @@ export const GetQualityDocument = gql`
  *   },
  * });
  */
-export function useGetQualityQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetQualityQuery, GetQualityQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetQualityQuery, GetQualityQueryVariables>(GetQualityDocument, baseOptions);
+export function useGetQualityQuery(baseOptions?: Apollo.QueryHookOptions<GetQualityQuery, GetQualityQueryVariables>) {
+        return Apollo.useQuery<GetQualityQuery, GetQualityQueryVariables>(GetQualityDocument, baseOptions);
       }
-export function useGetQualityLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetQualityQuery, GetQualityQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetQualityQuery, GetQualityQueryVariables>(GetQualityDocument, baseOptions);
+export function useGetQualityLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetQualityQuery, GetQualityQueryVariables>) {
+          return Apollo.useLazyQuery<GetQualityQuery, GetQualityQueryVariables>(GetQualityDocument, baseOptions);
         }
 export type GetQualityQueryHookResult = ReturnType<typeof useGetQualityQuery>;
 export type GetQualityLazyQueryHookResult = ReturnType<typeof useGetQualityLazyQuery>;
-export type GetQualityQueryResult = ApolloReactCommon.QueryResult<GetQualityQuery, GetQualityQueryVariables>;
+export type GetQualityQueryResult = Apollo.QueryResult<GetQualityQuery, GetQualityQueryVariables>;
 export const GetRecommendedDocument = gql`
     query getRecommended {
   tvShows: getRecommendedTVShows {
@@ -2012,7 +2012,7 @@ export const GetRecommendedDocument = gql`
  * __useGetRecommendedQuery__
  *
  * To run a query within a React component, call `useGetRecommendedQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetRecommendedQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetRecommendedQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -2023,15 +2023,15 @@ export const GetRecommendedDocument = gql`
  *   },
  * });
  */
-export function useGetRecommendedQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetRecommendedQuery, GetRecommendedQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetRecommendedQuery, GetRecommendedQueryVariables>(GetRecommendedDocument, baseOptions);
+export function useGetRecommendedQuery(baseOptions?: Apollo.QueryHookOptions<GetRecommendedQuery, GetRecommendedQueryVariables>) {
+        return Apollo.useQuery<GetRecommendedQuery, GetRecommendedQueryVariables>(GetRecommendedDocument, baseOptions);
       }
-export function useGetRecommendedLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetRecommendedQuery, GetRecommendedQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetRecommendedQuery, GetRecommendedQueryVariables>(GetRecommendedDocument, baseOptions);
+export function useGetRecommendedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetRecommendedQuery, GetRecommendedQueryVariables>) {
+          return Apollo.useLazyQuery<GetRecommendedQuery, GetRecommendedQueryVariables>(GetRecommendedDocument, baseOptions);
         }
 export type GetRecommendedQueryHookResult = ReturnType<typeof useGetRecommendedQuery>;
 export type GetRecommendedLazyQueryHookResult = ReturnType<typeof useGetRecommendedLazyQuery>;
-export type GetRecommendedQueryResult = ApolloReactCommon.QueryResult<GetRecommendedQuery, GetRecommendedQueryVariables>;
+export type GetRecommendedQueryResult = Apollo.QueryResult<GetRecommendedQuery, GetRecommendedQueryVariables>;
 export const GetTagsDocument = gql`
     query getTags {
   tags: getTags {
@@ -2048,7 +2048,7 @@ export const GetTagsDocument = gql`
  * __useGetTagsQuery__
  *
  * To run a query within a React component, call `useGetTagsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetTagsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetTagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -2059,15 +2059,15 @@ export const GetTagsDocument = gql`
  *   },
  * });
  */
-export function useGetTagsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetTagsQuery, GetTagsQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetTagsQuery, GetTagsQueryVariables>(GetTagsDocument, baseOptions);
+export function useGetTagsQuery(baseOptions?: Apollo.QueryHookOptions<GetTagsQuery, GetTagsQueryVariables>) {
+        return Apollo.useQuery<GetTagsQuery, GetTagsQueryVariables>(GetTagsDocument, baseOptions);
       }
-export function useGetTagsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetTagsQuery, GetTagsQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetTagsQuery, GetTagsQueryVariables>(GetTagsDocument, baseOptions);
+export function useGetTagsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTagsQuery, GetTagsQueryVariables>) {
+          return Apollo.useLazyQuery<GetTagsQuery, GetTagsQueryVariables>(GetTagsDocument, baseOptions);
         }
 export type GetTagsQueryHookResult = ReturnType<typeof useGetTagsQuery>;
 export type GetTagsLazyQueryHookResult = ReturnType<typeof useGetTagsLazyQuery>;
-export type GetTagsQueryResult = ApolloReactCommon.QueryResult<GetTagsQuery, GetTagsQueryVariables>;
+export type GetTagsQueryResult = Apollo.QueryResult<GetTagsQuery, GetTagsQueryVariables>;
 export const GetTorrentStatusDocument = gql`
     query getTorrentStatus($torrents: [GetTorrentStatusInput!]!) {
   torrents: getTorrentStatus(torrents: $torrents) {
@@ -2089,7 +2089,7 @@ export const GetTorrentStatusDocument = gql`
  * __useGetTorrentStatusQuery__
  *
  * To run a query within a React component, call `useGetTorrentStatusQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetTorrentStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetTorrentStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -2101,15 +2101,15 @@ export const GetTorrentStatusDocument = gql`
  *   },
  * });
  */
-export function useGetTorrentStatusQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>(GetTorrentStatusDocument, baseOptions);
+export function useGetTorrentStatusQuery(baseOptions?: Apollo.QueryHookOptions<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>) {
+        return Apollo.useQuery<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>(GetTorrentStatusDocument, baseOptions);
       }
-export function useGetTorrentStatusLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>(GetTorrentStatusDocument, baseOptions);
+export function useGetTorrentStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>) {
+          return Apollo.useLazyQuery<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>(GetTorrentStatusDocument, baseOptions);
         }
 export type GetTorrentStatusQueryHookResult = ReturnType<typeof useGetTorrentStatusQuery>;
 export type GetTorrentStatusLazyQueryHookResult = ReturnType<typeof useGetTorrentStatusLazyQuery>;
-export type GetTorrentStatusQueryResult = ApolloReactCommon.QueryResult<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>;
+export type GetTorrentStatusQueryResult = Apollo.QueryResult<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>;
 export const GetTvSeasonDetailsDocument = gql`
     query getTVSeasonDetails($tvShowTMDBId: Int!, $seasonNumber: Int!) {
   episodes: getTVSeasonDetails(tvShowTMDBId: $tvShowTMDBId, seasonNumber: $seasonNumber) {
@@ -2136,7 +2136,7 @@ export const GetTvSeasonDetailsDocument = gql`
  * __useGetTvSeasonDetailsQuery__
  *
  * To run a query within a React component, call `useGetTvSeasonDetailsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetTvSeasonDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetTvSeasonDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -2149,15 +2149,15 @@ export const GetTvSeasonDetailsDocument = gql`
  *   },
  * });
  */
-export function useGetTvSeasonDetailsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>(GetTvSeasonDetailsDocument, baseOptions);
+export function useGetTvSeasonDetailsQuery(baseOptions?: Apollo.QueryHookOptions<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>) {
+        return Apollo.useQuery<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>(GetTvSeasonDetailsDocument, baseOptions);
       }
-export function useGetTvSeasonDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>(GetTvSeasonDetailsDocument, baseOptions);
+export function useGetTvSeasonDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>) {
+          return Apollo.useLazyQuery<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>(GetTvSeasonDetailsDocument, baseOptions);
         }
 export type GetTvSeasonDetailsQueryHookResult = ReturnType<typeof useGetTvSeasonDetailsQuery>;
 export type GetTvSeasonDetailsLazyQueryHookResult = ReturnType<typeof useGetTvSeasonDetailsLazyQuery>;
-export type GetTvSeasonDetailsQueryResult = ApolloReactCommon.QueryResult<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>;
+export type GetTvSeasonDetailsQueryResult = Apollo.QueryResult<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>;
 export const GetTvShowSeasonsDocument = gql`
     query getTVShowSeasons($tvShowTMDBId: Int!) {
   seasons: getTVShowSeasons(tvShowTMDBId: $tvShowTMDBId) {
@@ -2177,7 +2177,7 @@ export const GetTvShowSeasonsDocument = gql`
  * __useGetTvShowSeasonsQuery__
  *
  * To run a query within a React component, call `useGetTvShowSeasonsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetTvShowSeasonsQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useGetTvShowSeasonsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -2189,15 +2189,15 @@ export const GetTvShowSeasonsDocument = gql`
  *   },
  * });
  */
-export function useGetTvShowSeasonsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>(GetTvShowSeasonsDocument, baseOptions);
+export function useGetTvShowSeasonsQuery(baseOptions?: Apollo.QueryHookOptions<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>) {
+        return Apollo.useQuery<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>(GetTvShowSeasonsDocument, baseOptions);
       }
-export function useGetTvShowSeasonsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>(GetTvShowSeasonsDocument, baseOptions);
+export function useGetTvShowSeasonsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>) {
+          return Apollo.useLazyQuery<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>(GetTvShowSeasonsDocument, baseOptions);
         }
 export type GetTvShowSeasonsQueryHookResult = ReturnType<typeof useGetTvShowSeasonsQuery>;
 export type GetTvShowSeasonsLazyQueryHookResult = ReturnType<typeof useGetTvShowSeasonsLazyQuery>;
-export type GetTvShowSeasonsQueryResult = ApolloReactCommon.QueryResult<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>;
+export type GetTvShowSeasonsQueryResult = Apollo.QueryResult<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>;
 export const OmdbSearchDocument = gql`
     query omdbSearch($title: String!) {
   result: omdbSearch(title: $title) {
@@ -2214,7 +2214,7 @@ export const OmdbSearchDocument = gql`
  * __useOmdbSearchQuery__
  *
  * To run a query within a React component, call `useOmdbSearchQuery` and pass it any options that fit your needs.
- * When your component renders, `useOmdbSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useOmdbSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -2226,15 +2226,15 @@ export const OmdbSearchDocument = gql`
  *   },
  * });
  */
-export function useOmdbSearchQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
-        return ApolloReactHooks.useQuery<OmdbSearchQuery, OmdbSearchQueryVariables>(OmdbSearchDocument, baseOptions);
+export function useOmdbSearchQuery(baseOptions?: Apollo.QueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
+        return Apollo.useQuery<OmdbSearchQuery, OmdbSearchQueryVariables>(OmdbSearchDocument, baseOptions);
       }
-export function useOmdbSearchLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<OmdbSearchQuery, OmdbSearchQueryVariables>(OmdbSearchDocument, baseOptions);
+export function useOmdbSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
+          return Apollo.useLazyQuery<OmdbSearchQuery, OmdbSearchQueryVariables>(OmdbSearchDocument, baseOptions);
         }
 export type OmdbSearchQueryHookResult = ReturnType<typeof useOmdbSearchQuery>;
 export type OmdbSearchLazyQueryHookResult = ReturnType<typeof useOmdbSearchLazyQuery>;
-export type OmdbSearchQueryResult = ApolloReactCommon.QueryResult<OmdbSearchQuery, OmdbSearchQueryVariables>;
+export type OmdbSearchQueryResult = Apollo.QueryResult<OmdbSearchQuery, OmdbSearchQueryVariables>;
 export const SearchTorrentDocument = gql`
     query searchTorrent($query: String!) {
   results: searchJackett(query: $query) {
@@ -2260,7 +2260,7 @@ export const SearchTorrentDocument = gql`
  * __useSearchTorrentQuery__
  *
  * To run a query within a React component, call `useSearchTorrentQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchTorrentQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useSearchTorrentQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -2272,15 +2272,15 @@ export const SearchTorrentDocument = gql`
  *   },
  * });
  */
-export function useSearchTorrentQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
-        return ApolloReactHooks.useQuery<SearchTorrentQuery, SearchTorrentQueryVariables>(SearchTorrentDocument, baseOptions);
+export function useSearchTorrentQuery(baseOptions?: Apollo.QueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
+        return Apollo.useQuery<SearchTorrentQuery, SearchTorrentQueryVariables>(SearchTorrentDocument, baseOptions);
       }
-export function useSearchTorrentLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<SearchTorrentQuery, SearchTorrentQueryVariables>(SearchTorrentDocument, baseOptions);
+export function useSearchTorrentLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
+          return Apollo.useLazyQuery<SearchTorrentQuery, SearchTorrentQueryVariables>(SearchTorrentDocument, baseOptions);
         }
 export type SearchTorrentQueryHookResult = ReturnType<typeof useSearchTorrentQuery>;
 export type SearchTorrentLazyQueryHookResult = ReturnType<typeof useSearchTorrentLazyQuery>;
-export type SearchTorrentQueryResult = ApolloReactCommon.QueryResult<SearchTorrentQuery, SearchTorrentQueryVariables>;
+export type SearchTorrentQueryResult = Apollo.QueryResult<SearchTorrentQuery, SearchTorrentQueryVariables>;
 export const SearchDocument = gql`
     query search($query: String!) {
   results: search(query: $query) {
@@ -2312,7 +2312,7 @@ export const SearchDocument = gql`
  * __useSearchQuery__
  *
  * To run a query within a React component, call `useSearchQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * When your component renders, `useSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
@@ -2324,12 +2324,12 @@ export const SearchDocument = gql`
  *   },
  * });
  */
-export function useSearchQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<SearchQuery, SearchQueryVariables>) {
-        return ApolloReactHooks.useQuery<SearchQuery, SearchQueryVariables>(SearchDocument, baseOptions);
+export function useSearchQuery(baseOptions?: Apollo.QueryHookOptions<SearchQuery, SearchQueryVariables>) {
+        return Apollo.useQuery<SearchQuery, SearchQueryVariables>(SearchDocument, baseOptions);
       }
-export function useSearchLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<SearchQuery, SearchQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<SearchQuery, SearchQueryVariables>(SearchDocument, baseOptions);
+export function useSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchQuery, SearchQueryVariables>) {
+          return Apollo.useLazyQuery<SearchQuery, SearchQueryVariables>(SearchDocument, baseOptions);
         }
 export type SearchQueryHookResult = ReturnType<typeof useSearchQuery>;
 export type SearchLazyQueryHookResult = ReturnType<typeof useSearchLazyQuery>;
-export type SearchQueryResult = ApolloReactCommon.QueryResult<SearchQuery, SearchQueryVariables>;
+export type SearchQueryResult = Apollo.QueryResult<SearchQuery, SearchQueryVariables>;

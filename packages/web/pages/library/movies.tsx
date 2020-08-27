@@ -18,4 +18,4 @@ function MoviesPage() {
   );
 }
 
-export default withApollo({ ssr: false })(MoviesPage);
+export default withApollo(MoviesPage);

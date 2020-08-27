@@ -18,4 +18,4 @@ function TVShowsPage() {
   );
 }
 
-export default withApollo({ ssr: false })(TVShowsPage);
+export default withApollo(TVShowsPage);
