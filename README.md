@@ -23,20 +23,30 @@ And to have something with a better ui, less configuration and faster 🚀
 
 ### Requirement
 
-* docker installed (https://get.docker.com/) with docker-compose
-* an account on a torrent website that is supported by jackett
+* [docker](https://get.docker.com/) installed  with [docker-compose](https://docs.docker.com/compose/install/).
 
 ## Installation
 
-* Clone the repo `$ git clone https://github.com/iam4x/bobarr.git && cd bobarr`
-* Set `PUID` and `PGID` in `.env` (see .env for explanation)
+1. Clone the repo `$ git clone https://github.com/iam4x/bobarr.git && cd bobarr`
+2. Set `PUID` and `PGID` in `.env` (see .env for explanation)
+3. (Optional) If you already have a library (`/movies` & `/tvshows`) edit `docker-compose.yml`:
+Look for `- ./library:/usr/library`, and change `./library` to the folder where your (`/movies` & `/tvshows`) are.
+
+As example, having:
+```
+/mnt/storage/
+|- movies/
+|- tvshows/
+```
+The line should be: `- /mnt/storage:/usr/library`
+
 
 ## How to start
 
 There are two way to start bobarr stack, first without VPN:
 
 * `$ docker-compose up --build --force-recreate -d`
-* Go to http://localhost:9117, add your torrent account and copy the API Key in top right corner
+* Go to http://localhost:9117, add your preferred torrent websites and copy the API Key in top right corner
 * Go to http://localhost:3000/settings and update the jackett API key
 
 If you want to enforce all torrent traffic through a VPN:
@@ -73,14 +83,7 @@ If you have NPM you can just run `$ npm run start` or `$ npm run start:wireguard
 
 * After configuration, go to http://localhost:3000/search and just start searching!
 * The files will be downloaded into `library/downloads`
-* The files will be simlinked and organized into `library/tvshows` or `library/movies`
-
-## Import your own library
-
-If you were using radarr or sonarr already you may have a tvshow or movies folder. You can easily import your already existing library into bobarr.
-
-* Change in docker-compose.yml the folder link `- ./library:/usr/library`
-* Point to your own library folder `- /mnt/storage/your/own/library:/usr/library`
+* The files will be moved/copied/simlinked (you can set this in settings) and organized into `library/tvshows` or `library/movies`
 
 The only requirement is to have a folder `tvshows` and a folder `movies` then bobarr can catch up and download to your user defined library folder.
 
