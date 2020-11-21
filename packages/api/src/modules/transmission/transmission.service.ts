@@ -12,7 +12,7 @@ import { LazyTransaction } from 'src/utils/lazy-transaction';
 
 @Injectable()
 export class TransmissionService {
-  private client = new Transmission({ host: 'transmission' });
+  private client = new Transmission({ host: 'transmission', port: 9091 });
 
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,

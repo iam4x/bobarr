@@ -36,9 +36,3 @@ services:
     network_mode: "service:vpn"
     depends_on:
       - vpn
-
-  transmission-web:
-    links:
-      - vpn:transmission
-    networks:
-      - default
