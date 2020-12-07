@@ -24,6 +24,7 @@
     "add": "^2.0.6",
     "apollo-server-express": "^2.11.0",
     "axios": "~0.20.0",
+    "body-parser": "^1.19.0",
     "bull": "^3.13.0",
     "bull-board": "^1.0.0-alpha.10",
     "child-command": "^1.0.3",
