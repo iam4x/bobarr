@@ -3,6 +3,7 @@
 /* eslint import/no-commonjs: off */
 
 module.exports = {
+  env: { WEB_UI_API_URL: process.env.WEB_UI_API_URL },
   webpackDevMiddleware: (config) => {
     // Solve compiling problem via vagrant
     config.watchOptions = {
