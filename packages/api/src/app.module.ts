@@ -26,6 +26,9 @@ import { OMDBModule } from './modules/omdb/omdb.module';
       autoSchemaFile: 'schema.gql',
       introspection: true,
       playground: true,
+      bodyParserConfig: {
+        limit: '10mb',
+      },
     }),
     TerminusModule,
     ParamsModule,
