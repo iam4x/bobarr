@@ -23,12 +23,12 @@ And to have something with a better ui, less configuration and faster 🚀
 
 ### Requirement
 
-* [docker](https://get.docker.com/) installed  with [docker-compose](https://docs.docker.com/compose/install/).
+* [docker](https://get.docker.com/) installed with [docker-compose](https://docs.docker.com/compose/install/).
 
 ## Installation
 
-1. Clone the repo `$ git clone https://github.com/iam4x/bobarr.git && cd bobarr`
-2. Set `PUID` and `PGID` in `.env` (see .env for explanation)
+1. Run the installation script `curl -o- https://raw.githubusercontent.com/iam4x/bobarr/master/scripts/install.sh | bash`
+2. Update your config in `.env`
 3. (Optional) If you already have a library (`/movies` & `/tvshows`) edit `docker-compose.yml`:
 Look for `- ./library:/usr/library`, and change `./library` to the folder where your (`/movies` & `/tvshows`) are.
 
@@ -45,7 +45,7 @@ The line should be: `- /mnt/storage:/usr/library`
 
 There are two way to start bobarr stack, first without VPN:
 
-* `$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build --force-recreate -d`
+* `$ ./bobarr.sh start`
 * Go to http://localhost:9117, add your preferred torrent websites and copy the API Key in top right corner
 * Go to http://localhost:3000/settings and update the jackett API key
 
@@ -54,16 +54,14 @@ If you want to enforce all torrent traffic through a VPN:
 #### OpenVPN
 
 * Copy your open vpn config file (.ovpn) into the folder `packages/vpn` name it `vpn.conf`
-* `$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.vpn.yml up --build --force-recreate -d`
+* `$ ./bobarr.sh start:vpn`
 
 If you have NPM you can just run `$ npm run start` or `$ npm run start:vpn`
 
 #### WireGuard
 
 * Copy your wireguard config file (wg0.conf) into the folder `packages/vpn`
-* `$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.wireguard.yml up --build --force-recreate -d`
-
-If you have NPM you can just run `$ npm run start` or `$ npm run start:wireguard`
+* `$ ./bobarr.sh start:wireguard`
 
 ## Configuration
 
@@ -100,22 +98,14 @@ You can now head to http://localhost:3000 and hit that "Scan library folder" but
 
 You can stop the whole bobarr stack with:
 
-* `docker-compose -f docker-compose.yml -f docker-compose.prod.yml down --remove-orphans`
+* `$ ./bobarr.sh stop`
 
 ## How to update
 
-Since bobarr is still in early development and hasn't reached a state where an updater is already built-in you have to update from sources.
-You need to pull master to get latest changes, something can break, you are a beta tester 😎
+Check the [CHANGELOG](https://github.com/iam4x/bobarr/blob/master/CHANGELOG.md) and update your `.env` if needed with new variables added.
 
-* `$ cd bobarr`
-* `$ git stash` (will keep your changes of docker-compose or transmission config)
-* `$ git pull origin master`
-* `$ git stash apply` (re-apply your custom changes)
-
-You can then re-start bobarr stack:
-
-* `$ docker-compose up -f docker-compose.yml -f docker-compose.prod.yml --build --force-recreate -d`
-* OR with VPN `$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.vpn.yml up --build --force-recreate -d`
+* `$ ./bobarr.sh update`
+* `$ ./bobarr.sh start`
 
 ## Services
 
@@ -127,10 +117,6 @@ You can then re-start bobarr stack:
 
 ## Development
 
-You can run bobarr API and Web UI in dev watch mode and display logs with:
+Clone the repository and then you can run bobarr API and Web UI in dev watch mode and display logs with:
 
-* With npm
-  * `$ yarn dev`
-* Without npm
-  * `$ docker-compose up -f docker-compose.yml -f docker-compose.dev.yml up --force-recreate -d`
-  * `$ docker-compose logs --tail 20 -f api web`
+* `$ yarn dev`

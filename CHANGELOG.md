@@ -10,6 +10,8 @@
 - env variable to change movies/tvshows folder name (https://github.com/iam4x/bobarr/issues/116)
 - calendar based on your actual library (https://github.com/iam4x/bobarr/issues/75)
 - clear redis cache action in settings
+- pushed images on docker hub with arm support (https://github.com/iam4x/bobarr/issues/163 and https://github.com/iam4x/bobarr/issues/41)
+- add install and start script (https://github.com/iam4x/bobarr/issues/4)
 
 ### Fixes
 
