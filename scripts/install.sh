@@ -43,7 +43,9 @@ curl -s https://raw.githubusercontent.com/iam4x/bobarr/master/docker-compose.yml
 curl -s https://raw.githubusercontent.com/iam4x/bobarr/master/docker-compose.prod.yml -o docker-compose.prod.yml
 curl -s https://raw.githubusercontent.com/iam4x/bobarr/master/docker-compose.vpn.yml -o docker-compose.vpn.yml
 curl -s https://raw.githubusercontent.com/iam4x/bobarr/master/docker-compose.wireguard.yml -o docker-compose.wireguard.yml
+
 curl -s https://raw.githubusercontent.com/iam4x/bobarr/master/scripts/bobarr.sh -o bobarr.sh
+chmod +x ./bobarr.sh
 
 echo "downloading docker images"
 
