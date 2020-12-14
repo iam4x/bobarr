@@ -45,7 +45,7 @@ The line should be: `- /mnt/storage:/usr/library`
 
 There are two way to start bobarr stack, first without VPN:
 
-* `$ docker-compose up --build --force-recreate -d`
+* `$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build --force-recreate -d`
 * Go to http://localhost:9117, add your preferred torrent websites and copy the API Key in top right corner
 * Go to http://localhost:3000/settings and update the jackett API key
 
@@ -54,14 +54,14 @@ If you want to enforce all torrent traffic through a VPN:
 #### OpenVPN
 
 * Copy your open vpn config file (.ovpn) into the folder `packages/vpn` name it `vpn.conf`
-* `$ docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up --build --force-recreate -d`
+* `$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.vpn.yml up --build --force-recreate -d`
 
 If you have NPM you can just run `$ npm run start` or `$ npm run start:vpn`
 
 #### WireGuard
 
 * Copy your wireguard config file (wg0.conf) into the folder `packages/vpn`
-* `$ docker-compose -f docker-compose.yml -f docker-compose.wireguard.yml up --build --force-recreate -d`
+* `$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.wireguard.yml up --build --force-recreate -d`
 
 If you have NPM you can just run `$ npm run start` or `$ npm run start:wireguard`
 
@@ -96,6 +96,12 @@ LIBRARY_TV_SHOWS_FOLDER_NAME=tvshows
 
 You can now head to http://localhost:3000 and hit that "Scan library folder" button.
 
+## How to stop
+
+You can stop the whole bobarr stack with:
+
+* `docker-compose -f docker-compose.yml -f docker-compose.prod.yml down --remove-orphans`
+
 ## How to update
 
 Since bobarr is still in early development and hasn't reached a state where an updater is already built-in you have to update from sources.
@@ -108,8 +114,8 @@ You need to pull master to get latest changes, something can break, you are a be
 
 You can then re-start bobarr stack:
 
-* `$ docker-compose up --build --force-recreate -d`
-* OR with VPN `$ docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up --build --force-recreate -d`
+* `$ docker-compose up -f docker-compose.yml -f docker-compose.prod.yml --build --force-recreate -d`
+* OR with VPN `$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.vpn.yml up --build --force-recreate -d`
 
 ## Services
 

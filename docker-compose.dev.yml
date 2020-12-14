@@ -1,16 +1,9 @@
 version: "3.6"
 
-volumes:
-  api_node_modules:
-  web_node_modules:
-  web_build:
-  api_build:
-
-networks:
-  default:
-
 services:
   api:
+    build:
+      context: ./packages/api
     command: yarn dev
     volumes:
       - ./packages/api:/usr/src/app
@@ -18,6 +11,8 @@ services:
       - api_build:/usr/src/app/dist
 
   web:
+    build:
+      context: ./packages/web
     command: yarn dev
     volumes:
       - ./packages/web:/usr/src/app

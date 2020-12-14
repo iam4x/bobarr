@@ -1,6 +1,8 @@
 version: "3.6"
 
 volumes:
+  api_node_modules:
+  web_node_modules:
   db_data:
   redis_data:
 
@@ -10,25 +12,17 @@ networks:
 services:
   api:
     container_name: bobarr-api
-    build:
-      context: ./packages/api
     env_file: .env
     volumes:
       - ./library:/usr/library
     ports:
       - 4000:4000
-    command: yarn start:prod
-    restart: unless-stopped
 
   web:
     container_name: bobarr-web
-    build:
-      context: ./packages/web
     env_file: .env
     ports:
       - 3000:3000
-    command: yarn start
-    restart: unless-stopped
 
   postgres:
     container_name: bobarr-postgresql
