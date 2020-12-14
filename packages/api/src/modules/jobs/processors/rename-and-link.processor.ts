@@ -65,11 +65,12 @@ export class RenameAndLinkProcessor {
   @Process(RenameAndLinkQueueProcessors.HANDLE_MOVIE)
   public async renameAndLinkMovie(job: Job<{ movieId: number }>) {
     const { movieId } = job.data;
-    this.logger.info('start rename and link movie', { movieId });
 
     const organizeStrategy = (await this.paramsService.get(
       ParameterKey.ORGANIZE_LIBRARY_STRATEGY
     )) as OrganizeLibraryStrategy;
+
+    this.logger.info(`start rename and ${organizeStrategy} movie`, { movieId });
 
     const movie = await this.libraryService.getMovie(movieId);
     const torrent = await this.transmissionService.getResourceTorrent({
@@ -155,11 +156,14 @@ export class RenameAndLinkProcessor {
   @Process(RenameAndLinkQueueProcessors.HANDLE_EPISODE)
   public async renameAndLinkEpisode(job: Job<{ episodeId: number }>) {
     const { episodeId } = job.data;
-    this.logger.info('start rename and link episode', { episodeId });
 
     const organizeStrategy = (await this.paramsService.get(
       ParameterKey.ORGANIZE_LIBRARY_STRATEGY
     )) as OrganizeLibraryStrategy;
+
+    this.logger.info(`start rename and ${organizeStrategy} episode`, {
+      episodeId,
+    });
 
     const episode = await this.tvEpisodeDAO.findOneOrFail({
       where: { id: episodeId },
@@ -227,11 +231,14 @@ export class RenameAndLinkProcessor {
   @Process(RenameAndLinkQueueProcessors.HANDLE_SEASON)
   public async renameAndLinkSeason(job: Job<{ seasonId: number }>) {
     const { seasonId } = job.data;
-    this.logger.info('start rename and link season', { seasonId });
 
     const organizeStrategy = (await this.paramsService.get(
       ParameterKey.ORGANIZE_LIBRARY_STRATEGY
     )) as OrganizeLibraryStrategy;
+
+    this.logger.info(`start rename and ${organizeStrategy} season`, {
+      seasonId,
+    });
 
     const season = await this.tvSeasonDAO.findOneOrFail({
       where: { id: seasonId },
