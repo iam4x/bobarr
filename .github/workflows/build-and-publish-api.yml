@@ -34,9 +34,7 @@ jobs:
           context: ./packages/api
           file: ./packages/api/Dockerfile
           push: true
-          tags: |
-            iam4x/bobarr-api:latest
-            iam4x/bobarr-api:${{ GITHUB_REF }}
+          tags: iam4x/bobarr-api:latest
           platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
 
       -
