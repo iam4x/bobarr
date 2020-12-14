@@ -1,14 +1,14 @@
 import dayjs from 'dayjs';
-import scan from 'scandirectory';
 import leven from 'leven';
+import path from 'path';
 import { promises as fs } from 'fs';
 import { Processor, Process, InjectQueue } from '@nestjs/bull';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { forEachSeries, map } from 'p-iteration';
+import { filterSeries, forEach, forEachSeries, map } from 'p-iteration';
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
-import { isPlainObject, times, orderBy } from 'lodash';
+import { times, orderBy } from 'lodash';
 import { Job, Queue } from 'bull';
 
 import { LIBRARY_CONFIG } from 'src/config';
@@ -115,24 +115,23 @@ export class ScanLibraryProcessor {
       folderName: LIBRARY_CONFIG.moviesFolderName,
     });
 
-    const { tree } = await this.scanDirectoryTree(
-      `/usr/library/${LIBRARY_CONFIG.moviesFolderName}`
-    );
-
-    const movies = Object.entries(tree)
-      .filter(([, value]) => typeof value === 'object')
-      .map(([key]) => key);
+    const root = `/usr/library/${LIBRARY_CONFIG.moviesFolderName}`;
+    const movies = await fs
+      .readdir(root)
+      .then((entries) =>
+        filterSeries(entries, (entry) =>
+          fs.stat(path.join(root, entry)).then((result) => result.isDirectory())
+        )
+      );
 
     this.logger.info(`found ${movies.length} movies on disk`);
 
-    movies
-      .reverse()
-      .forEach((movie) =>
-        this.scanLibraryQueue.add(
-          ScanLibraryQueueProcessors.PROCESS_MOVIE_FOLDER,
-          { movie }
-        )
-      );
+    await forEach(movies, (movie) =>
+      this.scanLibraryQueue.add(
+        ScanLibraryQueueProcessors.PROCESS_MOVIE_FOLDER,
+        { movie }
+      )
+    );
 
     this.logger.info('finish scan movies folder');
   }
@@ -150,7 +149,7 @@ export class ScanLibraryProcessor {
 
     this.logger.info(`found ${tvshows.length} tvshows on disk`);
 
-    tvshows.forEach((tvshow) =>
+    await forEach(tvshows, (tvshow) =>
       this.scanLibraryQueue.add(
         ScanLibraryQueueProcessors.PROCESS_TV_SHOW_FOLDER,
         { tvshow }
@@ -278,12 +277,19 @@ export class ScanLibraryProcessor {
     });
 
     const root = `/usr/library/${LIBRARY_CONFIG.tvShowsFolderName}`;
-    const seasons = await this.scanDirectoryTree(`${root}/${tvshow}`)
-      .then(({ tree }) => Object.entries(tree))
-      .then((tree) => tree.filter(([, episodes]) => isPlainObject(episodes)));
+    const seasons = await fs
+      .readdir(path.join(root, tvshow))
+      .then((entries) =>
+        filterSeries(entries, (entry) =>
+          fs
+            .stat(path.join(root, tvshow, entry))
+            .then((result) => result.isDirectory())
+        )
+      );
 
-    const seasonEpisodes: Array<[number, number[]]> = seasons.map(
-      ([season, episodeObj]) => {
+    const seasonEpisodes = await map<string, [number, number[]]>(
+      seasons,
+      async (season) => {
         const [seasonNumber] = /\d+/.exec(season) || [];
         if (!seasonNumber) {
           this.logger.error('could not parse season number', {
@@ -293,28 +299,28 @@ export class ScanLibraryProcessor {
           throw new Error('could not parse season number');
         }
 
-        const episodes = Object.keys(episodeObj).reduce<number[]>(
-          (res, str) => {
-            // if file is a srt file dont try to add as an episode
-            if (
-              str.startsWith('.') ||
-              str.endsWith('.srt') ||
-              str.endsWith('.nfo')
-            ) {
+        const episodes = await fs
+          .readdir(path.join(root, tvshow, season))
+          .then((entries) =>
+            entries.reduce((res, str) => {
+              if (
+                str.startsWith('.') ||
+                str.endsWith('.srt') ||
+                str.endsWith('.nfo')
+              ) {
+                return res;
+              }
+
+              // parse episode number from title
+              const [, episodeNumber] = /E(\d+)/.exec(str) || [];
+              if (episodeNumber) return [...res, parseInt(episodeNumber, 10)];
+
+              this.logger.error('could not parse episode number', {
+                file: str,
+              });
               return res;
-            }
-
-            // parse episode number from title
-            const [, episodeNumber] = /E(\d+)/.exec(str) || [];
-            if (episodeNumber) return [...res, parseInt(episodeNumber, 10)];
-
-            this.logger.error('could not parse episode number', {
-              file: str,
-            });
-            return res;
-          },
-          []
-        );
+            }, [] as number[])
+          );
 
         this.logger.info(
           `found season ${seasonNumber} with ${episodes.length} episodes`
@@ -361,21 +367,5 @@ export class ScanLibraryProcessor {
     });
 
     this.logger.info('finish processing tvshow', { tvshow });
-  }
-
-  private scanDirectoryTree(
-    folderPath: string
-  ): Promise<{ tree: Record<string, any>; list: Record<string, any> }> {
-    return new Promise((resolve, reject) => {
-      scan(
-        folderPath,
-        {},
-        (
-          err: Error | null,
-          list: Record<string, any>,
-          tree: Record<string, any>
-        ) => (err ? reject(err) : resolve({ list, tree }))
-      );
-    });
   }
 }
