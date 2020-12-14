@@ -29,20 +29,18 @@ export class OMDBService {
 
   private mapResult(omdbSearchResult: OMDBSearchResult) {
     const ratings = omdbSearchResult.Ratings?.reduce(
-      (prev, { Source, Value }) => {
-        return {
-          ...prev,
-          ...(Source === 'Metacritic' && {
-            metaCritic: Value,
-          }),
-          ...(Source === 'Internet Movie Database' && {
-            IMDB: Value,
-          }),
-          ...(Source === 'Rotten Tomatoes' && {
-            rottenTomatoes: Value,
-          }),
-        };
-      },
+      (prev, { Source, Value }) => ({
+        ...prev,
+        ...(Source === 'Metacritic' && {
+          metaCritic: Value,
+        }),
+        ...(Source === 'Internet Movie Database' && {
+          IMDB: Value,
+        }),
+        ...(Source === 'Rotten Tomatoes' && {
+          rottenTomatoes: Value,
+        }),
+      }),
       {}
     );
 

@@ -269,13 +269,12 @@ export class ScanLibraryProcessor {
       this.logger.info(`found ${results.length} potential match on tmdb`);
 
       const tmdbMovie = (() => {
-        const [exactMatch] = results.filter((result) => {
-          return (
+        const [exactMatch] = results.filter(
+          (result) =>
             dayjs(result.releaseDate).format('YYYY') === year &&
             (sanitize(title) === sanitize(result.title) ||
               sanitize(title) === sanitize(result.originalTitle))
-          );
-        });
+        );
 
         if (exactMatch) {
           return exactMatch;

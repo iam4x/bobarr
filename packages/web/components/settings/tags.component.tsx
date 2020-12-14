@@ -76,11 +76,10 @@ export function TagsComponent() {
   const handleAddSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (addValue && addValue.trim() && addValue.length > 1) {
-      const nextTags = [...tags, { name: addValue, score: 0 }].map(
-        (tag, index) => {
-          return { ...tag, score: tags.length + 1 - index };
-        }
-      );
+      const nextTags = [
+        ...tags,
+        { name: addValue, score: 0 },
+      ].map((tag, index) => ({ ...tag, score: tags.length + 1 - index }));
 
       setTags(orderBy(nextTags, ['score'], ['desc']));
       setAddValue('');

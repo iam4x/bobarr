@@ -9,6 +9,8 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
 
+    'no-shadow': 'off',
+    'no-redeclare': 'off',
     'new-cap': 'off',
     'no-console': 'warn',
   },
