@@ -27,10 +27,17 @@ And to have something with a better ui, less configuration and faster 🚀
 
 ## Installation
 
-1. Run the installation script `curl -o- https://raw.githubusercontent.com/iam4x/bobarr/master/scripts/install.sh | bash`
-2. Update your config in `.env`
-3. (Optional) If you already have a library (`/movies` & `/tvshows`) edit `docker-compose.yml`:
-Look for `- ./library:/usr/library`, and change `./library` to the folder where your (`/movies` & `/tvshows`) are.
+Run the installation script and follow the instructions:
+* `curl -o- https://raw.githubusercontent.com/iam4x/bobarr/master/scripts/install.sh | bash`
+
+### Configuration
+
+* Update your config in `.env`
+
+### Link your existing library if any (from Sonarr or Raddar)
+
+* Open `docker-compose.yml` and look for `- ./library:/usr/library`
+* Update `./library` to the folder where your (`/movies` & `/tvshows`) are
 
 As example, having:
 ```
