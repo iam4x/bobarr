@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue, JobOptions } from 'bull';
-import { setQueues } from 'bull-board';
+import { BullAdapter, setQueues } from 'bull-board';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -31,10 +31,10 @@ export class JobsService {
 
   private registerQueuesIntoBullBoard() {
     setQueues([
-      this.downloadQueue,
-      this.refreshTorrentQueue,
-      this.renameAndLinkQueue,
-      this.scanLibraryQueue,
+      new BullAdapter(this.downloadQueue),
+      new BullAdapter(this.refreshTorrentQueue),
+      new BullAdapter(this.renameAndLinkQueue),
+      new BullAdapter(this.scanLibraryQueue),
     ]);
   }
 

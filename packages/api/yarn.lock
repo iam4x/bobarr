@@ -938,10 +938,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@nestjs/bull@^0.1.0":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@nestjs/bull/-/bull-0.1.2.tgz#26422a7d97020ba5132f6efc6731b8631480c5e0"
-  integrity sha512-mg0CmBLs+tVZAkNkXy8/DJ/O7JdPRyw7QblCoaKw7ndqbJ+wJqioi8BLwSg0nfobd1xcupsozkoEaPM0zTSPJg==
+"@nestjs/bull@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/bull/-/bull-0.3.1.tgz#a7f7dba6807fd18a2cfdfd93600857b310b3f8ca"
+  integrity sha512-W7NvohlERijj3LTgNmXPKnoznsy7bQNXQjZcSKkSclmsD24WROGZijdUo3ZeWBawTYzewgmUahrXPTW+vPSQrg==
 
 "@nestjs/cli@^7.0.0":
   version "7.5.4"
@@ -2253,17 +2253,10 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
-axios@0.21.0:
+axios@0.21.0, axios@~0.21.0:
   version "0.21.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.0.tgz#26df088803a2350dff2c27f96fef99fe49442aca"
   integrity sha512-fmkJBknJKoZwem3/IKSSLpkdNXZeBu5Q7GA/aRsr2btgrptmSCxi2oFjZHqGdK9DoTil9PIHlPIZw2EcRJXRvw==
-  dependencies:
-    follow-redirects "^1.10.0"
-
-axios@~0.20.0:
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.20.0.tgz#057ba30f04884694993a8cd07fa394cff11c50bd"
-  integrity sha512-ANA4rr2BDcmmAQLOKft2fufrtuvlqR+cXNNinUmvfeSNCOF98PZL+7M/v1zIdGo7OLjEA9J2gXJL+j4zGsl0bA==
   dependencies:
     follow-redirects "^1.10.0"
 
@@ -2416,7 +2409,7 @@ buffer@^5.5.0, buffer@^5.7.0:
     base64-js "^1.3.1"
     ieee754 "^1.1.13"
 
-bull-board@^1.0.0-alpha.10:
+bull-board@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/bull-board/-/bull-board-1.1.2.tgz#8aa7ff5cc7b3102303637481f9ee38489f18d1df"
   integrity sha512-Wt/gFSjBjLqDMTotg9/SUp5O2rlzVLtuEaqqvWB2cbF/iOJ60wPPHx4uOiUZj3UntyymPSp/8CFeVPn9rzqANw==
