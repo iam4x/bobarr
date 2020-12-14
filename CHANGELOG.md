@@ -1,5 +1,11 @@
 # Changelog
 
+## master (pre-release)
+
+### Fixes
+
+- split scan library into multiple jobs for easier debugging
+
 ## [v1.0.0-beta.3] - 2020-12-14
 
 ### Fixes

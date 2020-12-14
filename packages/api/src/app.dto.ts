@@ -59,6 +59,10 @@ export enum RenameAndLinkQueueProcessors {
 export enum ScanLibraryQueueProcessors {
   SCAN_LIBRARY_FOLDER = 'scan_library_folder',
   FIND_NEW_EPISODES = 'find_new_episodes',
+  SCAN_TV_SHOWS_FOLDER = 'scan_tv_shows_folder',
+  SCAN_MOVIES_FOLDER = 'scan_movies_folder',
+  PROCESS_MOVIE_FOLDER = 'process_movie_folder',
+  PROCESS_TV_SHOW_FOLDER = 'process_tv_show_folder',
 }
 
 @ObjectType()
