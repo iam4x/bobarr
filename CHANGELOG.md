@@ -1,6 +1,6 @@
 # Changelog
 
-## Master (pre-release)
+## [v1.0.0-beta.2] - 2020-12-14
 
 ### Added
 

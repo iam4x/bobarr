@@ -34,7 +34,9 @@ jobs:
           context: ./packages/web
           file: ./packages/web/Dockerfile
           push: true
-          tags: iam4x/bobarr-web:latest
+          tags: |
+            iam4x/bobarr-web:latest
+            iam4x/bobarr-web:${{ GITHUB_REF }}
           platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
 
       -
