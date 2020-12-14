@@ -63,8 +63,6 @@ If you want to enforce all torrent traffic through a VPN:
 * Copy your open vpn config file (.ovpn) into the folder `packages/vpn` name it `vpn.conf`
 * `$ ./bobarr.sh start:vpn`
 
-If you have NPM you can just run `$ npm run start` or `$ npm run start:vpn`
-
 #### WireGuard
 
 * Copy your wireguard config file (wg0.conf) into the folder `packages/vpn`
