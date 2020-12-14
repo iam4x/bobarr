@@ -28,7 +28,7 @@ after_start() {
   echo "bobarr started correctly, printing bobarr api logs"
   echo "you can close this and bobarr will continue to run in backgound"
   echo ""
-  $dc logs -f --tail 20 api
+  $dc logs -f api
 }
 
 if [[ $args == 'start' ]]; then
