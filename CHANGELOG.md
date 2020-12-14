@@ -1,5 +1,12 @@
 # Changelog
 
+## [v1.0.0-beta.3] - 2020-12-14
+
+### Fixes
+
+- fix install script, make `./bobarr.sh` an executable
+- fix start script by printing all api logs
+
 ## [v1.0.0-beta.2] - 2020-12-14
 
 ### Added
