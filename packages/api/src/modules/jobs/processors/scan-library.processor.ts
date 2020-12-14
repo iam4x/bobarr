@@ -105,7 +105,10 @@ export class ScanLibraryProcessor {
   private async scanTVShowsFolder(
     @TransactionManager() manager?: EntityManager
   ) {
-    this.logger.info('start scan tvshows folder');
+    this.logger.info('start scan tvshows folder', {
+      folderName: LIBRARY_CONFIG.tvShowsFolderName,
+    });
+
     const tvShowDAO = manager!.getCustomRepository(TVShowDAO);
     const tvSeasonDAO = manager!.getCustomRepository(TVSeasonDAO);
     const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
@@ -227,7 +230,10 @@ export class ScanLibraryProcessor {
   private async scanMoviesFolder(
     @TransactionManager() manager?: EntityManager
   ) {
-    this.logger.info('start scan movies folder');
+    this.logger.info('start scan movies folder', {
+      folderName: LIBRARY_CONFIG.moviesFolderName,
+    });
+
     const movieDAO = manager!.getCustomRepository(MovieDAO);
 
     const { tree } = await this.scanDirectoryTree(
