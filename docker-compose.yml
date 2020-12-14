@@ -1,6 +1,8 @@
 version: "3.6"
 
 volumes:
+  web_build:
+  api_build:
   api_node_modules:
   web_node_modules:
   db_data:
