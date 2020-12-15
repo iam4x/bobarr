@@ -12,13 +12,7 @@ import { map } from 'rxjs/operators';
 import { RedisService } from './redis.service';
 import { CacheKeys } from './cache.dto';
 
-export function CacheMethod<TValue = any>({
-  key,
-  ttl,
-}: {
-  key: CacheKeys;
-  ttl: number;
-}) {
+export function CacheMethod({ key, ttl }: { key: CacheKeys; ttl: number }) {
   return function (
     _target: Record<string, any>,
     _propertyKey: string,

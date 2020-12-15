@@ -1,14 +1,15 @@
 import dayjs from 'dayjs';
-import scan from 'scandirectory';
 import leven from 'leven';
+import path from 'path';
 import { promises as fs } from 'fs';
-import { Processor, Process } from '@nestjs/bull';
+import { Processor, Process, InjectQueue } from '@nestjs/bull';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { forEachSeries, map } from 'p-iteration';
+import { filterSeries, forEach, forEachSeries, map } from 'p-iteration';
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
-import { isPlainObject, times, orderBy } from 'lodash';
+import { times, orderBy } from 'lodash';
+import { Job, Queue } from 'bull';
 
 import { LIBRARY_CONFIG } from 'src/config';
 
@@ -32,6 +33,8 @@ import { JobsService } from '../jobs.service';
 export class ScanLibraryProcessor {
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
+    @InjectQueue(JobsQueue.SCAN_LIBRARY)
+    private readonly scanLibraryQueue: Queue,
     private readonly jobsService: JobsService,
     private readonly tmdbService: TMDBService,
     private readonly tvEpisodeDAO: TVEpisodeDAO
@@ -94,24 +97,50 @@ export class ScanLibraryProcessor {
   }
 
   @Process(ScanLibraryQueueProcessors.SCAN_LIBRARY_FOLDER)
-  public async scanLibrary() {
-    this.logger.info('start scan library');
-    await this.scanMoviesFolder();
-    await this.scanTVShowsFolder();
-    this.logger.info('finish scan library');
+  public scanLibrary() {
+    this.scanLibraryQueue.add(
+      ScanLibraryQueueProcessors.SCAN_MOVIES_FOLDER,
+      {}
+    );
+
+    this.scanLibraryQueue.add(
+      ScanLibraryQueueProcessors.SCAN_TV_SHOWS_FOLDER,
+      {}
+    );
   }
 
-  @Transaction()
-  private async scanTVShowsFolder(
-    @TransactionManager() manager?: EntityManager
-  ) {
+  @Process(ScanLibraryQueueProcessors.SCAN_MOVIES_FOLDER)
+  public async scanMoviesFolder() {
+    this.logger.info('start scan movies folder', {
+      folderName: LIBRARY_CONFIG.moviesFolderName,
+    });
+
+    const root = `/usr/library/${LIBRARY_CONFIG.moviesFolderName}`;
+    const movies = await fs
+      .readdir(root)
+      .then((entries) =>
+        filterSeries(entries, (entry) =>
+          fs.stat(path.join(root, entry)).then((result) => result.isDirectory())
+        )
+      );
+
+    this.logger.info(`found ${movies.length} movies on disk`);
+
+    await forEach(movies, (movie) =>
+      this.scanLibraryQueue.add(
+        ScanLibraryQueueProcessors.PROCESS_MOVIE_FOLDER,
+        { movie }
+      )
+    );
+
+    this.logger.info('finish scan movies folder');
+  }
+
+  @Process(ScanLibraryQueueProcessors.SCAN_TV_SHOWS_FOLDER)
+  public async scanTVShowsFolder() {
     this.logger.info('start scan tvshows folder', {
       folderName: LIBRARY_CONFIG.tvShowsFolderName,
     });
-
-    const tvShowDAO = manager!.getCustomRepository(TVShowDAO);
-    const tvSeasonDAO = manager!.getCustomRepository(TVSeasonDAO);
-    const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
 
     const root = `/usr/library/${LIBRARY_CONFIG.tvShowsFolderName}`;
     const tvshows = (await fs.readdir(root, { withFileTypes: true }))
@@ -120,42 +149,160 @@ export class ScanLibraryProcessor {
 
     this.logger.info(`found ${tvshows.length} tvshows on disk`);
 
-    await forEachSeries(tvshows, async (tvshow) => {
-      this.logger.info('start processing tvshow', { tvshow });
+    await forEach(tvshows, (tvshow) =>
+      this.scanLibraryQueue.add(
+        ScanLibraryQueueProcessors.PROCESS_TV_SHOW_FOLDER,
+        { tvshow }
+      )
+    );
 
-      const [tmdbResult] = await this.tmdbService.searchTVShow(tvshow, {
-        language: 'en',
-      });
+    this.logger.info('finish scan tvshows folder');
+  }
 
-      if (!tmdbResult) {
-        this.logger.error('tvshow not found on tmdb', { tvshow });
-        return;
+  @Process(ScanLibraryQueueProcessors.PROCESS_MOVIE_FOLDER)
+  @Transaction()
+  public async processMovieFolder(
+    { data: { movie } }: Job<{ movie: string }>,
+    @TransactionManager() manager?: EntityManager
+  ) {
+    this.logger.info('processing movie', { movie });
+    const movieDAO = manager!.getCustomRepository(MovieDAO);
+
+    const [, title, year] = /^(.+) \((\d+)/.exec(movie) || [];
+
+    if (!title || !year) {
+      throw new Error(`cant parse movie name or year [${movie}]`);
+    }
+
+    this.logger.info('parsed filename', { title, year });
+
+    if (await movieDAO.findOne({ where: { title } })) {
+      this.logger.info('movie already in database', { title, year });
+      return;
+    }
+
+    const localizedResults = await this.tmdbService.searchMovie(title);
+    const englishResults = await this.tmdbService.searchMovie(title, {
+      language: 'en',
+    });
+
+    const results = [...localizedResults, ...englishResults];
+    this.logger.info(`found ${results.length} potential match on tmdb`);
+
+    const tmdbMovie = (() => {
+      const [exactMatch] = results.filter(
+        (result) =>
+          dayjs(result.releaseDate).format('YYYY') === year &&
+          (sanitize(title) === sanitize(result.title) ||
+            sanitize(title) === sanitize(result.originalTitle))
+      );
+
+      if (exactMatch) {
+        return exactMatch;
       }
 
-      this.logger.info('tvshow found on tmdb', { tmdbId: tmdbResult.tmdbId });
-      const tvShow = await tvShowDAO.findOrCreate({
-        tmdbId: tmdbResult.tmdbId,
-        title: tvshow,
+      this.logger.warn('could not find exact match movie');
+      this.logger.warn('fallback to year match and levenstein');
+
+      const [bestMatch] = orderBy(
+        results.filter(
+          (result) => dayjs(result.releaseDate).format('YYYY') === year
+        ),
+        [(result) => leven(result.title, title)],
+        ['asc']
+      );
+
+      if (bestMatch) {
+        this.logger.warn(`best guessed match for ${title}`);
+        this.logger.warn(bestMatch.title);
+        return bestMatch;
+      }
+
+      return undefined;
+    })();
+
+    if (!tmdbMovie) {
+      this.logger.error('no movie found matching title and year for');
+      this.logger.error(`${title} (${year})`);
+      return;
+    }
+
+    this.logger.info('found movie on tmdb', { tmdbId: tmdbMovie.tmdbId });
+
+    const match = await movieDAO.findOne({
+      where: { tmdbId: tmdbMovie.tmdbId },
+    });
+
+    if (match) {
+      this.logger.info('movie already in library', {
+        tmdbId: tmdbMovie.tmdbId,
       });
+    } else {
+      await movieDAO.save({
+        title,
+        tmdbId: tmdbMovie.id,
+        state: DownloadableMediaState.PROCESSED,
+      });
+      this.logger.info('new movie saved in database', {
+        tmdbId: tmdbMovie.tmdbId,
+      });
+    }
+  }
 
-      const seasons = await this.scanDirectoryTree(`${root}/${tvshow}`)
-        .then(({ tree }) => Object.entries(tree))
-        .then((tree) => tree.filter(([, episodes]) => isPlainObject(episodes)));
+  @Process(ScanLibraryQueueProcessors.PROCESS_TV_SHOW_FOLDER)
+  @Transaction()
+  public async processTVShow(
+    { data: { tvshow } }: Job<{ tvshow: string }>,
+    @TransactionManager() manager?: EntityManager
+  ) {
+    this.logger.info('start processing tvshow', { tvshow });
 
-      const seasonEpisodes: Array<[number, number[]]> = seasons.map(
-        ([season, episodeObj]) => {
-          const [seasonNumber] = /\d+/.exec(season) || [];
-          if (!seasonNumber) {
-            this.logger.error('could not parse season number', {
-              season,
-              seasonNumber,
-            });
-            throw new Error('could not parse season number');
-          }
+    const tvShowDAO = manager!.getCustomRepository(TVShowDAO);
+    const tvSeasonDAO = manager!.getCustomRepository(TVSeasonDAO);
+    const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
 
-          const episodes = Object.keys(episodeObj).reduce<number[]>(
-            (res, str) => {
-              // if file is a srt file dont try to add as an episode
+    const [tmdbResult] = await this.tmdbService.searchTVShow(tvshow, {
+      language: 'en',
+    });
+
+    if (!tmdbResult) {
+      this.logger.error('tvshow not found on tmdb', { tvshow });
+      return;
+    }
+
+    this.logger.info('tvshow found on tmdb', { tmdbId: tmdbResult.tmdbId });
+    const tvShow = await tvShowDAO.findOrCreate({
+      tmdbId: tmdbResult.tmdbId,
+      title: tvshow,
+    });
+
+    const root = `/usr/library/${LIBRARY_CONFIG.tvShowsFolderName}`;
+    const seasons = await fs
+      .readdir(path.join(root, tvshow))
+      .then((entries) =>
+        filterSeries(entries, (entry) =>
+          fs
+            .stat(path.join(root, tvshow, entry))
+            .then((result) => result.isDirectory())
+        )
+      );
+
+    const seasonEpisodes = await map<string, [number, number[]]>(
+      seasons,
+      async (season) => {
+        const [seasonNumber] = /\d+/.exec(season) || [];
+        if (!seasonNumber) {
+          this.logger.error('could not parse season number', {
+            season,
+            seasonNumber,
+          });
+          throw new Error('could not parse season number');
+        }
+
+        const episodes = await fs
+          .readdir(path.join(root, tvshow, season))
+          .then((entries) =>
+            entries.reduce((res, str) => {
               if (
                 str.startsWith('.') ||
                 str.endsWith('.srt') ||
@@ -172,179 +319,53 @@ export class ScanLibraryProcessor {
                 file: str,
               });
               return res;
-            },
-            []
+            }, [] as number[])
           );
 
-          this.logger.info(
-            `found season ${seasonNumber} with ${episodes.length} episodes`
-          );
+        this.logger.info(
+          `found season ${seasonNumber} with ${episodes.length} episodes`
+        );
 
-          return [parseInt(seasonNumber, 10), episodes];
-        }
-      );
+        return [parseInt(seasonNumber, 10), episodes];
+      }
+    );
 
-      await forEachSeries(seasonEpisodes, async ([seasonNumber, episodes]) => {
-        this.logger.info('start processing season', { seasonNumber });
+    await forEachSeries(seasonEpisodes, async ([seasonNumber, episodes]) => {
+      this.logger.info('start processing season', { seasonNumber });
 
-        const tvSeason = await tvSeasonDAO.findOrCreate({
+      const tvSeason = await tvSeasonDAO.findOrCreate({
+        tvShowId: tvShow.id,
+        seasonNumber,
+      });
+
+      await forEachSeries(episodes, async (episodeNumber) => {
+        this.logger.info(`start processing episode`, {
+          season: seasonNumber,
+          episode: episodeNumber,
+        });
+
+        const episode = await tvEpisodeDAO.findOrCreate({
           tvShowId: tvShow.id,
+          seasonId: tvSeason.id,
+          episodeNumber,
           seasonNumber,
         });
 
-        await forEachSeries(episodes, async (episodeNumber) => {
-          this.logger.info(`start processing episode`, {
-            season: seasonNumber,
-            episode: episodeNumber,
-          });
-
-          const episode = await tvEpisodeDAO.findOrCreate({
-            tvShowId: tvShow.id,
-            seasonId: tvSeason.id,
-            episodeNumber,
-            seasonNumber,
-          });
-
-          await tvEpisodeDAO.save({
-            id: episode.id,
-            state: DownloadableMediaState.PROCESSED,
-            season: tvSeason,
-          });
-        });
-
-        await tvSeasonDAO.save({
-          id: tvSeason.id,
+        await tvEpisodeDAO.save({
+          id: episode.id,
           state: DownloadableMediaState.PROCESSED,
+          season: tvSeason,
         });
-
-        this.logger.info(`finish processing season`, { seasonNumber });
       });
 
-      this.logger.info('finish processing tvshow', { tvshow });
-    });
-
-    this.logger.info('finish scan tvshows folder');
-  }
-
-  @Transaction()
-  private async scanMoviesFolder(
-    @TransactionManager() manager?: EntityManager
-  ) {
-    this.logger.info('start scan movies folder', {
-      folderName: LIBRARY_CONFIG.moviesFolderName,
-    });
-
-    const movieDAO = manager!.getCustomRepository(MovieDAO);
-
-    const { tree } = await this.scanDirectoryTree(
-      `/usr/library/${LIBRARY_CONFIG.moviesFolderName}`
-    );
-    const movies = Object.entries(tree)
-      .filter(([, value]) => typeof value === 'object')
-      .map(([key]) => key);
-
-    this.logger.info(`found ${movies.length} movies on disk`);
-
-    await forEachSeries(movies.reverse(), async (movie) => {
-      this.logger.info('processing movie', { movie });
-      const [, title, year] = /^(.+) \((\d+)/.exec(movie) || [];
-
-      if (!title || !year) {
-        throw new Error('cant parse movie name or year');
-      }
-
-      this.logger.info('parsed filename', { title, year });
-
-      if (await movieDAO.findOne({ where: { title } })) {
-        this.logger.info('movie already in database', { title, year });
-        return;
-      }
-
-      const localizedResults = await this.tmdbService.searchMovie(title);
-      const englishResults = await this.tmdbService.searchMovie(title, {
-        language: 'en',
+      await tvSeasonDAO.save({
+        id: tvSeason.id,
+        state: DownloadableMediaState.PROCESSED,
       });
 
-      const results = [...localizedResults, ...englishResults];
-      this.logger.info(`found ${results.length} potential match on tmdb`);
-
-      const tmdbMovie = (() => {
-        const [exactMatch] = results.filter((result) => {
-          return (
-            dayjs(result.releaseDate).format('YYYY') === year &&
-            (sanitize(title) === sanitize(result.title) ||
-              sanitize(title) === sanitize(result.originalTitle))
-          );
-        });
-
-        if (exactMatch) {
-          return exactMatch;
-        }
-
-        this.logger.warn('could not find exact match movie');
-        this.logger.warn('fallback to year match and levenstein');
-
-        const [bestMatch] = orderBy(
-          results.filter(
-            (result) => dayjs(result.releaseDate).format('YYYY') === year
-          ),
-          [(result) => leven(result.title, title)],
-          ['asc']
-        );
-
-        if (bestMatch) {
-          this.logger.warn(`best guessed match for ${title}`);
-          this.logger.warn(bestMatch.title);
-          return bestMatch;
-        }
-
-        return undefined;
-      })();
-
-      if (!tmdbMovie) {
-        this.logger.error('no movie found matching title and year for');
-        this.logger.error(`${title} (${year})`);
-        return;
-      }
-
-      this.logger.info('found movie on tmdb', { tmdbId: tmdbMovie.tmdbId });
-
-      const match = await movieDAO.findOne({
-        where: { tmdbId: tmdbMovie.tmdbId },
-      });
-
-      if (match) {
-        this.logger.info('movie already in library', {
-          tmdbId: tmdbMovie.tmdbId,
-        });
-      } else {
-        await movieDAO.save({
-          title,
-          tmdbId: tmdbMovie.id,
-          state: DownloadableMediaState.PROCESSED,
-        });
-        this.logger.info('new movie saved in database', {
-          tmdbId: tmdbMovie.tmdbId,
-        });
-      }
+      this.logger.info(`finish processing season`, { seasonNumber });
     });
 
-    this.logger.info('finish scan movies folder');
-  }
-
-  private scanDirectoryTree(
-    folderPath: string
-  ): Promise<{ tree: Record<string, any>; list: Record<string, any> }> {
-    return new Promise((resolve, reject) => {
-      scan(
-        folderPath,
-        {},
-        (
-          err: Error | null,
-          list: Record<string, any>,
-          tree: Record<string, any>
-        ) => (err ? reject(err) : resolve({ list, tree }))
-      );
-    });
+    this.logger.info('finish processing tvshow', { tvshow });
   }
 }

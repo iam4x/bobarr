@@ -57,10 +57,9 @@ export class ParamsService {
     @TransactionManager() manager: EntityManager | null
   ) {
     const qualityDAO = manager!.getCustomRepository(QualityDAO);
-    const defaultQualities: Array<Omit<
-      Quality,
-      'id' | 'createdAt' | 'updatedAt'
-    >> = [
+    const defaultQualities: Array<
+      Omit<Quality, 'id' | 'createdAt' | 'updatedAt'>
+    > = [
       {
         type: Entertainment.Movie,
         name: '4K',

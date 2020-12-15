@@ -25,11 +25,15 @@ import { JobsService } from './jobs.service';
 import { JobsResolver } from './jobs.resolver';
 
 const queues = [
-  { name: JobsQueue.REFRESH_TORRENT, redis: REDIS_CONFIG },
-  { name: JobsQueue.DOWNLOAD, redis: REDIS_CONFIG },
-  { name: JobsQueue.RENAME_AND_LINK, redis: REDIS_CONFIG },
-  { name: JobsQueue.SCAN_LIBRARY, redis: REDIS_CONFIG },
-];
+  JobsQueue.REFRESH_TORRENT,
+  JobsQueue.DOWNLOAD,
+  JobsQueue.RENAME_AND_LINK,
+  JobsQueue.SCAN_LIBRARY,
+].map((name) => ({
+  name,
+  redis: REDIS_CONFIG,
+  defaultJobOptions: { removeOnFail: 100, removeOnComplete: 100 },
+}));
 
 @Module({
   imports: [

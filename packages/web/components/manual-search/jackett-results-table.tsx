@@ -26,7 +26,11 @@ interface JackettResultTableProps {
   media: Media;
 }
 
-export function JackettResultsTable(props: JackettResultTableProps) {
+export function JackettResultsTable({
+  media,
+  refetchQueries,
+  results,
+}: JackettResultTableProps) {
   const columns: ColumnsType<JackettFormattedResult> = [
     {
       title: 'Age',
@@ -75,8 +79,8 @@ export function JackettResultsTable(props: JackettResultTableProps) {
       render: (row: JackettFormattedResult) => (
         <ManualDownloadMedia
           jackettResult={row}
-          media={props.media}
-          refetchQueries={props.refetchQueries || []}
+          media={media}
+          refetchQueries={refetchQueries || []}
         />
       ),
     },
@@ -86,7 +90,7 @@ export function JackettResultsTable(props: JackettResultTableProps) {
     <Table<JackettFormattedResult>
       rowKey="id"
       size="small"
-      dataSource={props.results}
+      dataSource={results}
       columns={columns}
     />
   );
