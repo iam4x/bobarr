@@ -57,7 +57,7 @@ services:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: bobarr-flaresolverr
     environment:
-      - LOG_LEVEL: info
+      - LOG_LEVEL=info
     restart: unless-stopped
     ports:
       - 8191:8191
