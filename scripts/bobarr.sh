@@ -17,10 +17,9 @@ cat << "EOF"
 EOF
 
 args=$1
-dc='docker-compose -f docker-compose.yml -f docker-compose.prod.yml'
 
 stop_bobarr() {
-  $dc down --remove-orphans || true
+  docker-compose down --remove-orphans || true
 }
 
 after_start() {
@@ -28,20 +27,20 @@ after_start() {
   echo "bobarr started correctly, printing bobarr api logs"
   echo "you can close this and bobarr will continue to run in backgound"
   echo ""
-  $dc logs -f api
+  docker-compose logs -f api
 }
 
 if [[ $args == 'start' ]]; then
   stop_bobarr
-  $dc up --force-recreate -d
+  docker-compose up --force-recreate -d
   after_start
 elif [[ $args == 'start:vpn' ]]; then
   stop_bobarr
-  $dc -f docker-compose.vpn.yml up --force-recreate -d
+  docker-compose -f docker-compose.vpn.yml up --force-recreate -d
   after_start
 elif [[ $args == 'start:wireguard' ]]; then
   stop_bobarr
-  $dc -f docker-compose.wireguard.yml up --force-recreate -d
+  docker-compose -f docker-compose.wireguard.yml up --force-recreate -d
   after_start
 elif [[ $args == 'stop' ]]; then
   stop_bobarr
@@ -49,7 +48,7 @@ elif [[ $args == 'stop' ]]; then
   echo "bobarr correctly stopped"
 elif [[ $args == 'update' ]]; then
   stop_bobarr
-  $dc pull
+  docker-compose pull
   echo ""
   echo "bobarr correctly updated, you can now re-start bobarr"
 else
