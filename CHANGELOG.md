@@ -2,9 +2,15 @@
 
 ## master (pre-release)
 
+### Added
+
+- added FlareSolverr for solving CloudFare on certains trackers within jackett (https://github.com/iam4x/bobarr/issues/165)
+- update jobs ui
+- update nodejs to v14
+
 ### Fixes
 
-- split scan library into multiple jobs for easier debugging
+- update strategy for scannig library
 
 ## [v1.0.0-beta.3] - 2020-12-14
 
