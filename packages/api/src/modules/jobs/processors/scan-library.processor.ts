@@ -6,6 +6,10 @@ import { Processor, Process, InjectQueue } from '@nestjs/bull';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { Transaction, TransactionManager, EntityManager } from 'typeorm';
+import { times, orderBy } from 'lodash';
+import { Job, Queue } from 'bull';
+
 import {
   filterSeries,
   forEach,
@@ -13,9 +17,6 @@ import {
   map,
   mapSeries,
 } from 'p-iteration';
-import { Transaction, TransactionManager, EntityManager } from 'typeorm';
-import { times, orderBy } from 'lodash';
-import { Job, Queue } from 'bull';
 
 import { LIBRARY_CONFIG } from 'src/config';
 
@@ -27,13 +28,13 @@ import {
 
 import { sanitize } from 'src/utils/sanitize';
 
+import { JobsService } from 'src/modules/jobs//jobs.service';
 import { TMDBService } from 'src/modules/tmdb/tmdb.service';
+
 import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { TVShowDAO } from 'src/entities/dao/tvshow.dao';
 import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
-
-import { JobsService } from '../jobs.service';
 import { FileDAO } from 'src/entities/dao/file.dao';
 
 @Processor(JobsQueue.SCAN_LIBRARY)
