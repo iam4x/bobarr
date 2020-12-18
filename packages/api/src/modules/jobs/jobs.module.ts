@@ -9,6 +9,7 @@ import { MovieDAO } from 'src/entities/dao/movie.dao';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
+import { FileDAO } from 'src/entities/dao/file.dao';
 
 import { JackettModule } from 'src/modules/jackett/jackett.module';
 import { LibraryModule } from 'src/modules/library/library.module';
@@ -18,7 +19,7 @@ import { ParamsModule } from 'src/modules/params/params.module';
 
 import { DownloadProcessor } from './processors/download.processor';
 import { RefreshTorrentProcessor } from './processors/refresh-torrent.processor';
-import { RenameAndLinkProcessor } from './processors/rename-and-link.processor';
+import { OrganizeProcessor } from './processors/organize.processor';
 import { ScanLibraryProcessor } from './processors/scan-library.processor';
 
 import { JobsService } from './jobs.service';
@@ -37,7 +38,13 @@ const queues = [
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([MovieDAO, TorrentDAO, TVSeasonDAO, TVEpisodeDAO]),
+    TypeOrmModule.forFeature([
+      MovieDAO,
+      TorrentDAO,
+      TVSeasonDAO,
+      TVEpisodeDAO,
+      FileDAO,
+    ]),
     BullModule.registerQueue(...queues),
     JackettModule,
     TransmissionModule,
@@ -48,7 +55,7 @@ const queues = [
   providers: [
     DownloadProcessor,
     RefreshTorrentProcessor,
-    RenameAndLinkProcessor,
+    OrganizeProcessor,
     ScanLibraryProcessor,
     JobsService,
     JobsResolver,

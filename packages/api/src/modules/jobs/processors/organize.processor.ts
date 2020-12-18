@@ -15,7 +15,7 @@ import {
   JobsQueue,
   FileType,
   DownloadableMediaState,
-  RenameAndLinkQueueProcessors,
+  OrganizeQueueProcessors,
   ParameterKey,
   OrganizeLibraryStrategy,
 } from 'src/app.dto';
@@ -31,9 +31,10 @@ import { TorrentDAO } from 'src/entities/dao/torrent.dao';
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
 import { LibraryService } from 'src/modules/library/library.service';
 import { ParamsService } from 'src/modules/params/params.service';
+import { FileDAO } from 'src/entities/dao/file.dao';
 
 @Processor(JobsQueue.RENAME_AND_LINK)
-export class RenameAndLinkProcessor {
+export class OrganizeProcessor {
   // eslint-disable-next-line max-params
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
@@ -41,11 +42,12 @@ export class RenameAndLinkProcessor {
     private readonly tvSeasonDAO: TVSeasonDAO,
     private readonly tvEpisodeDAO: TVEpisodeDAO,
     private readonly torrentDAO: TorrentDAO,
+    private readonly fileDAO: FileDAO,
     private readonly transmissionService: TransmissionService,
     private readonly libraryService: LibraryService,
     private readonly paramsService: ParamsService
   ) {
-    this.logger = this.logger.child({ context: 'RenameAndLinkProcessor' });
+    this.logger = this.logger.child({ context: 'OrganizeProcessor' });
   }
 
   private getOrganizeStrategyCommand(strategy: OrganizeLibraryStrategy) {
@@ -62,7 +64,7 @@ export class RenameAndLinkProcessor {
     }
   }
 
-  @Process(RenameAndLinkQueueProcessors.HANDLE_MOVIE)
+  @Process(OrganizeQueueProcessors.HANDLE_MOVIE)
   public async renameAndLinkMovie(job: Job<{ movieId: number }>) {
     const { movieId } = job.data;
 
@@ -138,6 +140,11 @@ export class RenameAndLinkProcessor {
               "${torrentFile.next}"
           `
       );
+
+      await this.fileDAO.save({
+        movieId,
+        path: path.join(newFolder, torrentFile.next),
+      });
     });
 
     if (organizeStrategy === OrganizeLibraryStrategy.MOVE) {
@@ -153,7 +160,7 @@ export class RenameAndLinkProcessor {
     this.logger.info('finish rename and link movie', { movieId });
   }
 
-  @Process(RenameAndLinkQueueProcessors.HANDLE_EPISODE)
+  @Process(OrganizeQueueProcessors.HANDLE_EPISODE)
   public async renameAndLinkEpisode(job: Job<{ episodeId: number }>) {
     const { episodeId } = job.data;
 
@@ -213,6 +220,11 @@ export class RenameAndLinkProcessor {
             "${torrentFile.next}"
         `
       );
+
+      await this.fileDAO.save({
+        episodeId,
+        path: path.join(seasonFolder, torrentFile.next),
+      });
     });
 
     if (organizeStrategy === OrganizeLibraryStrategy.MOVE) {
@@ -228,7 +240,7 @@ export class RenameAndLinkProcessor {
     this.logger.info('finish rename and link episode', { episodeId });
   }
 
-  @Process(RenameAndLinkQueueProcessors.HANDLE_SEASON)
+  @Process(OrganizeQueueProcessors.HANDLE_SEASON)
   public async renameAndLinkSeason(job: Job<{ seasonId: number }>) {
     const { seasonId } = job.data;
 
@@ -312,6 +324,17 @@ export class RenameAndLinkProcessor {
           "${newName}${file.ext}"
         `
       );
+
+      const episode = season.episodes.find(
+        (k) => k.episodeNumber === file.episodeNb
+      );
+
+      if (episode) {
+        await this.fileDAO.save({
+          episodeId: episode.id,
+          path: path.join(seasonFolder, newName, file.ext),
+        });
+      }
     });
 
     if (organizeStrategy === OrganizeLibraryStrategy.MOVE) {

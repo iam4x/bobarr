@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { map, forEachSeries, forEach, reduce, mapSeries } from 'p-iteration';
-import { times } from 'lodash';
+import { flatten, times, uniq } from 'lodash';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import childCommand from 'child-command';
@@ -8,8 +8,6 @@ import dayjs from 'dayjs';
 import path from 'path';
 
 import { DeepPartial, TransactionManager, EntityManager, Any } from 'typeorm';
-
-import { LIBRARY_CONFIG } from 'src/config';
 
 import { FileType, DownloadableMediaState } from 'src/app.dto';
 import { LazyTransaction } from 'src/utils/lazy-transaction';
@@ -34,6 +32,7 @@ import { TransmissionService } from 'src/modules/transmission/transmission.servi
 import { ParamsService } from 'src/modules/params/params.service';
 
 import { JackettInput } from './library.dto';
+import { FileDAO } from 'src/entities/dao/file.dao';
 
 @Injectable()
 export class LibraryService {
@@ -191,8 +190,13 @@ export class LibraryService {
     this.logger.info('start remove movie', { tmdbId });
     const movieDAO = manager!.getCustomRepository(MovieDAO);
     const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+    const fileDAO = manager!.getCustomRepository(FileDAO);
 
-    const movie = await movieDAO.findOneOrFail({ where: { tmdbId } });
+    const movie = await movieDAO.findOneOrFail({
+      where: { tmdbId },
+      relations: ['files'],
+    });
+
     const torrent = await torrentDAO.findOne({
       resourceType: FileType.MOVIE,
       resourceId: movie.id,
@@ -204,17 +208,12 @@ export class LibraryService {
       this.logger.info('movie torrent removed', { torrent: torrent.id });
     }
 
-    const enrichedMovie = await this.getMovie(movie.id);
-    const year = dayjs(enrichedMovie.releaseDate).format('YYYY');
-    const folderName = `${movie.title} (${year})`;
-    const folderPath = path.resolve(
-      __dirname,
-      `../../../../../library/${LIBRARY_CONFIG.moviesFolderName}`,
-      folderName
+    const folders = uniq(movie.files.map((file) => path.dirname(file.path)));
+    await forEachSeries(folders, (folder) =>
+      childCommand(`rm -rf "${folder}"`)
     );
 
-    await childCommand(`rm -rf "${folderPath}"`);
-    this.logger.info('movie files and folder deleted from file system');
+    await fileDAO.remove(movie.files);
 
     if (softDelete) {
       await movieDAO.save({
@@ -237,10 +236,11 @@ export class LibraryService {
 
     const tvShowDAO = manager!.getCustomRepository(TVShowDAO);
     const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+    const fileDAO = manager!.getCustomRepository(FileDAO);
 
     const tvShow = await tvShowDAO.findOneOrFail({
       where: { tmdbId },
-      relations: ['seasons', 'episodes'],
+      relations: ['seasons', 'episodes', 'episodes.files'],
     });
 
     await forEach(tvShow.seasons, async (season) => {
@@ -273,15 +273,23 @@ export class LibraryService {
       }
     });
 
-    const enTVShow = await this.getTVShow(tvShow.id, { language: 'en' });
-    const tvShowFolder = path.resolve(
-      __dirname,
-      `../../../../../library/${LIBRARY_CONFIG.tvShowsFolderName}/`,
-      enTVShow.title
+    const tvShowFolders = uniq(
+      flatten(
+        tvShow.episodes.map((episode) =>
+          episode.files.map((file) => path.dirname(path.dirname(file.path)))
+        )
+      )
     );
 
-    await childCommand(`rm -rf "${tvShowFolder}"`);
+    await forEachSeries(tvShowFolders, (folder) =>
+      childCommand(`rm -rf "${folder}"`)
+    );
+
     this.logger.info('tv show files and folder deleted from file system');
+
+    await fileDAO.remove(
+      flatten(tvShow.episodes.map((episode) => episode.files))
+    );
 
     await tvShowDAO.remove(tvShow);
     this.logger.info('finish remove tv show', { tmdbId });

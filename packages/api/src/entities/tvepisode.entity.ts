@@ -9,6 +9,7 @@ import {
   ManyToOne,
   Unique,
   Index,
+  OneToMany,
 } from 'typeorm';
 
 import { DownloadableMediaState } from 'src/app.dto';
@@ -16,6 +17,7 @@ import { formatNumber } from 'src/utils/format-number';
 
 import { TVSeason } from './tvseason.entity';
 import { TVShow } from './tvshow.entity';
+import { File } from './file.entity';
 
 @Entity()
 @Unique(['episodeNumber', 'seasonNumber', 'tvShow'])
@@ -56,6 +58,9 @@ export class TVEpisode {
     onDelete: 'CASCADE',
   })
   public tvShow!: TVShow;
+
+  @OneToMany((_type) => File, (file) => file.tvEpisode)
+  public files!: File[];
 
   @Field()
   @CreateDateColumn()

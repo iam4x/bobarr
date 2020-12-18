@@ -7,9 +7,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  OneToMany,
 } from 'typeorm';
 
 import { DownloadableMediaState } from 'src/app.dto';
+import { File } from './file.entity';
 
 @Entity()
 @ObjectType()
@@ -31,6 +33,9 @@ export class Movie {
   @Index()
   @Column('varchar', { default: DownloadableMediaState.SEARCHING })
   public state: DownloadableMediaState = DownloadableMediaState.SEARCHING;
+
+  @OneToMany((_type) => File, (file) => file.movie)
+  public files!: File[];
 
   @Field()
   @CreateDateColumn()

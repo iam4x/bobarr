@@ -7,6 +7,19 @@ type GraphQLCommonResponse {
   message: String
 }
 
+type TVShow {
+  id: Float!
+  tmdbId: Float!
+  title: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Movie {
   id: Float!
   tmdbId: Float!
@@ -22,19 +35,6 @@ enum DownloadableMediaState {
   DOWNLOADING
   DOWNLOADED
   PROCESSED
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type TVShow {
-  id: Float!
-  tmdbId: Float!
-  title: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
 }
 
 type TMDBFormattedTVEpisode {

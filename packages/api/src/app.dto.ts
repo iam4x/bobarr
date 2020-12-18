@@ -50,7 +50,7 @@ export enum DownloadQueueProcessors {
   DOWNLOAD_MISSING = 'download_missing',
 }
 
-export enum RenameAndLinkQueueProcessors {
+export enum OrganizeQueueProcessors {
   HANDLE_MOVIE = 'handle_movie',
   HANDLE_SEASON = 'handle_season',
   HANDLE_EPISODE = 'handle_episode',
