@@ -6,7 +6,13 @@ import { Processor, Process, InjectQueue } from '@nestjs/bull';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { filterSeries, forEach, forEachSeries, map } from 'p-iteration';
+import {
+  filterSeries,
+  forEach,
+  forEachSeries,
+  map,
+  mapSeries,
+} from 'p-iteration';
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
 import { times, orderBy } from 'lodash';
 import { Job, Queue } from 'bull';
@@ -28,6 +34,7 @@ import { TVEpisodeDAO } from 'src/entities/dao/tvepisode.dao';
 import { TVSeasonDAO } from 'src/entities/dao/tvseason.dao';
 
 import { JobsService } from '../jobs.service';
+import { FileDAO } from 'src/entities/dao/file.dao';
 
 @Processor(JobsQueue.SCAN_LIBRARY)
 export class ScanLibraryProcessor {
@@ -166,7 +173,36 @@ export class ScanLibraryProcessor {
     @TransactionManager() manager?: EntityManager
   ) {
     this.logger.info('processing movie', { movie });
+
     const movieDAO = manager!.getCustomRepository(MovieDAO);
+    const fileDAO = manager!.getCustomRepository(FileDAO);
+
+    const root = `/usr/library/${LIBRARY_CONFIG.moviesFolderName}`;
+    const movieFolder = path.join(root, movie);
+    const movieFiles = (await fs.readdir(movieFolder, { withFileTypes: true }))
+      .filter((dirent) => dirent.isFile())
+      .map((dirent) => dirent.name);
+
+    const files = await mapSeries(movieFiles, async (file) => {
+      const match = await fileDAO.findOne({
+        where: { path: path.join(movieFolder, file) },
+        relations: ['movie'],
+      });
+      return { match, file: path.join(movieFolder, file) };
+    });
+
+    const movieInDatabase = files.find((file) => file.match?.movie);
+    const untrackedFiles = files.filter((file) => !file.match);
+
+    if (movieInDatabase) {
+      this.logger.info('movie already tracked in library', { untrackedFiles });
+
+      await forEachSeries(untrackedFiles, ({ file }) =>
+        fileDAO.save({ path: file, movieId: movieInDatabase.match?.id })
+      );
+
+      return;
+    }
 
     const [, title, year] = /^(.+) \((\d+)/.exec(movie) || [];
 
@@ -176,8 +212,15 @@ export class ScanLibraryProcessor {
 
     this.logger.info('parsed filename', { title, year });
 
-    if (await movieDAO.findOne({ where: { title } })) {
+    const matchByTitle = await movieDAO.findOne({ where: { title } });
+
+    if (matchByTitle) {
       this.logger.info('movie already in database', { title, year });
+
+      await forEachSeries(untrackedFiles, ({ file }) =>
+        fileDAO.save({ path: file, movieId: matchByTitle.id })
+      );
+
       return;
     }
 
@@ -237,12 +280,21 @@ export class ScanLibraryProcessor {
       this.logger.info('movie already in library', {
         tmdbId: tmdbMovie.tmdbId,
       });
+
+      await forEachSeries(untrackedFiles, ({ file }) =>
+        fileDAO.save({ path: file, movieId: match.id })
+      );
     } else {
-      await movieDAO.save({
+      const newMovie = await movieDAO.save({
         title,
         tmdbId: tmdbMovie.id,
         state: DownloadableMediaState.PROCESSED,
       });
+
+      await forEachSeries(untrackedFiles, ({ file }) =>
+        fileDAO.save({ path: file, movieId: newMovie.id })
+      );
+
       this.logger.info('new movie saved in database', {
         tmdbId: tmdbMovie.tmdbId,
       });
