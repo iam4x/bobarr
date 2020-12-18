@@ -181,7 +181,7 @@ export class ScanLibraryProcessor {
     const root = `/usr/library/${LIBRARY_CONFIG.moviesFolderName}`;
     const movieFolder = path.join(root, movie);
     const movieFiles = (await fs.readdir(movieFolder, { withFileTypes: true }))
-      .filter((dirent) => dirent.isFile())
+      .filter((dirent) => dirent.isFile() || dirent.isSymbolicLink())
       .map((dirent) => dirent.name);
 
     const files = await mapSeries(movieFiles, async (file) => {
