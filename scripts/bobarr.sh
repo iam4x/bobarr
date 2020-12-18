@@ -36,11 +36,11 @@ if [[ $args == 'start' ]]; then
   after_start
 elif [[ $args == 'start:vpn' ]]; then
   stop_bobarr
-  docker-compose -f docker-compose.vpn.yml up --force-recreate -d
+  docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up --force-recreate -d
   after_start
 elif [[ $args == 'start:wireguard' ]]; then
   stop_bobarr
-  docker-compose -f docker-compose.wireguard.yml up --force-recreate -d
+  docker-compose -f docker-compose.yml -f docker-compose.wireguard.yml up --force-recreate -d
   after_start
 elif [[ $args == 'stop' ]]; then
   stop_bobarr
