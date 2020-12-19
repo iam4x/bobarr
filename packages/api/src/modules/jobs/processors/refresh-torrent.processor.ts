@@ -9,7 +9,7 @@ import {
   JobsQueue,
   DownloadableMediaState,
   FileType,
-  RenameAndLinkQueueProcessors,
+  OrganizeQueueProcessors,
 } from 'src/app.dto';
 
 import { MovieDAO } from 'src/entities/dao/movie.dao';
@@ -103,7 +103,7 @@ export class RefreshTorrentProcessor {
           state: DownloadableMediaState.DOWNLOADED,
         });
         await this.renameAndLinkQueue.add(
-          RenameAndLinkQueueProcessors.HANDLE_MOVIE,
+          OrganizeQueueProcessors.HANDLE_MOVIE,
           { movieId: resourceId }
         );
       }
@@ -114,7 +114,7 @@ export class RefreshTorrentProcessor {
           state: DownloadableMediaState.DOWNLOADED,
         });
         await this.renameAndLinkQueue.add(
-          RenameAndLinkQueueProcessors.HANDLE_SEASON,
+          OrganizeQueueProcessors.HANDLE_SEASON,
           { seasonId: resourceId }
         );
       }
@@ -125,7 +125,7 @@ export class RefreshTorrentProcessor {
           state: DownloadableMediaState.DOWNLOADED,
         });
         await this.renameAndLinkQueue.add(
-          RenameAndLinkQueueProcessors.HANDLE_EPISODE,
+          OrganizeQueueProcessors.HANDLE_EPISODE,
           { episodeId: resourceId }
         );
       }
