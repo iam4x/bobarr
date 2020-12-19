@@ -6,9 +6,16 @@ import { Processor, Process, InjectQueue } from '@nestjs/bull';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { Transaction, TransactionManager, EntityManager, Like } from 'typeorm';
 import { times, orderBy, flatten } from 'lodash';
 import { Job, Queue } from 'bull';
+
+import {
+  Transaction,
+  TransactionManager,
+  EntityManager,
+  Like,
+  IsNull,
+} from 'typeorm';
 
 import {
   filterSeries,
@@ -316,7 +323,7 @@ export class ScanLibraryProcessor {
     const fileDAO = manager!.getCustomRepository(FileDAO);
 
     const isTVShowInDatabase = await fileDAO.findOne({
-      where: { path: Like(`%${tvshow}%`) },
+      where: { path: Like(`%${tvshow}%`), movieId: IsNull() },
       relations: ['tvEpisode', 'tvEpisode.tvShow'],
     });
 
@@ -344,16 +351,20 @@ export class ScanLibraryProcessor {
 
     const root = `/usr/library/${LIBRARY_CONFIG.tvShowsFolderName}`;
     const episodes = await fs
-      .readdir(path.join(root, tvshow))
+      .readdir(path.join(root, tvshow), { withFileTypes: true })
       .then((seasons) =>
-        mapSeries(seasons, (season) =>
-          fs
-            .readdir(path.join(root, tvshow, season), { withFileTypes: true })
-            .then((entries) =>
-              entries
-                .filter((f) => f.isFile() || f.isSymbolicLink())
-                .map((f) => path.join(root, tvshow, season, f.name))
-            )
+        mapSeries(
+          seasons
+            .filter((season) => season.isDirectory())
+            .map((season) => season.name),
+          (season) =>
+            fs
+              .readdir(path.join(root, tvshow, season), { withFileTypes: true })
+              .then((entries) =>
+                entries
+                  .filter((f) => f.isFile() || f.isSymbolicLink())
+                  .map((f) => path.join(root, tvshow, season, f.name))
+              )
         ).then(flatten)
       );
 
@@ -368,7 +379,7 @@ export class ScanLibraryProcessor {
       }
 
       this.logger.info(`start processing episode`, {
-        episode: `${path.basename(episodePath)}.${path.extname(episodePath)}`,
+        episode: path.basename(episodePath),
       });
 
       const file = await fileDAO.findOne({ where: { path: episodePath } });
