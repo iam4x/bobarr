@@ -25,7 +25,7 @@ export class File {
 
   @Field()
   @Column('int', { nullable: true })
-  public episodeId!: number;
+  public tvEpisodeId!: number;
 
   @Field()
   @Column('int', { nullable: true })
