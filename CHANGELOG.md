@@ -18,6 +18,7 @@
 - update strategy for scannig library
 - handle multi part episodes when downloading a season pack
 - wrap organize library jobs into transactions (better error handling if something fails)
+- ensure torrent still exists in refresh torrent job (https://github.com/iam4x/bobarr/issues/153)
 
 ## [v1.0.0-beta.3] - 2020-12-14
 
