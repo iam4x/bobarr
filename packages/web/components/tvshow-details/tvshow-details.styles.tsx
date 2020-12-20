@@ -43,26 +43,45 @@ export const TVShowSeasonsModalComponentStyles = styled(MovieDetailsStyles)`
   .seasons-details {
     padding-top: 12px;
 
-    .season-title {
+    .season-top {
+      margin-bottom: 4px;
+    }
+
+    .season-title,
+    .season-top {
       display: flex;
       align-items: center;
+    }
+
+    .season-title,
+    .season-replace {
       cursor: pointer;
+    }
 
-      .season-number {
-        font-size: 1.25em;
-        font-weight: 600;
-        margin-right: 8px;
-      }
+    .season-replace {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      margin-left: 32px;
+      border: 1px solid #fff5;
+      border-radius: 5px;
+      padding: 0 4px;
+    }
 
-      .season-year {
-        font-size: 1em;
-        font-weight: 300;
-      }
+    .season-number {
+      font-size: 1.25em;
+      font-weight: 600;
+      margin-right: 8px;
+    }
 
-      .season-toggle {
-        margin-right: 12px;
-        margin-top: 4px;
-      }
+    .season-year {
+      font-size: 1em;
+      font-weight: 300;
+    }
+
+    .season-toggle {
+      margin-right: 12px;
+      margin-top: 4px;
     }
 
     .ant-table {

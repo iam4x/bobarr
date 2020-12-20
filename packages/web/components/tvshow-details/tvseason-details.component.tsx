@@ -122,27 +122,27 @@ export function TVSeasonDetailsComponent({
         className="season"
         style={{ marginBottom: isOpen && season.seasonNumber !== 1 ? 12 : 0 }}
       >
-        <div className="season-title" onClick={toggle}>
-          <div className="season-toggle">
-            {isOpen ? <FaChevronCircleDown /> : <FaChevronCircleRight />}
-          </div>
-          <div className="season-number">Season {season.seasonNumber}</div>
-          {season.airDate && (
-            <div className="season-year">
-              {' '}
-              ({dayjs(season.airDate).format('YYYY')})
+        <div className="season-top">
+          <div className="season-title" onClick={toggle}>
+            <div className="season-toggle">
+              {isOpen ? <FaChevronCircleDown /> : <FaChevronCircleRight />}
             </div>
-          )}
-          <div>
-            <Tag
-              icon={<SearchOutlined />}
-              onClick={() =>
-                setManualSearch({ ...season, tvShowTitle, tvShowTMDBId })
-              }
-              style={{ width: 80, textAlign: 'center', cursor: 'pointer' }}
-            >
-              {season.inLibrary ? 'Replace' : 'Search'}
-            </Tag>
+            <div className="season-number">Season {season.seasonNumber}</div>
+            {season.airDate && (
+              <div className="season-year">
+                {' '}
+                ({dayjs(season.airDate).format('YYYY')})
+              </div>
+            )}
+          </div>
+          <div
+            className="season-replace"
+            onClick={() =>
+              setManualSearch({ ...season, tvShowTitle, tvShowTMDBId })
+            }
+          >
+            {season.inLibrary ? 'Replace' : 'Search'}
+            <SearchOutlined style={{ marginLeft: 8 }} />
           </div>
         </div>
         {isOpen && (
