@@ -19,16 +19,18 @@ import { ManualSearchComponent } from '../manual-search/manual-search.component'
 interface TVSeasonDetailsProps {
   tvShowTMDBId: number;
   season: TmdbFormattedTvSeason;
+  tvShowTitle: string;
 }
 
 export function TVSeasonDetailsComponent({
   tvShowTMDBId,
   season,
+  tvShowTitle,
 }: TVSeasonDetailsProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [manualSearch, setManualSearch] = useState<EnrichedTvEpisode | null>(
-    null
-  );
+  const [manualSearch, setManualSearch] = useState<
+    EnrichedTvEpisode | (TmdbFormattedTvSeason & { tvShowTitle: string }) | null
+  >(null);
 
   const { data, loading } = useGetTvSeasonDetailsQuery({
     pollInterval: 5000,
@@ -132,6 +134,15 @@ export function TVSeasonDetailsComponent({
               ({dayjs(season.airDate).format('YYYY')})
             </div>
           )}
+          <div>
+            <Tag
+              icon={<SearchOutlined />}
+              onClick={() => setManualSearch({ ...season, tvShowTitle })}
+              style={{ width: 80, textAlign: 'center', cursor: 'pointer' }}
+            >
+              {season.inLibrary ? 'Replace' : 'Search'}
+            </Tag>
+          </div>
         </div>
         {isOpen && (
           <Table<EnrichedTvEpisode>

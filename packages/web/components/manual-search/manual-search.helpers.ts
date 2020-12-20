@@ -7,13 +7,15 @@ import {
   MissingMoviesFragment,
   EnrichedMovie,
   EnrichedTvEpisode,
+  TmdbFormattedTvSeason,
 } from '../../utils/graphql';
 
 export type Media =
   | MissingTvEpisodesFragment
   | MissingMoviesFragment
   | EnrichedMovie
-  | EnrichedTvEpisode;
+  | EnrichedTvEpisode
+  | (TmdbFormattedTvSeason & { tvShowTitle: string });
 
 export function getDefaultSearchQuery(media: Media) {
   if (media.__typename === 'EnrichedTVEpisode') {
@@ -25,6 +27,11 @@ export function getDefaultSearchQuery(media: Media) {
   if (media.__typename === 'EnrichedMovie') {
     const year = dayjs(media.releaseDate).format('YYYY');
     return `${media.title} ${year}`;
+  }
+
+  if (media.__typename === 'TMDBFormattedTVSeason') {
+    const seasonNb = formatNumber(media.seasonNumber!);
+    return `${media.tvShowTitle} S${seasonNb}`;
   }
 
   return '';

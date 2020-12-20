@@ -98,6 +98,16 @@ export class LibraryResolver {
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)
+  public async downloadSeason(
+    @Args('seasonId', { type: () => Int }) seasonId: number,
+    @Args('jackettResult', { type: () => JackettInput })
+    jackettResult: JackettInput
+  ) {
+    await this.libraryService.downloadTVSeason(seasonId, jackettResult, null);
+    return { success: true, message: 'TV_EPISODE_DOWNLOAD_STARTED' };
+  }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
   public async downloadTVEpisode(
     @Args('episodeId', { type: () => Int }) episodeId: number,
     @Args('jackettResult', { type: () => JackettInput })

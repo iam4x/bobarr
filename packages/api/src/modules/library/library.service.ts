@@ -348,10 +348,7 @@ export class LibraryService {
     this.logger.info('start download tv season', { seasonId });
     this.logger.info(jackettResult.title);
 
-    await manager!.getCustomRepository(TVSeasonDAO).save({
-      id: seasonId,
-      state: DownloadableMediaState.DOWNLOADING,
-    });
+    await this.replaceSeason(seasonId, manager!);
 
     const torrent = await this.transmissionService.addTorrent(
       {
@@ -580,6 +577,10 @@ export class LibraryService {
       },
     } as const;
 
+    if (mediaType === FileType.SEASON) {
+      await this.replaceSeason(mediaId, manager!);
+    }
+
     if (mediaType === FileType.EPISODE) {
       await this.replaceTVEpisode(mediaId, manager!);
     }
@@ -597,6 +598,65 @@ export class LibraryService {
       mediaId,
       mediaType,
       torrentId: torrentEntity.id,
+    });
+  }
+
+  private async replaceSeason(seasonId: number, manager: EntityManager) {
+    const tvSeasonDAO = manager!.getCustomRepository(TVSeasonDAO);
+    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+    const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
+    const fileDAO = manager!.getCustomRepository(FileDAO);
+
+    const tvSeason = await tvSeasonDAO.findOneOrFail({
+      where: { id: seasonId },
+      relations: ['episodes'],
+    });
+
+    if (tvSeason.state !== DownloadableMediaState.MISSING) {
+      this.logger.info('tv season already download, removing existing files');
+
+      await forEach(tvSeason.episodes, async (episode) => {
+        const torrent = await torrentDAO.findOne({
+          resourceId: episode.id,
+          resourceType: FileType.EPISODE,
+        });
+
+        if (torrent) {
+          await torrentDAO.remove(torrent);
+          await this.transmissionService.removeTorrentAndFiles(
+            torrent.torrentHash
+          );
+          this.logger.info('episode torrent removed', { torrent: torrent.id });
+        }
+      });
+
+      const tvSeasonFolders = uniq(
+        flatten(
+          tvSeason.episodes.map((episode) =>
+            episode.files.map((file) => path.dirname(file.path))
+          )
+        )
+      );
+
+      await forEachSeries(tvSeasonFolders, (folder) =>
+        childCommand(`rm -rf "${folder}"`)
+      );
+
+      await fileDAO.remove(
+        flatten(tvSeason.episodes.map((episode) => episode.files))
+      );
+    }
+
+    await tvEpisodeDAO.save(
+      tvSeason.episodes.map((episode) => ({
+        ...episode,
+        state: DownloadableMediaState.DOWNLOADING,
+      }))
+    );
+
+    await tvSeasonDAO.save({
+      id: seasonId,
+      state: DownloadableMediaState.DOWNLOADING,
     });
   }
 

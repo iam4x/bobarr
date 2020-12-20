@@ -14,3 +14,10 @@ mutation downloadTVEpisode($episodeId: Int!, $jackettResult: JackettInput!) {
     message
   }
 }
+
+mutation downloadSeason($seasonId: Int!, $jackettResult: JackettInput!) {
+  result: downloadSeason(seasonId: $seasonId, jackettResult: $jackettResult) {
+    success
+    message
+  }
+}

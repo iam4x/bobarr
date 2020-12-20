@@ -1,3 +1,5 @@
+/* eslint-disable */
+/* this is a generated file, do not edit */
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
@@ -21,6 +23,16 @@ export type GraphQlCommonResponse = {
   message?: Maybe<Scalars['String']>;
 };
 
+export type TvShow = {
+  __typename?: 'TVShow';
+  id: Scalars['Float'];
+  tmdbId: Scalars['Float'];
+  title: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
+
 export type Movie = {
   __typename?: 'Movie';
   id: Scalars['Float'];
@@ -38,16 +50,6 @@ export enum DownloadableMediaState {
   Downloaded = 'DOWNLOADED',
   Processed = 'PROCESSED'
 }
-
-
-export type TvShow = {
-  __typename?: 'TVShow';
-  id: Scalars['Float'];
-  tmdbId: Scalars['Float'];
-  title: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-};
 
 export type TmdbFormattedTvEpisode = {
   __typename?: 'TMDBFormattedTVEpisode';
@@ -376,6 +378,7 @@ export type Mutation = {
   startFindNewEpisodesJob: GraphQlCommonResponse;
   startDownloadMissingJob: GraphQlCommonResponse;
   downloadMovie: GraphQlCommonResponse;
+  downloadSeason: GraphQlCommonResponse;
   downloadTVEpisode: GraphQlCommonResponse;
   trackMovie: Movie;
   removeMovie: GraphQlCommonResponse;
@@ -404,6 +407,12 @@ export type MutationUpdateParamsArgs = {
 export type MutationDownloadMovieArgs = {
   jackettResult: JackettInput;
   movieId: Scalars['Int'];
+};
+
+
+export type MutationDownloadSeasonArgs = {
+  jackettResult: JackettInput;
+  seasonId: Scalars['Int'];
 };
 
 
@@ -476,7 +485,7 @@ export type ClearCacheMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -491,7 +500,7 @@ export type DownloadOwnTorrentMutation = (
   { __typename?: 'Mutation' }
   & { downloadOwnTorrent: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -502,7 +511,7 @@ export type StartScanLibraryMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -513,7 +522,7 @@ export type StartFindNewEpisodesMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -524,7 +533,7 @@ export type StartDownloadMissingMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -538,7 +547,7 @@ export type DownloadMovieMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -552,7 +561,21 @@ export type DownloadTvEpisodeMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+  ) }
+);
+
+export type DownloadSeasonMutationVariables = Exact<{
+  seasonId: Scalars['Int'];
+  jackettResult: JackettInput;
+}>;
+
+
+export type DownloadSeasonMutation = (
+  { __typename?: 'Mutation' }
+  & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -565,7 +588,7 @@ export type RemoveMovieMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -578,7 +601,7 @@ export type RemoveTvShowMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -592,7 +615,7 @@ export type ResetLibraryMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -605,7 +628,7 @@ export type SaveQualityMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -618,7 +641,7 @@ export type SaveTagsMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -632,7 +655,7 @@ export type TrackMovieMutation = (
   { __typename?: 'Mutation' }
   & { movie: (
     { __typename?: 'Movie' }
-    & Pick<Movie, 'id'>
+    & Pick<Movie, '[object Object]'>
   ) }
 );
 
@@ -646,7 +669,7 @@ export type TrackTvShowMutation = (
   { __typename?: 'Mutation' }
   & { tvShow: (
     { __typename?: 'TVShow' }
-    & Pick<TvShow, 'id'>
+    & Pick<TvShow, '[object Object]'>
   ) }
 );
 
@@ -659,7 +682,7 @@ export type UpdateParamsMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -672,13 +695,13 @@ export type GetCalendarQuery = (
     { __typename?: 'LibraryCalendar' }
     & { movies: Array<(
       { __typename?: 'EnrichedMovie' }
-      & Pick<EnrichedMovie, 'id' | 'title' | 'state' | 'releaseDate'>
+      & Pick<EnrichedMovie, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
     )>, tvEpisodes: Array<(
       { __typename?: 'EnrichedTVEpisode' }
-      & Pick<EnrichedTvEpisode, 'id' | 'episodeNumber' | 'seasonNumber' | 'state' | 'releaseDate'>
+      & Pick<EnrichedTvEpisode, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
       & { tvShow: (
         { __typename?: 'TVShow' }
-        & Pick<TvShow, 'id' | 'title'>
+        & Pick<TvShow, '[object Object]' | '[object Object]'>
       ) }
     )> }
   ) }
@@ -698,10 +721,10 @@ export type GetDiscoverQuery = (
   { __typename?: 'Query' }
   & { TMDBResults: (
     { __typename?: 'TMDBPaginatedResult' }
-    & Pick<TmdbPaginatedResult, 'page' | 'totalResults' | 'totalPages'>
+    & Pick<TmdbPaginatedResult, '[object Object]' | '[object Object]' | '[object Object]'>
     & { results: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate'>
+      & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
     )> }
   ) }
 );
@@ -713,10 +736,10 @@ export type GetDownloadingQuery = (
   { __typename?: 'Query' }
   & { searching: Array<(
     { __typename?: 'SearchingMedia' }
-    & Pick<SearchingMedia, 'id' | 'title' | 'resourceId' | 'resourceType'>
+    & Pick<SearchingMedia, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   )>, downloading: Array<(
     { __typename?: 'DownloadingMedia' }
-    & Pick<DownloadingMedia, 'id' | 'title' | 'tag' | 'quality' | 'torrent' | 'resourceId' | 'resourceType'>
+    & Pick<DownloadingMedia, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   )> }
 );
 
@@ -729,10 +752,10 @@ export type GetGenresQuery = (
     { __typename?: 'TMDBGenresResults' }
     & { movieGenres: Array<(
       { __typename?: 'TMDBGenresResult' }
-      & Pick<TmdbGenresResult, 'id' | 'name'>
+      & Pick<TmdbGenresResult, '[object Object]' | '[object Object]'>
     )>, tvShowGenres: Array<(
       { __typename?: 'TMDBGenresResult' }
-      & Pick<TmdbGenresResult, 'id' | 'name'>
+      & Pick<TmdbGenresResult, '[object Object]' | '[object Object]'>
     )> }
   ) }
 );
@@ -744,7 +767,7 @@ export type GetLanguagesQuery = (
   { __typename?: 'Query' }
   & { languages: Array<(
     { __typename?: 'TMDBLanguagesResult' }
-    & Pick<TmdbLanguagesResult, 'code' | 'language'>
+    & Pick<TmdbLanguagesResult, '[object Object]' | '[object Object]'>
   )> }
 );
 
@@ -755,7 +778,7 @@ export type GetLibraryMoviesQuery = (
   { __typename?: 'Query' }
   & { movies: Array<(
     { __typename?: 'EnrichedMovie' }
-    & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'state' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
+    & Pick<EnrichedMovie, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   )> }
 );
 
@@ -766,22 +789,22 @@ export type GetLibraryTvShowsQuery = (
   { __typename?: 'Query' }
   & { tvShows: Array<(
     { __typename?: 'EnrichedTVShow' }
-    & Pick<EnrichedTvShow, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'posterPath' | 'runtime' | 'overview' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
+    & Pick<EnrichedTvShow, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   )> }
 );
 
 export type MissingTvEpisodesFragment = (
   { __typename?: 'EnrichedTVEpisode' }
-  & Pick<EnrichedTvEpisode, 'id' | 'seasonNumber' | 'episodeNumber' | 'releaseDate'>
+  & Pick<EnrichedTvEpisode, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   & { tvShow: (
     { __typename?: 'TVShow' }
-    & Pick<TvShow, 'id' | 'title'>
+    & Pick<TvShow, '[object Object]' | '[object Object]'>
   ) }
 );
 
 export type MissingMoviesFragment = (
   { __typename?: 'EnrichedMovie' }
-  & Pick<EnrichedMovie, 'id' | 'title' | 'releaseDate'>
+  & Pick<EnrichedMovie, '[object Object]' | '[object Object]' | '[object Object]'>
 );
 
 export type GetMissingQueryVariables = Exact<{ [key: string]: never; }>;
@@ -807,7 +830,7 @@ export type GetMovieFileDetailsQuery = (
   { __typename?: 'Query' }
   & { details: (
     { __typename?: 'LibraryFileDetails' }
-    & Pick<LibraryFileDetails, 'id' | 'libraryPath' | 'libraryFileSize' | 'torrentFileName'>
+    & Pick<LibraryFileDetails, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -818,7 +841,7 @@ export type GetParamsQuery = (
   { __typename?: 'Query' }
   & { params: (
     { __typename?: 'ParamsHash' }
-    & Pick<ParamsHash, 'region' | 'language' | 'tmdb_api_key' | 'jackett_api_key' | 'max_movie_download_size' | 'max_tvshow_episode_download_size' | 'organize_library_strategy'>
+    & Pick<ParamsHash, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   ) }
 );
 
@@ -831,10 +854,10 @@ export type GetPopularQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
+      & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
+      & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
     )> }
   ) }
 );
@@ -848,7 +871,7 @@ export type GetQualityQuery = (
   { __typename?: 'Query' }
   & { qualities: Array<(
     { __typename?: 'Quality' }
-    & Pick<Quality, 'id' | 'name' | 'match' | 'score' | 'updatedAt' | 'createdAt' | 'type'>
+    & Pick<Quality, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   )> }
 );
 
@@ -859,10 +882,10 @@ export type GetRecommendedQuery = (
   { __typename?: 'Query' }
   & { tvShows: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
+    & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   )>, movies: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
+    & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   )> }
 );
 
@@ -873,7 +896,7 @@ export type GetTagsQuery = (
   { __typename?: 'Query' }
   & { tags: Array<(
     { __typename?: 'Tag' }
-    & Pick<Tag, 'id' | 'name' | 'score' | 'createdAt' | 'updatedAt'>
+    & Pick<Tag, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   )> }
 );
 
@@ -886,7 +909,7 @@ export type GetTorrentStatusQuery = (
   { __typename?: 'Query' }
   & { torrents: Array<(
     { __typename?: 'TorrentStatus' }
-    & Pick<TorrentStatus, 'id' | 'resourceId' | 'resourceType' | 'percentDone' | 'rateDownload' | 'rateUpload' | 'uploadRatio' | 'uploadedEver' | 'totalSize' | 'status'>
+    & Pick<TorrentStatus, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   )> }
 );
 
@@ -900,10 +923,10 @@ export type GetTvSeasonDetailsQuery = (
   { __typename?: 'Query' }
   & { episodes: Array<(
     { __typename?: 'EnrichedTVEpisode' }
-    & Pick<EnrichedTvEpisode, 'id' | 'episodeNumber' | 'seasonNumber' | 'state' | 'updatedAt' | 'voteAverage' | 'releaseDate' | 'createdAt'>
+    & Pick<EnrichedTvEpisode, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
     & { tvShow: (
       { __typename?: 'TVShow' }
-      & Pick<TvShow, 'id' | 'title' | 'tmdbId' | 'updatedAt' | 'createdAt'>
+      & Pick<TvShow, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
     ) }
   )> }
 );
@@ -917,7 +940,7 @@ export type GetTvShowSeasonsQuery = (
   { __typename?: 'Query' }
   & { seasons: Array<(
     { __typename?: 'TMDBFormattedTVSeason' }
-    & Pick<TmdbFormattedTvSeason, 'id' | 'name' | 'seasonNumber' | 'episodeCount' | 'overview' | 'posterPath' | 'airDate' | 'inLibrary'>
+    & Pick<TmdbFormattedTvSeason, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   )> }
 );
 
@@ -932,7 +955,7 @@ export type OmdbSearchQuery = (
     { __typename?: 'OMDBInfo' }
     & { ratings: (
       { __typename?: 'Ratings' }
-      & Pick<Ratings, 'IMDB' | 'rottenTomatoes' | 'metaCritic'>
+      & Pick<Ratings, '[object Object]' | '[object Object]' | '[object Object]'>
     ) }
   ) }
 );
@@ -946,7 +969,7 @@ export type SearchTorrentQuery = (
   { __typename?: 'Query' }
   & { results: Array<(
     { __typename?: 'JackettFormattedResult' }
-    & Pick<JackettFormattedResult, 'id' | 'title' | 'quality' | 'qualityScore' | 'seeders' | 'peers' | 'link' | 'downloadLink' | 'tag' | 'tagScore' | 'normalizedTitle' | 'normalizedTitleParts' | 'size' | 'publishDate'>
+    & Pick<JackettFormattedResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
   )> }
 );
 
@@ -961,10 +984,10 @@ export type SearchQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
+      & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
+      & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
     )> }
   ) }
 );
@@ -996,24 +1019,6 @@ export const ClearCacheDocument = gql`
   }
 }
     `;
-export type ClearCacheMutationFn = Apollo.MutationFunction<ClearCacheMutation, ClearCacheMutationVariables>;
-
-/**
- * __useClearCacheMutation__
- *
- * To run a mutation, you first call `useClearCacheMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useClearCacheMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [clearCacheMutation, { data, loading, error }] = useClearCacheMutation({
- *   variables: {
- *   },
- * });
- */
 export function useClearCacheMutation(baseOptions?: Apollo.MutationHookOptions<ClearCacheMutation, ClearCacheMutationVariables>) {
         return Apollo.useMutation<ClearCacheMutation, ClearCacheMutationVariables>(ClearCacheDocument, baseOptions);
       }
@@ -1028,27 +1033,6 @@ export const DownloadOwnTorrentDocument = gql`
   }
 }
     `;
-export type DownloadOwnTorrentMutationFn = Apollo.MutationFunction<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>;
-
-/**
- * __useDownloadOwnTorrentMutation__
- *
- * To run a mutation, you first call `useDownloadOwnTorrentMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDownloadOwnTorrentMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [downloadOwnTorrentMutation, { data, loading, error }] = useDownloadOwnTorrentMutation({
- *   variables: {
- *      mediaId: // value for 'mediaId'
- *      mediaType: // value for 'mediaType'
- *      torrent: // value for 'torrent'
- *   },
- * });
- */
 export function useDownloadOwnTorrentMutation(baseOptions?: Apollo.MutationHookOptions<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>) {
         return Apollo.useMutation<DownloadOwnTorrentMutation, DownloadOwnTorrentMutationVariables>(DownloadOwnTorrentDocument, baseOptions);
       }
@@ -1063,24 +1047,6 @@ export const StartScanLibraryDocument = gql`
   }
 }
     `;
-export type StartScanLibraryMutationFn = Apollo.MutationFunction<StartScanLibraryMutation, StartScanLibraryMutationVariables>;
-
-/**
- * __useStartScanLibraryMutation__
- *
- * To run a mutation, you first call `useStartScanLibraryMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useStartScanLibraryMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [startScanLibraryMutation, { data, loading, error }] = useStartScanLibraryMutation({
- *   variables: {
- *   },
- * });
- */
 export function useStartScanLibraryMutation(baseOptions?: Apollo.MutationHookOptions<StartScanLibraryMutation, StartScanLibraryMutationVariables>) {
         return Apollo.useMutation<StartScanLibraryMutation, StartScanLibraryMutationVariables>(StartScanLibraryDocument, baseOptions);
       }
@@ -1095,24 +1061,6 @@ export const StartFindNewEpisodesDocument = gql`
   }
 }
     `;
-export type StartFindNewEpisodesMutationFn = Apollo.MutationFunction<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>;
-
-/**
- * __useStartFindNewEpisodesMutation__
- *
- * To run a mutation, you first call `useStartFindNewEpisodesMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useStartFindNewEpisodesMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [startFindNewEpisodesMutation, { data, loading, error }] = useStartFindNewEpisodesMutation({
- *   variables: {
- *   },
- * });
- */
 export function useStartFindNewEpisodesMutation(baseOptions?: Apollo.MutationHookOptions<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>) {
         return Apollo.useMutation<StartFindNewEpisodesMutation, StartFindNewEpisodesMutationVariables>(StartFindNewEpisodesDocument, baseOptions);
       }
@@ -1127,24 +1075,6 @@ export const StartDownloadMissingDocument = gql`
   }
 }
     `;
-export type StartDownloadMissingMutationFn = Apollo.MutationFunction<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>;
-
-/**
- * __useStartDownloadMissingMutation__
- *
- * To run a mutation, you first call `useStartDownloadMissingMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useStartDownloadMissingMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [startDownloadMissingMutation, { data, loading, error }] = useStartDownloadMissingMutation({
- *   variables: {
- *   },
- * });
- */
 export function useStartDownloadMissingMutation(baseOptions?: Apollo.MutationHookOptions<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>) {
         return Apollo.useMutation<StartDownloadMissingMutation, StartDownloadMissingMutationVariables>(StartDownloadMissingDocument, baseOptions);
       }
@@ -1159,26 +1089,6 @@ export const DownloadMovieDocument = gql`
   }
 }
     `;
-export type DownloadMovieMutationFn = Apollo.MutationFunction<DownloadMovieMutation, DownloadMovieMutationVariables>;
-
-/**
- * __useDownloadMovieMutation__
- *
- * To run a mutation, you first call `useDownloadMovieMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDownloadMovieMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [downloadMovieMutation, { data, loading, error }] = useDownloadMovieMutation({
- *   variables: {
- *      movieId: // value for 'movieId'
- *      jackettResult: // value for 'jackettResult'
- *   },
- * });
- */
 export function useDownloadMovieMutation(baseOptions?: Apollo.MutationHookOptions<DownloadMovieMutation, DownloadMovieMutationVariables>) {
         return Apollo.useMutation<DownloadMovieMutation, DownloadMovieMutationVariables>(DownloadMovieDocument, baseOptions);
       }
@@ -1193,32 +1103,26 @@ export const DownloadTvEpisodeDocument = gql`
   }
 }
     `;
-export type DownloadTvEpisodeMutationFn = Apollo.MutationFunction<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>;
-
-/**
- * __useDownloadTvEpisodeMutation__
- *
- * To run a mutation, you first call `useDownloadTvEpisodeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDownloadTvEpisodeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [downloadTvEpisodeMutation, { data, loading, error }] = useDownloadTvEpisodeMutation({
- *   variables: {
- *      episodeId: // value for 'episodeId'
- *      jackettResult: // value for 'jackettResult'
- *   },
- * });
- */
 export function useDownloadTvEpisodeMutation(baseOptions?: Apollo.MutationHookOptions<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>) {
         return Apollo.useMutation<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>(DownloadTvEpisodeDocument, baseOptions);
       }
 export type DownloadTvEpisodeMutationHookResult = ReturnType<typeof useDownloadTvEpisodeMutation>;
 export type DownloadTvEpisodeMutationResult = Apollo.MutationResult<DownloadTvEpisodeMutation>;
 export type DownloadTvEpisodeMutationOptions = Apollo.BaseMutationOptions<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>;
+export const DownloadSeasonDocument = gql`
+    mutation downloadSeason($seasonId: Int!, $jackettResult: JackettInput!) {
+  result: downloadSeason(seasonId: $seasonId, jackettResult: $jackettResult) {
+    success
+    message
+  }
+}
+    `;
+export function useDownloadSeasonMutation(baseOptions?: Apollo.MutationHookOptions<DownloadSeasonMutation, DownloadSeasonMutationVariables>) {
+        return Apollo.useMutation<DownloadSeasonMutation, DownloadSeasonMutationVariables>(DownloadSeasonDocument, baseOptions);
+      }
+export type DownloadSeasonMutationHookResult = ReturnType<typeof useDownloadSeasonMutation>;
+export type DownloadSeasonMutationResult = Apollo.MutationResult<DownloadSeasonMutation>;
+export type DownloadSeasonMutationOptions = Apollo.BaseMutationOptions<DownloadSeasonMutation, DownloadSeasonMutationVariables>;
 export const RemoveMovieDocument = gql`
     mutation removeMovie($tmdbId: Int!) {
   result: removeMovie(tmdbId: $tmdbId) {
@@ -1227,25 +1131,6 @@ export const RemoveMovieDocument = gql`
   }
 }
     `;
-export type RemoveMovieMutationFn = Apollo.MutationFunction<RemoveMovieMutation, RemoveMovieMutationVariables>;
-
-/**
- * __useRemoveMovieMutation__
- *
- * To run a mutation, you first call `useRemoveMovieMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRemoveMovieMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [removeMovieMutation, { data, loading, error }] = useRemoveMovieMutation({
- *   variables: {
- *      tmdbId: // value for 'tmdbId'
- *   },
- * });
- */
 export function useRemoveMovieMutation(baseOptions?: Apollo.MutationHookOptions<RemoveMovieMutation, RemoveMovieMutationVariables>) {
         return Apollo.useMutation<RemoveMovieMutation, RemoveMovieMutationVariables>(RemoveMovieDocument, baseOptions);
       }
@@ -1260,25 +1145,6 @@ export const RemoveTvShowDocument = gql`
   }
 }
     `;
-export type RemoveTvShowMutationFn = Apollo.MutationFunction<RemoveTvShowMutation, RemoveTvShowMutationVariables>;
-
-/**
- * __useRemoveTvShowMutation__
- *
- * To run a mutation, you first call `useRemoveTvShowMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRemoveTvShowMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [removeTvShowMutation, { data, loading, error }] = useRemoveTvShowMutation({
- *   variables: {
- *      tmdbId: // value for 'tmdbId'
- *   },
- * });
- */
 export function useRemoveTvShowMutation(baseOptions?: Apollo.MutationHookOptions<RemoveTvShowMutation, RemoveTvShowMutationVariables>) {
         return Apollo.useMutation<RemoveTvShowMutation, RemoveTvShowMutationVariables>(RemoveTvShowDocument, baseOptions);
       }
@@ -1293,26 +1159,6 @@ export const ResetLibraryDocument = gql`
   }
 }
     `;
-export type ResetLibraryMutationFn = Apollo.MutationFunction<ResetLibraryMutation, ResetLibraryMutationVariables>;
-
-/**
- * __useResetLibraryMutation__
- *
- * To run a mutation, you first call `useResetLibraryMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useResetLibraryMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [resetLibraryMutation, { data, loading, error }] = useResetLibraryMutation({
- *   variables: {
- *      deleteFiles: // value for 'deleteFiles'
- *      resetSettings: // value for 'resetSettings'
- *   },
- * });
- */
 export function useResetLibraryMutation(baseOptions?: Apollo.MutationHookOptions<ResetLibraryMutation, ResetLibraryMutationVariables>) {
         return Apollo.useMutation<ResetLibraryMutation, ResetLibraryMutationVariables>(ResetLibraryDocument, baseOptions);
       }
@@ -1327,25 +1173,6 @@ export const SaveQualityDocument = gql`
   }
 }
     `;
-export type SaveQualityMutationFn = Apollo.MutationFunction<SaveQualityMutation, SaveQualityMutationVariables>;
-
-/**
- * __useSaveQualityMutation__
- *
- * To run a mutation, you first call `useSaveQualityMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSaveQualityMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [saveQualityMutation, { data, loading, error }] = useSaveQualityMutation({
- *   variables: {
- *      qualities: // value for 'qualities'
- *   },
- * });
- */
 export function useSaveQualityMutation(baseOptions?: Apollo.MutationHookOptions<SaveQualityMutation, SaveQualityMutationVariables>) {
         return Apollo.useMutation<SaveQualityMutation, SaveQualityMutationVariables>(SaveQualityDocument, baseOptions);
       }
@@ -1360,25 +1187,6 @@ export const SaveTagsDocument = gql`
   }
 }
     `;
-export type SaveTagsMutationFn = Apollo.MutationFunction<SaveTagsMutation, SaveTagsMutationVariables>;
-
-/**
- * __useSaveTagsMutation__
- *
- * To run a mutation, you first call `useSaveTagsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSaveTagsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [saveTagsMutation, { data, loading, error }] = useSaveTagsMutation({
- *   variables: {
- *      tags: // value for 'tags'
- *   },
- * });
- */
 export function useSaveTagsMutation(baseOptions?: Apollo.MutationHookOptions<SaveTagsMutation, SaveTagsMutationVariables>) {
         return Apollo.useMutation<SaveTagsMutation, SaveTagsMutationVariables>(SaveTagsDocument, baseOptions);
       }
@@ -1392,26 +1200,6 @@ export const TrackMovieDocument = gql`
   }
 }
     `;
-export type TrackMovieMutationFn = Apollo.MutationFunction<TrackMovieMutation, TrackMovieMutationVariables>;
-
-/**
- * __useTrackMovieMutation__
- *
- * To run a mutation, you first call `useTrackMovieMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useTrackMovieMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [trackMovieMutation, { data, loading, error }] = useTrackMovieMutation({
- *   variables: {
- *      title: // value for 'title'
- *      tmdbId: // value for 'tmdbId'
- *   },
- * });
- */
 export function useTrackMovieMutation(baseOptions?: Apollo.MutationHookOptions<TrackMovieMutation, TrackMovieMutationVariables>) {
         return Apollo.useMutation<TrackMovieMutation, TrackMovieMutationVariables>(TrackMovieDocument, baseOptions);
       }
@@ -1425,26 +1213,6 @@ export const TrackTvShowDocument = gql`
   }
 }
     `;
-export type TrackTvShowMutationFn = Apollo.MutationFunction<TrackTvShowMutation, TrackTvShowMutationVariables>;
-
-/**
- * __useTrackTvShowMutation__
- *
- * To run a mutation, you first call `useTrackTvShowMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useTrackTvShowMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [trackTvShowMutation, { data, loading, error }] = useTrackTvShowMutation({
- *   variables: {
- *      tmdbId: // value for 'tmdbId'
- *      seasonNumbers: // value for 'seasonNumbers'
- *   },
- * });
- */
 export function useTrackTvShowMutation(baseOptions?: Apollo.MutationHookOptions<TrackTvShowMutation, TrackTvShowMutationVariables>) {
         return Apollo.useMutation<TrackTvShowMutation, TrackTvShowMutationVariables>(TrackTvShowDocument, baseOptions);
       }
@@ -1459,25 +1227,6 @@ export const UpdateParamsDocument = gql`
   }
 }
     `;
-export type UpdateParamsMutationFn = Apollo.MutationFunction<UpdateParamsMutation, UpdateParamsMutationVariables>;
-
-/**
- * __useUpdateParamsMutation__
- *
- * To run a mutation, you first call `useUpdateParamsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateParamsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateParamsMutation, { data, loading, error }] = useUpdateParamsMutation({
- *   variables: {
- *      params: // value for 'params'
- *   },
- * });
- */
 export function useUpdateParamsMutation(baseOptions?: Apollo.MutationHookOptions<UpdateParamsMutation, UpdateParamsMutationVariables>) {
         return Apollo.useMutation<UpdateParamsMutation, UpdateParamsMutationVariables>(UpdateParamsDocument, baseOptions);
       }
@@ -1507,22 +1256,6 @@ export const GetCalendarDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetCalendarQuery__
- *
- * To run a query within a React component, call `useGetCalendarQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCalendarQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetCalendarQuery({
- *   variables: {
- *   },
- * });
- */
 export function useGetCalendarQuery(baseOptions?: Apollo.QueryHookOptions<GetCalendarQuery, GetCalendarQueryVariables>) {
         return Apollo.useQuery<GetCalendarQuery, GetCalendarQueryVariables>(GetCalendarDocument, baseOptions);
       }
@@ -1534,7 +1267,14 @@ export type GetCalendarLazyQueryHookResult = ReturnType<typeof useGetCalendarLaz
 export type GetCalendarQueryResult = Apollo.QueryResult<GetCalendarQuery, GetCalendarQueryVariables>;
 export const GetDiscoverDocument = gql`
     query getDiscover($entertainment: Entertainment, $originLanguage: String, $primaryReleaseYear: String, $score: Float, $genres: [Float!], $page: Float) {
-  TMDBResults: discover(entertainment: $entertainment, originLanguage: $originLanguage, primaryReleaseYear: $primaryReleaseYear, score: $score, genres: $genres, page: $page) {
+  TMDBResults: discover(
+    entertainment: $entertainment
+    originLanguage: $originLanguage
+    primaryReleaseYear: $primaryReleaseYear
+    score: $score
+    genres: $genres
+    page: $page
+  ) {
     page
     totalResults
     totalPages
@@ -1551,28 +1291,6 @@ export const GetDiscoverDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetDiscoverQuery__
- *
- * To run a query within a React component, call `useGetDiscoverQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetDiscoverQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetDiscoverQuery({
- *   variables: {
- *      entertainment: // value for 'entertainment'
- *      originLanguage: // value for 'originLanguage'
- *      primaryReleaseYear: // value for 'primaryReleaseYear'
- *      score: // value for 'score'
- *      genres: // value for 'genres'
- *      page: // value for 'page'
- *   },
- * });
- */
 export function useGetDiscoverQuery(baseOptions?: Apollo.QueryHookOptions<GetDiscoverQuery, GetDiscoverQueryVariables>) {
         return Apollo.useQuery<GetDiscoverQuery, GetDiscoverQueryVariables>(GetDiscoverDocument, baseOptions);
       }
@@ -1601,22 +1319,6 @@ export const GetDownloadingDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetDownloadingQuery__
- *
- * To run a query within a React component, call `useGetDownloadingQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetDownloadingQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetDownloadingQuery({
- *   variables: {
- *   },
- * });
- */
 export function useGetDownloadingQuery(baseOptions?: Apollo.QueryHookOptions<GetDownloadingQuery, GetDownloadingQueryVariables>) {
         return Apollo.useQuery<GetDownloadingQuery, GetDownloadingQueryVariables>(GetDownloadingDocument, baseOptions);
       }
@@ -1640,22 +1342,6 @@ export const GetGenresDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetGenresQuery__
- *
- * To run a query within a React component, call `useGetGenresQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetGenresQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetGenresQuery({
- *   variables: {
- *   },
- * });
- */
 export function useGetGenresQuery(baseOptions?: Apollo.QueryHookOptions<GetGenresQuery, GetGenresQueryVariables>) {
         return Apollo.useQuery<GetGenresQuery, GetGenresQueryVariables>(GetGenresDocument, baseOptions);
       }
@@ -1673,22 +1359,6 @@ export const GetLanguagesDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetLanguagesQuery__
- *
- * To run a query within a React component, call `useGetLanguagesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetLanguagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetLanguagesQuery({
- *   variables: {
- *   },
- * });
- */
 export function useGetLanguagesQuery(baseOptions?: Apollo.QueryHookOptions<GetLanguagesQuery, GetLanguagesQueryVariables>) {
         return Apollo.useQuery<GetLanguagesQuery, GetLanguagesQueryVariables>(GetLanguagesDocument, baseOptions);
       }
@@ -1716,22 +1386,6 @@ export const GetLibraryMoviesDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetLibraryMoviesQuery__
- *
- * To run a query within a React component, call `useGetLibraryMoviesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetLibraryMoviesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetLibraryMoviesQuery({
- *   variables: {
- *   },
- * });
- */
 export function useGetLibraryMoviesQuery(baseOptions?: Apollo.QueryHookOptions<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>) {
         return Apollo.useQuery<GetLibraryMoviesQuery, GetLibraryMoviesQueryVariables>(GetLibraryMoviesDocument, baseOptions);
       }
@@ -1758,22 +1412,6 @@ export const GetLibraryTvShowsDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetLibraryTvShowsQuery__
- *
- * To run a query within a React component, call `useGetLibraryTvShowsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetLibraryTvShowsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetLibraryTvShowsQuery({
- *   variables: {
- *   },
- * });
- */
 export function useGetLibraryTvShowsQuery(baseOptions?: Apollo.QueryHookOptions<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>) {
         return Apollo.useQuery<GetLibraryTvShowsQuery, GetLibraryTvShowsQueryVariables>(GetLibraryTvShowsDocument, baseOptions);
       }
@@ -1794,22 +1432,6 @@ export const GetMissingDocument = gql`
 }
     ${MissingTvEpisodesFragmentDoc}
 ${MissingMoviesFragmentDoc}`;
-
-/**
- * __useGetMissingQuery__
- *
- * To run a query within a React component, call `useGetMissingQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetMissingQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetMissingQuery({
- *   variables: {
- *   },
- * });
- */
 export function useGetMissingQuery(baseOptions?: Apollo.QueryHookOptions<GetMissingQuery, GetMissingQueryVariables>) {
         return Apollo.useQuery<GetMissingQuery, GetMissingQueryVariables>(GetMissingDocument, baseOptions);
       }
@@ -1829,23 +1451,6 @@ export const GetMovieFileDetailsDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetMovieFileDetailsQuery__
- *
- * To run a query within a React component, call `useGetMovieFileDetailsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetMovieFileDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetMovieFileDetailsQuery({
- *   variables: {
- *      tmdbId: // value for 'tmdbId'
- *   },
- * });
- */
 export function useGetMovieFileDetailsQuery(baseOptions?: Apollo.QueryHookOptions<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>) {
         return Apollo.useQuery<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>(GetMovieFileDetailsDocument, baseOptions);
       }
@@ -1868,22 +1473,6 @@ export const GetParamsDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetParamsQuery__
- *
- * To run a query within a React component, call `useGetParamsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetParamsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetParamsQuery({
- *   variables: {
- *   },
- * });
- */
 export function useGetParamsQuery(baseOptions?: Apollo.QueryHookOptions<GetParamsQuery, GetParamsQueryVariables>) {
         return Apollo.useQuery<GetParamsQuery, GetParamsQueryVariables>(GetParamsDocument, baseOptions);
       }
@@ -1919,22 +1508,6 @@ export const GetPopularDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetPopularQuery__
- *
- * To run a query within a React component, call `useGetPopularQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetPopularQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetPopularQuery({
- *   variables: {
- *   },
- * });
- */
 export function useGetPopularQuery(baseOptions?: Apollo.QueryHookOptions<GetPopularQuery, GetPopularQueryVariables>) {
         return Apollo.useQuery<GetPopularQuery, GetPopularQueryVariables>(GetPopularDocument, baseOptions);
       }
@@ -1957,23 +1530,6 @@ export const GetQualityDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetQualityQuery__
- *
- * To run a query within a React component, call `useGetQualityQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetQualityQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetQualityQuery({
- *   variables: {
- *      type: // value for 'type'
- *   },
- * });
- */
 export function useGetQualityQuery(baseOptions?: Apollo.QueryHookOptions<GetQualityQuery, GetQualityQueryVariables>) {
         return Apollo.useQuery<GetQualityQuery, GetQualityQueryVariables>(GetQualityDocument, baseOptions);
       }
@@ -2007,22 +1563,6 @@ export const GetRecommendedDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetRecommendedQuery__
- *
- * To run a query within a React component, call `useGetRecommendedQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetRecommendedQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetRecommendedQuery({
- *   variables: {
- *   },
- * });
- */
 export function useGetRecommendedQuery(baseOptions?: Apollo.QueryHookOptions<GetRecommendedQuery, GetRecommendedQueryVariables>) {
         return Apollo.useQuery<GetRecommendedQuery, GetRecommendedQueryVariables>(GetRecommendedDocument, baseOptions);
       }
@@ -2043,22 +1583,6 @@ export const GetTagsDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetTagsQuery__
- *
- * To run a query within a React component, call `useGetTagsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetTagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetTagsQuery({
- *   variables: {
- *   },
- * });
- */
 export function useGetTagsQuery(baseOptions?: Apollo.QueryHookOptions<GetTagsQuery, GetTagsQueryVariables>) {
         return Apollo.useQuery<GetTagsQuery, GetTagsQueryVariables>(GetTagsDocument, baseOptions);
       }
@@ -2084,23 +1608,6 @@ export const GetTorrentStatusDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetTorrentStatusQuery__
- *
- * To run a query within a React component, call `useGetTorrentStatusQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetTorrentStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetTorrentStatusQuery({
- *   variables: {
- *      torrents: // value for 'torrents'
- *   },
- * });
- */
 export function useGetTorrentStatusQuery(baseOptions?: Apollo.QueryHookOptions<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>) {
         return Apollo.useQuery<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>(GetTorrentStatusDocument, baseOptions);
       }
@@ -2112,7 +1619,10 @@ export type GetTorrentStatusLazyQueryHookResult = ReturnType<typeof useGetTorren
 export type GetTorrentStatusQueryResult = Apollo.QueryResult<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>;
 export const GetTvSeasonDetailsDocument = gql`
     query getTVSeasonDetails($tvShowTMDBId: Int!, $seasonNumber: Int!) {
-  episodes: getTVSeasonDetails(tvShowTMDBId: $tvShowTMDBId, seasonNumber: $seasonNumber) {
+  episodes: getTVSeasonDetails(
+    tvShowTMDBId: $tvShowTMDBId
+    seasonNumber: $seasonNumber
+  ) {
     id
     episodeNumber
     seasonNumber
@@ -2131,24 +1641,6 @@ export const GetTvSeasonDetailsDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetTvSeasonDetailsQuery__
- *
- * To run a query within a React component, call `useGetTvSeasonDetailsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetTvSeasonDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetTvSeasonDetailsQuery({
- *   variables: {
- *      tvShowTMDBId: // value for 'tvShowTMDBId'
- *      seasonNumber: // value for 'seasonNumber'
- *   },
- * });
- */
 export function useGetTvSeasonDetailsQuery(baseOptions?: Apollo.QueryHookOptions<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>) {
         return Apollo.useQuery<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>(GetTvSeasonDetailsDocument, baseOptions);
       }
@@ -2172,23 +1664,6 @@ export const GetTvShowSeasonsDocument = gql`
   }
 }
     `;
-
-/**
- * __useGetTvShowSeasonsQuery__
- *
- * To run a query within a React component, call `useGetTvShowSeasonsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetTvShowSeasonsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetTvShowSeasonsQuery({
- *   variables: {
- *      tvShowTMDBId: // value for 'tvShowTMDBId'
- *   },
- * });
- */
 export function useGetTvShowSeasonsQuery(baseOptions?: Apollo.QueryHookOptions<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>) {
         return Apollo.useQuery<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>(GetTvShowSeasonsDocument, baseOptions);
       }
@@ -2209,23 +1684,6 @@ export const OmdbSearchDocument = gql`
   }
 }
     `;
-
-/**
- * __useOmdbSearchQuery__
- *
- * To run a query within a React component, call `useOmdbSearchQuery` and pass it any options that fit your needs.
- * When your component renders, `useOmdbSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOmdbSearchQuery({
- *   variables: {
- *      title: // value for 'title'
- *   },
- * });
- */
 export function useOmdbSearchQuery(baseOptions?: Apollo.QueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
         return Apollo.useQuery<OmdbSearchQuery, OmdbSearchQueryVariables>(OmdbSearchDocument, baseOptions);
       }
@@ -2255,23 +1713,6 @@ export const SearchTorrentDocument = gql`
   }
 }
     `;
-
-/**
- * __useSearchTorrentQuery__
- *
- * To run a query within a React component, call `useSearchTorrentQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchTorrentQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSearchTorrentQuery({
- *   variables: {
- *      query: // value for 'query'
- *   },
- * });
- */
 export function useSearchTorrentQuery(baseOptions?: Apollo.QueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
         return Apollo.useQuery<SearchTorrentQuery, SearchTorrentQueryVariables>(SearchTorrentDocument, baseOptions);
       }
@@ -2307,23 +1748,6 @@ export const SearchDocument = gql`
   }
 }
     `;
-
-/**
- * __useSearchQuery__
- *
- * To run a query within a React component, call `useSearchQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSearchQuery({
- *   variables: {
- *      query: // value for 'query'
- *   },
- * });
- */
 export function useSearchQuery(baseOptions?: Apollo.QueryHookOptions<SearchQuery, SearchQueryVariables>) {
         return Apollo.useQuery<SearchQuery, SearchQueryVariables>(SearchDocument, baseOptions);
       }
