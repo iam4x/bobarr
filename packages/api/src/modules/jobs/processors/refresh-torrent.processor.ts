@@ -89,7 +89,7 @@ export class RefreshTorrentProcessor {
       torrent.torrentHash
     );
 
-    const isComplete = transmissionTorrent.percentDone === 1;
+    const isComplete = transmissionTorrent?.percentDone === 1;
 
     this.logger.info(
       isComplete ? 'torrent download finish' : 'torrent download in progress',
