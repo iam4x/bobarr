@@ -609,7 +609,7 @@ export class LibraryService {
 
     const tvSeason = await tvSeasonDAO.findOneOrFail({
       where: { id: seasonId },
-      relations: ['episodes'],
+      relations: ['episodes', 'episodes.files'],
     });
 
     if (tvSeason.state !== DownloadableMediaState.MISSING) {
@@ -647,13 +647,7 @@ export class LibraryService {
       );
     }
 
-    await tvEpisodeDAO.save(
-      tvSeason.episodes.map((episode) => ({
-        ...episode,
-        state: DownloadableMediaState.DOWNLOADING,
-      }))
-    );
-
+    await tvEpisodeDAO.remove(tvSeason.episodes);
     await tvSeasonDAO.save({
       id: seasonId,
       state: DownloadableMediaState.DOWNLOADING,

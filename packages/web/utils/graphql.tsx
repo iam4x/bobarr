@@ -4,6 +4,8 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -412,7 +414,8 @@ export type MutationDownloadMovieArgs = {
 
 export type MutationDownloadSeasonArgs = {
   jackettResult: JackettInput;
-  seasonId: Scalars['Int'];
+  seasonNumber: Scalars['Int'];
+  tvShowTMDBId: Scalars['Int'];
 };
 
 
@@ -485,7 +488,7 @@ export type ClearCacheMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -500,7 +503,7 @@ export type DownloadOwnTorrentMutation = (
   { __typename?: 'Mutation' }
   & { downloadOwnTorrent: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -511,7 +514,7 @@ export type StartScanLibraryMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -522,7 +525,7 @@ export type StartFindNewEpisodesMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -533,7 +536,7 @@ export type StartDownloadMissingMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -547,7 +550,7 @@ export type DownloadMovieMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -561,12 +564,13 @@ export type DownloadTvEpisodeMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
 export type DownloadSeasonMutationVariables = Exact<{
-  seasonId: Scalars['Int'];
+  tvShowTMDBId: Scalars['Int'];
+  seasonNumber: Scalars['Int'];
   jackettResult: JackettInput;
 }>;
 
@@ -575,7 +579,7 @@ export type DownloadSeasonMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -588,7 +592,7 @@ export type RemoveMovieMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -601,7 +605,7 @@ export type RemoveTvShowMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -615,7 +619,7 @@ export type ResetLibraryMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -628,7 +632,7 @@ export type SaveQualityMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -641,7 +645,7 @@ export type SaveTagsMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -655,7 +659,7 @@ export type TrackMovieMutation = (
   { __typename?: 'Mutation' }
   & { movie: (
     { __typename?: 'Movie' }
-    & Pick<Movie, '[object Object]'>
+    & Pick<Movie, 'id'>
   ) }
 );
 
@@ -669,7 +673,7 @@ export type TrackTvShowMutation = (
   { __typename?: 'Mutation' }
   & { tvShow: (
     { __typename?: 'TVShow' }
-    & Pick<TvShow, '[object Object]'>
+    & Pick<TvShow, 'id'>
   ) }
 );
 
@@ -682,7 +686,7 @@ export type UpdateParamsMutation = (
   { __typename?: 'Mutation' }
   & { result: (
     { __typename?: 'GraphQLCommonResponse' }
-    & Pick<GraphQlCommonResponse, '[object Object]' | '[object Object]'>
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
 );
 
@@ -695,13 +699,13 @@ export type GetCalendarQuery = (
     { __typename?: 'LibraryCalendar' }
     & { movies: Array<(
       { __typename?: 'EnrichedMovie' }
-      & Pick<EnrichedMovie, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+      & Pick<EnrichedMovie, 'id' | 'title' | 'state' | 'releaseDate'>
     )>, tvEpisodes: Array<(
       { __typename?: 'EnrichedTVEpisode' }
-      & Pick<EnrichedTvEpisode, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+      & Pick<EnrichedTvEpisode, 'id' | 'episodeNumber' | 'seasonNumber' | 'state' | 'releaseDate'>
       & { tvShow: (
         { __typename?: 'TVShow' }
-        & Pick<TvShow, '[object Object]' | '[object Object]'>
+        & Pick<TvShow, 'id' | 'title'>
       ) }
     )> }
   ) }
@@ -721,10 +725,10 @@ export type GetDiscoverQuery = (
   { __typename?: 'Query' }
   & { TMDBResults: (
     { __typename?: 'TMDBPaginatedResult' }
-    & Pick<TmdbPaginatedResult, '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<TmdbPaginatedResult, 'page' | 'totalResults' | 'totalPages'>
     & { results: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate'>
     )> }
   ) }
 );
@@ -736,10 +740,10 @@ export type GetDownloadingQuery = (
   { __typename?: 'Query' }
   & { searching: Array<(
     { __typename?: 'SearchingMedia' }
-    & Pick<SearchingMedia, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<SearchingMedia, 'id' | 'title' | 'resourceId' | 'resourceType'>
   )>, downloading: Array<(
     { __typename?: 'DownloadingMedia' }
-    & Pick<DownloadingMedia, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<DownloadingMedia, 'id' | 'title' | 'tag' | 'quality' | 'torrent' | 'resourceId' | 'resourceType'>
   )> }
 );
 
@@ -752,10 +756,10 @@ export type GetGenresQuery = (
     { __typename?: 'TMDBGenresResults' }
     & { movieGenres: Array<(
       { __typename?: 'TMDBGenresResult' }
-      & Pick<TmdbGenresResult, '[object Object]' | '[object Object]'>
+      & Pick<TmdbGenresResult, 'id' | 'name'>
     )>, tvShowGenres: Array<(
       { __typename?: 'TMDBGenresResult' }
-      & Pick<TmdbGenresResult, '[object Object]' | '[object Object]'>
+      & Pick<TmdbGenresResult, 'id' | 'name'>
     )> }
   ) }
 );
@@ -767,7 +771,7 @@ export type GetLanguagesQuery = (
   { __typename?: 'Query' }
   & { languages: Array<(
     { __typename?: 'TMDBLanguagesResult' }
-    & Pick<TmdbLanguagesResult, '[object Object]' | '[object Object]'>
+    & Pick<TmdbLanguagesResult, 'code' | 'language'>
   )> }
 );
 
@@ -778,7 +782,7 @@ export type GetLibraryMoviesQuery = (
   { __typename?: 'Query' }
   & { movies: Array<(
     { __typename?: 'EnrichedMovie' }
-    & Pick<EnrichedMovie, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<EnrichedMovie, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'state' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -789,22 +793,22 @@ export type GetLibraryTvShowsQuery = (
   { __typename?: 'Query' }
   & { tvShows: Array<(
     { __typename?: 'EnrichedTVShow' }
-    & Pick<EnrichedTvShow, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<EnrichedTvShow, 'id' | 'tmdbId' | 'title' | 'originalTitle' | 'posterPath' | 'runtime' | 'overview' | 'voteAverage' | 'releaseDate' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
 export type MissingTvEpisodesFragment = (
   { __typename?: 'EnrichedTVEpisode' }
-  & Pick<EnrichedTvEpisode, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+  & Pick<EnrichedTvEpisode, 'id' | 'seasonNumber' | 'episodeNumber' | 'releaseDate'>
   & { tvShow: (
     { __typename?: 'TVShow' }
-    & Pick<TvShow, '[object Object]' | '[object Object]'>
+    & Pick<TvShow, 'id' | 'title'>
   ) }
 );
 
 export type MissingMoviesFragment = (
   { __typename?: 'EnrichedMovie' }
-  & Pick<EnrichedMovie, '[object Object]' | '[object Object]' | '[object Object]'>
+  & Pick<EnrichedMovie, 'id' | 'title' | 'releaseDate'>
 );
 
 export type GetMissingQueryVariables = Exact<{ [key: string]: never; }>;
@@ -830,7 +834,7 @@ export type GetMovieFileDetailsQuery = (
   { __typename?: 'Query' }
   & { details: (
     { __typename?: 'LibraryFileDetails' }
-    & Pick<LibraryFileDetails, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<LibraryFileDetails, 'id' | 'libraryPath' | 'libraryFileSize' | 'torrentFileName'>
   ) }
 );
 
@@ -841,7 +845,7 @@ export type GetParamsQuery = (
   { __typename?: 'Query' }
   & { params: (
     { __typename?: 'ParamsHash' }
-    & Pick<ParamsHash, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<ParamsHash, 'region' | 'language' | 'tmdb_api_key' | 'jackett_api_key' | 'max_movie_download_size' | 'max_tvshow_episode_download_size' | 'organize_library_strategy'>
   ) }
 );
 
@@ -854,10 +858,10 @@ export type GetPopularQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )> }
   ) }
 );
@@ -871,7 +875,7 @@ export type GetQualityQuery = (
   { __typename?: 'Query' }
   & { qualities: Array<(
     { __typename?: 'Quality' }
-    & Pick<Quality, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<Quality, 'id' | 'name' | 'match' | 'score' | 'updatedAt' | 'createdAt' | 'type'>
   )> }
 );
 
@@ -882,10 +886,10 @@ export type GetRecommendedQuery = (
   { __typename?: 'Query' }
   & { tvShows: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
   )>, movies: Array<(
     { __typename?: 'TMDBSearchResult' }
-    & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
   )> }
 );
 
@@ -896,7 +900,7 @@ export type GetTagsQuery = (
   { __typename?: 'Query' }
   & { tags: Array<(
     { __typename?: 'Tag' }
-    & Pick<Tag, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<Tag, 'id' | 'name' | 'score' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -909,7 +913,7 @@ export type GetTorrentStatusQuery = (
   { __typename?: 'Query' }
   & { torrents: Array<(
     { __typename?: 'TorrentStatus' }
-    & Pick<TorrentStatus, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<TorrentStatus, 'id' | 'resourceId' | 'resourceType' | 'percentDone' | 'rateDownload' | 'rateUpload' | 'uploadRatio' | 'uploadedEver' | 'totalSize' | 'status'>
   )> }
 );
 
@@ -923,10 +927,10 @@ export type GetTvSeasonDetailsQuery = (
   { __typename?: 'Query' }
   & { episodes: Array<(
     { __typename?: 'EnrichedTVEpisode' }
-    & Pick<EnrichedTvEpisode, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<EnrichedTvEpisode, 'id' | 'episodeNumber' | 'seasonNumber' | 'state' | 'updatedAt' | 'voteAverage' | 'releaseDate' | 'createdAt'>
     & { tvShow: (
       { __typename?: 'TVShow' }
-      & Pick<TvShow, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+      & Pick<TvShow, 'id' | 'title' | 'tmdbId' | 'updatedAt' | 'createdAt'>
     ) }
   )> }
 );
@@ -940,7 +944,7 @@ export type GetTvShowSeasonsQuery = (
   { __typename?: 'Query' }
   & { seasons: Array<(
     { __typename?: 'TMDBFormattedTVSeason' }
-    & Pick<TmdbFormattedTvSeason, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<TmdbFormattedTvSeason, 'id' | 'name' | 'seasonNumber' | 'episodeCount' | 'overview' | 'posterPath' | 'airDate' | 'inLibrary'>
   )> }
 );
 
@@ -955,7 +959,7 @@ export type OmdbSearchQuery = (
     { __typename?: 'OMDBInfo' }
     & { ratings: (
       { __typename?: 'Ratings' }
-      & Pick<Ratings, '[object Object]' | '[object Object]' | '[object Object]'>
+      & Pick<Ratings, 'IMDB' | 'rottenTomatoes' | 'metaCritic'>
     ) }
   ) }
 );
@@ -969,7 +973,7 @@ export type SearchTorrentQuery = (
   { __typename?: 'Query' }
   & { results: Array<(
     { __typename?: 'JackettFormattedResult' }
-    & Pick<JackettFormattedResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+    & Pick<JackettFormattedResult, 'id' | 'title' | 'quality' | 'qualityScore' | 'seeders' | 'peers' | 'link' | 'downloadLink' | 'tag' | 'tagScore' | 'normalizedTitle' | 'normalizedTitleParts' | 'size' | 'publishDate'>
   )> }
 );
 
@@ -984,10 +988,10 @@ export type SearchQuery = (
     { __typename?: 'TMDBSearchResults' }
     & { movies: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )>, tvShows: Array<(
       { __typename?: 'TMDBSearchResult' }
-      & Pick<TmdbSearchResult, '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]' | '[object Object]'>
+      & Pick<TmdbSearchResult, 'id' | 'tmdbId' | 'title' | 'releaseDate' | 'posterPath' | 'overview' | 'runtime' | 'voteAverage'>
     )> }
   ) }
 );
@@ -1110,8 +1114,12 @@ export type DownloadTvEpisodeMutationHookResult = ReturnType<typeof useDownloadT
 export type DownloadTvEpisodeMutationResult = Apollo.MutationResult<DownloadTvEpisodeMutation>;
 export type DownloadTvEpisodeMutationOptions = Apollo.BaseMutationOptions<DownloadTvEpisodeMutation, DownloadTvEpisodeMutationVariables>;
 export const DownloadSeasonDocument = gql`
-    mutation downloadSeason($seasonId: Int!, $jackettResult: JackettInput!) {
-  result: downloadSeason(seasonId: $seasonId, jackettResult: $jackettResult) {
+    mutation downloadSeason($tvShowTMDBId: Int!, $seasonNumber: Int!, $jackettResult: JackettInput!) {
+  result: downloadSeason(
+    tvShowTMDBId: $tvShowTMDBId
+    seasonNumber: $seasonNumber
+    jackettResult: $jackettResult
+  ) {
     success
     message
   }
@@ -1451,7 +1459,7 @@ export const GetMovieFileDetailsDocument = gql`
   }
 }
     `;
-export function useGetMovieFileDetailsQuery(baseOptions?: Apollo.QueryHookOptions<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>) {
+export function useGetMovieFileDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>) {
         return Apollo.useQuery<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>(GetMovieFileDetailsDocument, baseOptions);
       }
 export function useGetMovieFileDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMovieFileDetailsQuery, GetMovieFileDetailsQueryVariables>) {
@@ -1530,7 +1538,7 @@ export const GetQualityDocument = gql`
   }
 }
     `;
-export function useGetQualityQuery(baseOptions?: Apollo.QueryHookOptions<GetQualityQuery, GetQualityQueryVariables>) {
+export function useGetQualityQuery(baseOptions: Apollo.QueryHookOptions<GetQualityQuery, GetQualityQueryVariables>) {
         return Apollo.useQuery<GetQualityQuery, GetQualityQueryVariables>(GetQualityDocument, baseOptions);
       }
 export function useGetQualityLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetQualityQuery, GetQualityQueryVariables>) {
@@ -1608,7 +1616,7 @@ export const GetTorrentStatusDocument = gql`
   }
 }
     `;
-export function useGetTorrentStatusQuery(baseOptions?: Apollo.QueryHookOptions<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>) {
+export function useGetTorrentStatusQuery(baseOptions: Apollo.QueryHookOptions<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>) {
         return Apollo.useQuery<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>(GetTorrentStatusDocument, baseOptions);
       }
 export function useGetTorrentStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTorrentStatusQuery, GetTorrentStatusQueryVariables>) {
@@ -1641,7 +1649,7 @@ export const GetTvSeasonDetailsDocument = gql`
   }
 }
     `;
-export function useGetTvSeasonDetailsQuery(baseOptions?: Apollo.QueryHookOptions<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>) {
+export function useGetTvSeasonDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>) {
         return Apollo.useQuery<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>(GetTvSeasonDetailsDocument, baseOptions);
       }
 export function useGetTvSeasonDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTvSeasonDetailsQuery, GetTvSeasonDetailsQueryVariables>) {
@@ -1664,7 +1672,7 @@ export const GetTvShowSeasonsDocument = gql`
   }
 }
     `;
-export function useGetTvShowSeasonsQuery(baseOptions?: Apollo.QueryHookOptions<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>) {
+export function useGetTvShowSeasonsQuery(baseOptions: Apollo.QueryHookOptions<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>) {
         return Apollo.useQuery<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>(GetTvShowSeasonsDocument, baseOptions);
       }
 export function useGetTvShowSeasonsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTvShowSeasonsQuery, GetTvShowSeasonsQueryVariables>) {
@@ -1684,7 +1692,7 @@ export const OmdbSearchDocument = gql`
   }
 }
     `;
-export function useOmdbSearchQuery(baseOptions?: Apollo.QueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
+export function useOmdbSearchQuery(baseOptions: Apollo.QueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
         return Apollo.useQuery<OmdbSearchQuery, OmdbSearchQueryVariables>(OmdbSearchDocument, baseOptions);
       }
 export function useOmdbSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OmdbSearchQuery, OmdbSearchQueryVariables>) {
@@ -1713,7 +1721,7 @@ export const SearchTorrentDocument = gql`
   }
 }
     `;
-export function useSearchTorrentQuery(baseOptions?: Apollo.QueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
+export function useSearchTorrentQuery(baseOptions: Apollo.QueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
         return Apollo.useQuery<SearchTorrentQuery, SearchTorrentQueryVariables>(SearchTorrentDocument, baseOptions);
       }
 export function useSearchTorrentLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchTorrentQuery, SearchTorrentQueryVariables>) {
@@ -1748,7 +1756,7 @@ export const SearchDocument = gql`
   }
 }
     `;
-export function useSearchQuery(baseOptions?: Apollo.QueryHookOptions<SearchQuery, SearchQueryVariables>) {
+export function useSearchQuery(baseOptions: Apollo.QueryHookOptions<SearchQuery, SearchQueryVariables>) {
         return Apollo.useQuery<SearchQuery, SearchQueryVariables>(SearchDocument, baseOptions);
       }
 export function useSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchQuery, SearchQueryVariables>) {

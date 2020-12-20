@@ -15,6 +15,7 @@ import {
 
 import { availableIn } from '../../utils/available-in';
 import { ManualSearchComponent } from '../manual-search/manual-search.component';
+import { Media } from '../manual-search/manual-search.helpers';
 
 interface TVSeasonDetailsProps {
   tvShowTMDBId: number;
@@ -28,9 +29,7 @@ export function TVSeasonDetailsComponent({
   tvShowTitle,
 }: TVSeasonDetailsProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [manualSearch, setManualSearch] = useState<
-    EnrichedTvEpisode | (TmdbFormattedTvSeason & { tvShowTitle: string }) | null
-  >(null);
+  const [manualSearch, setManualSearch] = useState<Media | null>(null);
 
   const { data, loading } = useGetTvSeasonDetailsQuery({
     pollInterval: 5000,
@@ -137,7 +136,9 @@ export function TVSeasonDetailsComponent({
           <div>
             <Tag
               icon={<SearchOutlined />}
-              onClick={() => setManualSearch({ ...season, tvShowTitle })}
+              onClick={() =>
+                setManualSearch({ ...season, tvShowTitle, tvShowTMDBId })
+              }
               style={{ width: 80, textAlign: 'center', cursor: 'pointer' }}
             >
               {season.inLibrary ? 'Replace' : 'Search'}

@@ -15,7 +15,7 @@ export type Media =
   | MissingMoviesFragment
   | EnrichedMovie
   | EnrichedTvEpisode
-  | (TmdbFormattedTvSeason & { tvShowTitle: string });
+  | (TmdbFormattedTvSeason & { tvShowTitle: string; tvShowTMDBId: number });
 
 export function getDefaultSearchQuery(media: Media) {
   if (media.__typename === 'EnrichedTVEpisode') {

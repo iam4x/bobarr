@@ -198,7 +198,8 @@ function ManualDownloadMedia({
     if (media.__typename === 'TMDBFormattedTVSeason') {
       downloadTVSeason({
         variables: {
-          seasonId: media.id!,
+          tvShowTMDBId: media.tvShowTMDBId!,
+          seasonNumber: media.seasonNumber!,
           jackettResult: jackettInput,
         },
       });
