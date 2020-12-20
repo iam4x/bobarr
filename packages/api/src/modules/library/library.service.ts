@@ -647,7 +647,13 @@ export class LibraryService {
       );
     }
 
-    await tvEpisodeDAO.remove(tvSeason.episodes);
+    await tvEpisodeDAO.save(
+      tvSeason.episodes.map((v) => ({
+        id: v.id,
+        state: DownloadableMediaState.SEARCHING,
+      }))
+    );
+
     await tvSeasonDAO.save({
       id: seasonId,
       state: DownloadableMediaState.DOWNLOADING,
