@@ -23,10 +23,14 @@ import {
 } from './library.dto';
 
 import { makeCacheInterceptor } from '../redis/cache.interceptor';
+import { TVShowDAO } from 'src/entities/dao/tvshow.dao';
 
 @Resolver()
 export class LibraryResolver {
-  public constructor(private readonly libraryService: LibraryService) {}
+  public constructor(
+    private readonly libraryService: LibraryService,
+    private readonly tvShowDAO: TVShowDAO
+  ) {}
 
   @Query((_returns) => [DownloadingMedia])
   public getDownloadingMedias() {
@@ -95,6 +99,30 @@ export class LibraryResolver {
   ) {
     await this.libraryService.downloadMovie(movieId, jackettResult, null);
     return { success: true, message: 'MOVIE_DOWNLOAD_STARTED' };
+  }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
+  public async downloadSeason(
+    @Args('tvShowTMDBId', { type: () => Int }) tvShowTMDBId: number,
+    @Args('seasonNumber', { type: () => Int }) seasonNumber: number,
+    @Args('jackettResult', { type: () => JackettInput })
+    jackettResult: JackettInput
+  ) {
+    const { seasons } = await this.tvShowDAO
+      .createQueryBuilder('tvShow')
+      .innerJoinAndSelect(
+        'tvShow.seasons',
+        'season',
+        'season.seasonNumber = :seasonNumber',
+        { seasonNumber }
+      )
+      .where('tvShow.tmdbId = :tvShowTMDBId', { tvShowTMDBId })
+      .getOneOrFail();
+
+    const [{ id: seasonId }] = seasons;
+    await this.libraryService.downloadTVSeason(seasonId, jackettResult, null);
+
+    return { success: true, message: 'TV_EPISODE_DOWNLOAD_STARTED' };
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)

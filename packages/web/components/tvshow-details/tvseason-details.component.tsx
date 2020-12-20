@@ -15,20 +15,21 @@ import {
 
 import { availableIn } from '../../utils/available-in';
 import { ManualSearchComponent } from '../manual-search/manual-search.component';
+import { Media } from '../manual-search/manual-search.helpers';
 
 interface TVSeasonDetailsProps {
   tvShowTMDBId: number;
   season: TmdbFormattedTvSeason;
+  tvShowTitle: string;
 }
 
 export function TVSeasonDetailsComponent({
   tvShowTMDBId,
   season,
+  tvShowTitle,
 }: TVSeasonDetailsProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [manualSearch, setManualSearch] = useState<EnrichedTvEpisode | null>(
-    null
-  );
+  const [manualSearch, setManualSearch] = useState<Media | null>(null);
 
   const { data, loading } = useGetTvSeasonDetailsQuery({
     pollInterval: 5000,
@@ -90,9 +91,9 @@ export function TVSeasonDetailsComponent({
           <Tag
             icon={<SearchOutlined />}
             onClick={() => setManualSearch(row)}
-            style={{ width: 80, textAlign: 'center', cursor: 'pointer' }}
+            style={{ width: 120, textAlign: 'center', cursor: 'pointer' }}
           >
-            {inLibrary ? 'Replace' : 'Search'}
+            {inLibrary ? 'Replace' : 'Search'} episode
           </Tag>
         );
       },
@@ -121,17 +122,28 @@ export function TVSeasonDetailsComponent({
         className="season"
         style={{ marginBottom: isOpen && season.seasonNumber !== 1 ? 12 : 0 }}
       >
-        <div className="season-title" onClick={toggle}>
-          <div className="season-toggle">
-            {isOpen ? <FaChevronCircleDown /> : <FaChevronCircleRight />}
-          </div>
-          <div className="season-number">Season {season.seasonNumber}</div>
-          {season.airDate && (
-            <div className="season-year">
-              {' '}
-              ({dayjs(season.airDate).format('YYYY')})
+        <div className="season-top">
+          <div className="season-title" onClick={toggle}>
+            <div className="season-toggle">
+              {isOpen ? <FaChevronCircleDown /> : <FaChevronCircleRight />}
             </div>
-          )}
+            <div className="season-number">Season {season.seasonNumber}</div>
+            {season.airDate && (
+              <div className="season-year">
+                {' '}
+                ({dayjs(season.airDate).format('YYYY')})
+              </div>
+            )}
+          </div>
+          <div
+            className="season-replace"
+            onClick={() =>
+              setManualSearch({ ...season, tvShowTitle, tvShowTMDBId })
+            }
+          >
+            {season.inLibrary ? 'Replace' : 'Search'} season
+            <SearchOutlined style={{ marginLeft: 8 }} />
+          </div>
         </div>
         {isOpen && (
           <Table<EnrichedTvEpisode>

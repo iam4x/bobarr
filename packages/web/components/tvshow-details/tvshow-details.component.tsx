@@ -135,6 +135,7 @@ export function TVShowSeasonsModalComponent(
                       key={season.id}
                       season={season}
                       tvShowTMDBId={tvShow.tmdbId}
+                      tvShowTitle={tvShow.title}
                     />
                   ))}
               </div>

@@ -293,6 +293,7 @@ type Mutation {
   startFindNewEpisodesJob: GraphQLCommonResponse!
   startDownloadMissingJob: GraphQLCommonResponse!
   downloadMovie(jackettResult: JackettInput!, movieId: Int!): GraphQLCommonResponse!
+  downloadSeason(jackettResult: JackettInput!, seasonNumber: Int!, tvShowTMDBId: Int!): GraphQLCommonResponse!
   downloadTVEpisode(jackettResult: JackettInput!, episodeId: Int!): GraphQLCommonResponse!
   trackMovie(tmdbId: Int!, title: String!): Movie!
   removeMovie(tmdbId: Int!): GraphQLCommonResponse!
