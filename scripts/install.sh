@@ -18,7 +18,7 @@ EOF
 
 if [ "$(ls -A $PWD)" ]
 then
-    echo "warning, directory is not empty will stop"
+    echo "Please run this script in an empty and new directory"
     exit 2
 fi
 
