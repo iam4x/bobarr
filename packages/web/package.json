@@ -36,6 +36,7 @@
     "yarn": "^1.22.4"
   },
   "devDependencies": {
+    "@graphql-codegen/add": "^2.0.2",
     "@graphql-codegen/cli": "^1.13.1",
     "@graphql-codegen/fragment-matcher": "1.17.8",
     "@graphql-codegen/introspection": "1.17.8",
