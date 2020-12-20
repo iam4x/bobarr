@@ -18,7 +18,8 @@ EOF
 
 if [ "$(ls -A $PWD)" ]
 then
-    echo "Please run this script in an empty and new directory"
+    echo "$(pwd) is not empty"
+    echo "please re-run this install script in an empty and new directory"
     exit 2
 fi
 

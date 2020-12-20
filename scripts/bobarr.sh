@@ -47,10 +47,9 @@ elif [[ $args == 'stop' ]]; then
   echo ""
   echo "bobarr correctly stopped"
 elif [[ $args == 'update' ]]; then
-  stop_bobarr
   docker-compose pull
   echo ""
-  echo "bobarr correctly updated, you can now re-start bobarr"
+  echo "bobarr docker images correctly updated, you can now re-start bobarr"
 else
   echo "unknow command: $args"
   echo "use [start | start:vpn | start:wireguard | stop | update]"
