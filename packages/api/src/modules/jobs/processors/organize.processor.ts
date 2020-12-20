@@ -276,7 +276,12 @@ export class OrganizeProcessor {
 
     const torrentFiles = torrent.transmissionTorrent.files.reduce(
       (
-        results: Array<{ original: string; ext: string; episodeNb: number }>,
+        results: Array<{
+          original: string;
+          ext: string;
+          episodeNb: number;
+          part?: string;
+        }>,
         file
       ) => {
         const ext = path.extname(file.name);
@@ -284,13 +289,19 @@ export class OrganizeProcessor {
 
         const [, episodeNb1] = /S\d+ ?E(\d+)/.exec(fileName) || []; // Foobar_S01E01.mkv
         const [, episodeNb2] = /\d+X(\d+)/.exec(fileName) || []; // Foobar_1x01.mkv
-
         const episodeNb = episodeNb1 || episodeNb2;
+
+        const [, part] = /part ?(\d+)/.exec(fileName.toLowerCase()) || []; // Foobar_S01E01_Part1
 
         if (episodeNb && allowedExtensions.includes(ext.replace(/^\./, ''))) {
           return [
             ...results,
-            { original: file.name, ext, episodeNb: parseInt(episodeNb, 10) },
+            {
+              ext,
+              part,
+              original: file.name,
+              episodeNb: parseInt(episodeNb, 10),
+            },
           ];
         }
 
@@ -313,8 +324,11 @@ export class OrganizeProcessor {
       const newName = [
         tvShow.title,
         `S${seasonNb}E${formatNumber(file.episodeNb)}`,
+        file.part ? `Part ${file.part}` : undefined,
         `${torrent.quality} [${torrent.tag.toUpperCase()}]`,
-      ].join(' - ');
+      ]
+        .filter((v) => v !== undefined)
+        .join(' - ');
 
       await childCommand(
         oneLine`
@@ -329,7 +343,12 @@ export class OrganizeProcessor {
         (k) => k.episodeNumber === file.episodeNb
       );
 
-      if (episode) {
+      const newFilePath = path.join(seasonFolder, newName, file.ext);
+      const fileAlreadyTracked = await this.fileDAO.findOne({
+        where: { path: newFilePath },
+      });
+
+      if (episode && !fileAlreadyTracked) {
         await this.fileDAO.save({
           episodeId: episode.id,
           path: path.join(seasonFolder, newName, file.ext),
