@@ -7,6 +7,7 @@ import { mapSeries } from 'p-iteration';
 import { Job } from 'bull';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { EntityManager, Transaction, TransactionManager } from 'typeorm';
 import { Logger } from 'winston';
 
 import { LIBRARY_CONFIG } from 'src/config';
@@ -35,14 +36,8 @@ import { FileDAO } from 'src/entities/dao/file.dao';
 
 @Processor(JobsQueue.RENAME_AND_LINK)
 export class OrganizeProcessor {
-  // eslint-disable-next-line max-params
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
-    private readonly movieDAO: MovieDAO,
-    private readonly tvSeasonDAO: TVSeasonDAO,
-    private readonly tvEpisodeDAO: TVEpisodeDAO,
-    private readonly torrentDAO: TorrentDAO,
-    private readonly fileDAO: FileDAO,
     private readonly transmissionService: TransmissionService,
     private readonly libraryService: LibraryService,
     private readonly paramsService: ParamsService
@@ -65,8 +60,16 @@ export class OrganizeProcessor {
   }
 
   @Process(OrganizeQueueProcessors.HANDLE_MOVIE)
-  public async renameAndLinkMovie(job: Job<{ movieId: number }>) {
+  @Transaction()
+  public async renameAndLinkMovie(
+    job: Job<{ movieId: number }>,
+    @TransactionManager() manager?: EntityManager
+  ) {
     const { movieId } = job.data;
+
+    const movieDAO = manager!.getCustomRepository(MovieDAO);
+    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+    const fileDAO = manager!.getCustomRepository(FileDAO);
 
     const organizeStrategy = (await this.paramsService.get(
       ParameterKey.ORGANIZE_LIBRARY_STRATEGY
@@ -141,7 +144,7 @@ export class OrganizeProcessor {
           `
       );
 
-      await this.fileDAO.save({
+      await fileDAO.save({
         movieId,
         path: path.join(newFolder, torrentFile.next),
       });
@@ -149,10 +152,10 @@ export class OrganizeProcessor {
 
     if (organizeStrategy === OrganizeLibraryStrategy.MOVE) {
       await this.transmissionService.removeTorrentAndFiles(torrent.torrentHash);
-      await this.torrentDAO.remove(torrent);
+      await torrentDAO.remove(torrent);
     }
 
-    await this.movieDAO.save({
+    await movieDAO.save({
       id: movieId,
       state: DownloadableMediaState.PROCESSED,
     });
@@ -161,8 +164,16 @@ export class OrganizeProcessor {
   }
 
   @Process(OrganizeQueueProcessors.HANDLE_EPISODE)
-  public async renameAndLinkEpisode(job: Job<{ episodeId: number }>) {
+  @Transaction()
+  public async renameAndLinkEpisode(
+    job: Job<{ episodeId: number }>,
+    @TransactionManager() manager?: EntityManager
+  ) {
     const { episodeId } = job.data;
+
+    const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
+    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+    const fileDAO = manager!.getCustomRepository(FileDAO);
 
     const organizeStrategy = (await this.paramsService.get(
       ParameterKey.ORGANIZE_LIBRARY_STRATEGY
@@ -172,7 +183,7 @@ export class OrganizeProcessor {
       episodeId,
     });
 
-    const episode = await this.tvEpisodeDAO.findOneOrFail({
+    const episode = await tvEpisodeDAO.findOneOrFail({
       where: { id: episodeId },
       relations: ['season', 'season.tvShow'],
     });
@@ -221,7 +232,7 @@ export class OrganizeProcessor {
         `
       );
 
-      await this.fileDAO.save({
+      await fileDAO.save({
         episodeId,
         path: path.join(seasonFolder, torrentFile.next),
       });
@@ -229,10 +240,10 @@ export class OrganizeProcessor {
 
     if (organizeStrategy === OrganizeLibraryStrategy.MOVE) {
       await this.transmissionService.removeTorrentAndFiles(torrent.torrentHash);
-      await this.torrentDAO.remove(torrent);
+      await torrentDAO.remove(torrent);
     }
 
-    await this.tvEpisodeDAO.save({
+    await tvEpisodeDAO.save({
       id: episode.id,
       state: DownloadableMediaState.PROCESSED,
     });
@@ -241,8 +252,17 @@ export class OrganizeProcessor {
   }
 
   @Process(OrganizeQueueProcessors.HANDLE_SEASON)
-  public async renameAndLinkSeason(job: Job<{ seasonId: number }>) {
+  @Transaction()
+  public async renameAndLinkSeason(
+    job: Job<{ seasonId: number }>,
+    @TransactionManager() manager?: EntityManager
+  ) {
     const { seasonId } = job.data;
+
+    const tvSeasonDAO = manager!.getCustomRepository(TVSeasonDAO);
+    const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
+    const torrentDAO = manager!.getCustomRepository(TorrentDAO);
+    const fileDAO = manager!.getCustomRepository(FileDAO);
 
     const organizeStrategy = (await this.paramsService.get(
       ParameterKey.ORGANIZE_LIBRARY_STRATEGY
@@ -252,7 +272,7 @@ export class OrganizeProcessor {
       seasonId,
     });
 
-    const season = await this.tvSeasonDAO.findOneOrFail({
+    const season = await tvSeasonDAO.findOneOrFail({
       where: { id: seasonId },
       relations: ['tvShow', 'episodes'],
     });
@@ -343,13 +363,8 @@ export class OrganizeProcessor {
         (k) => k.episodeNumber === file.episodeNb
       );
 
-      const newFilePath = path.join(seasonFolder, newName, file.ext);
-      const fileAlreadyTracked = await this.fileDAO.findOne({
-        where: { path: newFilePath },
-      });
-
-      if (episode && !fileAlreadyTracked) {
-        await this.fileDAO.save({
+      if (episode) {
+        await fileDAO.save({
           episodeId: episode.id,
           path: path.join(seasonFolder, newName, file.ext),
         });
@@ -358,10 +373,10 @@ export class OrganizeProcessor {
 
     if (organizeStrategy === OrganizeLibraryStrategy.MOVE) {
       await this.transmissionService.removeTorrentAndFiles(torrent.torrentHash);
-      await this.torrentDAO.remove(torrent);
+      await torrentDAO.remove(torrent);
     }
 
-    await this.tvEpisodeDAO.save(
+    await tvEpisodeDAO.save(
       season.episodes
         .filter((episode) =>
           torrentFiles.some((file) => file.episodeNb === episode.episodeNumber)
@@ -372,7 +387,7 @@ export class OrganizeProcessor {
         }))
     );
 
-    await this.tvSeasonDAO.save({
+    await tvSeasonDAO.save({
       id: season.id,
       state: DownloadableMediaState.PROCESSED,
     });
