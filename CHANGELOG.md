@@ -4,6 +4,10 @@
 
 ### Added
 
+- manual search season pack (https://github.com/iam4x/bobarr/pull/172)
+
+### Added
+
 - added FlareSolverr for solving CloudFare on certains trackers within jackett (https://github.com/iam4x/bobarr/issues/165)
 - update jobs ui
 - update nodejs to v14
