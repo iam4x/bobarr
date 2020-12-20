@@ -91,9 +91,9 @@ export function TVSeasonDetailsComponent({
           <Tag
             icon={<SearchOutlined />}
             onClick={() => setManualSearch(row)}
-            style={{ width: 80, textAlign: 'center', cursor: 'pointer' }}
+            style={{ width: 120, textAlign: 'center', cursor: 'pointer' }}
           >
-            {inLibrary ? 'Replace' : 'Search'}
+            {inLibrary ? 'Replace' : 'Search'} episode
           </Tag>
         );
       },
@@ -141,7 +141,7 @@ export function TVSeasonDetailsComponent({
               setManualSearch({ ...season, tvShowTitle, tvShowTMDBId })
             }
           >
-            {season.inLibrary ? 'Replace' : 'Search'}
+            {season.inLibrary ? 'Replace' : 'Search'} season
             <SearchOutlined style={{ marginLeft: 8 }} />
           </div>
         </div>
