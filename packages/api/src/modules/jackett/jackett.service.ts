@@ -104,6 +104,8 @@ export class JackettService {
     }
 
     const queries = uniq(titles)
+      // support "American Dad!" like
+      .map((title) => title.replace('!', ''))
       .map((title) => [
         `${title} S${formatNumber(tvSeason.seasonNumber)}`,
         `${title} Season ${formatNumber(tvSeason.seasonNumber)}`,
