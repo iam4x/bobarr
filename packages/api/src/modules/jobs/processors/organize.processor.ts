@@ -376,6 +376,7 @@ export class OrganizeProcessor {
       await torrentDAO.remove(torrent);
     }
 
+    // set downloaded episodes to processed
     await tvEpisodeDAO.save(
       season.episodes
         .filter((episode) =>
@@ -387,6 +388,19 @@ export class OrganizeProcessor {
         }))
     );
 
+    // set other episodes to missing
+    await tvEpisodeDAO.save(
+      season.episodes
+        .filter((episode) =>
+          torrentFiles.every((file) => file.episodeNb !== episode.episodeNumber)
+        )
+        .map((episode) => ({
+          id: episode.id,
+          state: DownloadableMediaState.MISSING,
+        }))
+    );
+
+    // set tvSeason as processed too
     await tvSeasonDAO.save({
       id: season.id,
       state: DownloadableMediaState.PROCESSED,
