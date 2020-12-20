@@ -328,7 +328,7 @@ export class ScanLibraryProcessor {
     });
 
     let tvShow = isTVShowInDatabase
-      ? isTVShowInDatabase.tvEpisode.tvShow
+      ? isTVShowInDatabase?.tvEpisode?.tvShow
       : null;
 
     if (!tvShow) {
