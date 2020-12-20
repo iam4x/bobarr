@@ -12,6 +12,8 @@
 ### Fixes
 
 - update strategy for scannig library
+- handle multi part episodes when downloading a season pack
+- wrap organize library jobs into transactions (better error handling if something fails)
 
 ## [v1.0.0-beta.3] - 2020-12-14
 
