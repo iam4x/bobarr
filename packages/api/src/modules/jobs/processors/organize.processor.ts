@@ -366,7 +366,7 @@ export class OrganizeProcessor {
       if (episode) {
         await fileDAO.save({
           episodeId: episode.id,
-          path: path.join(seasonFolder, newName, file.ext),
+          path: `${path.join(seasonFolder, newName)}.${file.ext}`,
         });
       }
     });
