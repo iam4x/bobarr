@@ -37,7 +37,7 @@
     "ioredis": "^4.16.2",
     "leven": "^3.1.0",
     "lib-get-redirects": "^1.0.0",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "nest-winston": "^1.3.3",
     "p-iteration": "^1.1.8",
     "pg": "^8.0.0",
