@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import prettySize from 'prettysize';
-import { truncate, pick } from 'lodash';
+import { pick } from 'lodash';
 import { PureQueryOptions } from '@apollo/client';
 
 import { Table, Popover, Tag, notification } from 'antd';
@@ -46,8 +46,14 @@ export function JackettResultsTable({
     },
     {
       title: 'Name',
-      render: (row: JackettFormattedResult) =>
-        truncate(row.title, { length: 70 }),
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (row: JackettFormattedResult) => (
+        <Popover content={row.title}>
+          {row.title}
+        </Popover>
+      ),
     },
     {
       title: 'Size',
@@ -209,6 +215,8 @@ function ManualDownloadMedia({
   return loading1 || loading2 || loading3 ? (
     <LoadingOutlined />
   ) : (
-    <DownloadOutlined style={{ cursor: 'pointer' }} onClick={handleClick} />
+    <Popover content={jackettResult.link}>
+      <DownloadOutlined style={{ cursor: 'pointer' }} onClick={handleClick} />
+    </Popover>
   );
 }
