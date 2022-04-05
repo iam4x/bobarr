@@ -1,3 +1,4 @@
+import { DownloadableMediaState } from 'src/app.dto';
 import { EntityRepository, Repository } from 'typeorm';
 import { TVSeason } from '../tvseason.entity';
 
@@ -19,8 +20,8 @@ export class TVSeasonDAO extends Repository<TVSeason> {
   public async findOrCreate(seasonAttributes: {
     tvShowId: number;
     seasonNumber: number;
-  }) {
+  }, defaultState?: DownloadableMediaState) {
     const match = await this.findOne(seasonAttributes);
-    return match || (await this.save(seasonAttributes));
+    return match || (await this.save({ ...seasonAttributes, state: defaultState }));
   }
 }
