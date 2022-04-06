@@ -17,11 +17,16 @@ export class TVSeasonDAO extends Repository<TVSeason> {
     return match !== undefined;
   }
 
-  public async findOrCreate(seasonAttributes: {
-    tvShowId: number;
-    seasonNumber: number;
-  }, defaultState?: DownloadableMediaState) {
+  public async findOrCreate(
+    seasonAttributes: {
+      tvShowId: number;
+      seasonNumber: number;
+    },
+    defaultState?: DownloadableMediaState
+  ) {
     const match = await this.findOne(seasonAttributes);
-    return match || (await this.save({ ...seasonAttributes, state: defaultState }));
+    return (
+      match || (await this.save({ ...seasonAttributes, state: defaultState }))
+    );
   }
 }
