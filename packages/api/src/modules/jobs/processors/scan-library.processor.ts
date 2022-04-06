@@ -408,10 +408,13 @@ export class ScanLibraryProcessor {
         episodeNumber,
       });
 
-      const tvSeason = await tvSeasonDAO.findOrCreate({
-        tvShowId: tvShow!.id,
-        seasonNumber: parseInt(seasonNumber, 10),
-      });
+      const tvSeason = await tvSeasonDAO.findOrCreate(
+        {
+          tvShowId: tvShow!.id,
+          seasonNumber: parseInt(seasonNumber, 10),
+        },
+        DownloadableMediaState.PROCESSED
+      );
 
       const episode = await tvEpisodeDAO.findOrCreate({
         tvShowId: tvShow!.id,
