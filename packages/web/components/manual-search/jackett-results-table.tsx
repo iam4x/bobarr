@@ -50,9 +50,7 @@ export function JackettResultsTable({
         showTitle: false,
       },
       render: (row: JackettFormattedResult) => (
-        <Popover content={row.title}>
-          {row.title}
-        </Popover>
+        <Popover content={row.title}>{row.title}</Popover>
       ),
     },
     {
