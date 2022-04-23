@@ -3,7 +3,6 @@
 /* eslint import/no-commonjs: off */
 
 module.exports = {
-  env: { WEB_UI_API_URL: process.env.WEB_UI_API_URL },
   webpackDevMiddleware: (config) => {
     // Solve compiling problem via vagrant
     config.watchOptions = {
@@ -11,6 +10,12 @@ module.exports = {
       aggregateTimeout: 300, // delay before rebuilding
     };
     return config;
+  },
+  publicRuntimeConfig: {
+    WEB_UI_API_URL: process.env.WEB_UI_API_URL
+  },
+  serverRuntimeConfig: {
+    WEB_UI_SSR_API_URL: process.env.WEB_UI_SSR_API_URL
   },
   async redirects() {
     return [
