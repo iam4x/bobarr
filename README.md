@@ -127,3 +127,8 @@ Check the [CHANGELOG](https://github.com/iam4x/bobarr/blob/master/CHANGELOG.md) 
 Clone the repository and then you can run bobarr API and Web UI in dev watch mode and display logs with:
 
 * `$ yarn dev`
+
+
+### Infrastructure model
+
+![Insfrastructure model](.infragenie/infrastructure_model.png)
