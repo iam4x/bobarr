@@ -154,6 +154,7 @@ export type ParamsHash = {
   language: Scalars['String'];
   tmdb_api_key: Scalars['String'];
   jackett_api_key: Scalars['String'];
+  jackett_url: Scalars['String'];
   max_movie_download_size: Scalars['String'];
   max_tvshow_episode_download_size: Scalars['String'];
   organize_library_strategy: Scalars['String'];
@@ -845,7 +846,7 @@ export type GetParamsQuery = (
   { __typename?: 'Query' }
   & { params: (
     { __typename?: 'ParamsHash' }
-    & Pick<ParamsHash, 'region' | 'language' | 'tmdb_api_key' | 'jackett_api_key' | 'max_movie_download_size' | 'max_tvshow_episode_download_size' | 'organize_library_strategy'>
+    & Pick<ParamsHash, 'region' | 'language' | 'tmdb_api_key' | 'jackett_api_key' | 'jackett_url' | 'max_movie_download_size' | 'max_tvshow_episode_download_size' | 'organize_library_strategy'>
   ) }
 );
 
@@ -1475,6 +1476,7 @@ export const GetParamsDocument = gql`
     language
     tmdb_api_key
     jackett_api_key
+    jackett_url
     max_movie_download_size
     max_tvshow_episode_download_size
     organize_library_strategy

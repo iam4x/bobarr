@@ -48,17 +48,6 @@ services:
     volumes:
       - redis_data:/bitnami/redis/data
 
-  jackett:
-    image: linuxserver/jackett
-    container_name: bobarr-jacket
-    env_file: .env
-    restart: unless-stopped
-    volumes:
-      - ./packages/jackett/config:/config
-      - ./packages/jackett/downloads:/downloads
-    ports:
-      - 9117:9117
-
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: bobarr-flaresolverr

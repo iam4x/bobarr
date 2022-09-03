@@ -44,6 +44,7 @@ export class ParamsService {
       [ParameterKey.MAX_MOVIE_DOWNLOAD_SIZE, (20e9).toString()], // max file size 20gb
       [ParameterKey.MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE, (5e9).toString()], // max file size 5gb
       [ParameterKey.JACKETT_API_KEY, ''],
+      [ParameterKey.JACKETT_URL, 'http://127.0.0.1:9117/'],
       [ParameterKey.ORGANIZE_LIBRARY_STRATEGY, OrganizeLibraryStrategy.LINK],
     ];
 

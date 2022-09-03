@@ -9,6 +9,7 @@ import { Logger } from 'winston';
 
 import { ParameterKey } from 'src/app.dto';
 import { formatNumber } from 'src/utils/format-number';
+import { formatUrl } from 'src/utils/format-url';
 import { sanitize } from 'src/utils/sanitize';
 
 import { ParamsService } from 'src/modules/params/params.service';
@@ -40,9 +41,12 @@ export class JackettService {
     const jackettApiKey = await this.paramsService.get(
       ParameterKey.JACKETT_API_KEY
     );
+    const jackettUrl = await this.paramsService.get(
+      ParameterKey.JACKETT_URL
+    );
 
     const client = axios.create({
-      baseURL: 'http://jackett:9117/api/v2.0/indexers/all',
+      baseURL: formatUrl(jackettUrl) + 'api/v2.0/indexers/all',
       params: { apikey: jackettApiKey },
     });
 

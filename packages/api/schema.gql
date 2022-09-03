@@ -127,6 +127,7 @@ type ParamsHash {
   language: String!
   tmdb_api_key: String!
   jackett_api_key: String!
+  jackett_url: String!
   max_movie_download_size: String!
   max_tvshow_episode_download_size: String!
   organize_library_strategy: String!

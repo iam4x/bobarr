@@ -25,6 +25,7 @@ export enum ParameterKey {
   LANGUAGE = 'language',
   TMDB_API_KEY = 'tmdb_api_key',
   JACKETT_API_KEY = 'jackett_api_key',
+  JACKETT_URL = 'jackett_url',
   MAX_MOVIE_DOWNLOAD_SIZE = 'max_movie_download_size',
   MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE = 'max_tvshow_episode_download_size',
   ORGANIZE_LIBRARY_STRATEGY = 'organize_library_strategy',
