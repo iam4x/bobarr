@@ -1,6 +1,6 @@
 export const DB_CONFIG = {
   type: 'postgres' as const,
-  host: 'postgres',
+  host: process.env.POSTGRES_HOST,
   port: 5432,
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
@@ -11,7 +11,7 @@ export const DB_CONFIG = {
 
 export const DEBUG_REDIS = process.env.DEBUG_REDIS === 'true' || false;
 export const REDIS_CONFIG = {
-  host: 'redis',
+  host: process.env.REDIS_HOST,
   port: 6379,
   password: process.env.REDIS_PASSWORD,
 };
