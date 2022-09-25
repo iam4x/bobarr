@@ -10,9 +10,11 @@ import { Torrent } from 'src/entities/torrent.entity';
 import { TorrentDAO } from 'src/entities/dao/torrent.dao';
 import { LazyTransaction } from 'src/utils/lazy-transaction';
 
+import { TRANSMISSION_CONFIG } from 'src/config';
+
 @Injectable()
 export class TransmissionService {
-  private client = new Transmission({ host: 'transmission' });
+  private client = new Transmission({ host: TRANSMISSION_CONFIG.host, port: TRANSMISSION_CONFIG.port });
 
   public constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,

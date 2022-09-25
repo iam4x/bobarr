@@ -24,6 +24,11 @@ export const JACKETT_CONFIG = {
 
 }
 
+export const TRANSMISSION_CONFIG = {
+  host: process.env.TRANSMISSION_HOST || 'transmission',
+  port: process.env.TRANSMISSION_PORT || '9091'
+}
+
 export const LIBRARY_CONFIG = {
   moviesFolderName: process.env.LIBRARY_MOVIES_FOLDER_NAME,
   tvShowsFolderName: process.env.LIBRARY_TV_SHOWS_FOLDER_NAME,
