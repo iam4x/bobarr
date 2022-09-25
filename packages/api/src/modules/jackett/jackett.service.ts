@@ -22,7 +22,7 @@ import { Tag } from 'src/entities/tag.entity';
 import { JackettResult, JackettIndexer } from './jackett.dto';
 import { Entertainment } from '../tmdb/tmdb.dto';
 import { PromiseRaceAll } from 'src/utils/promise-resolve';
-import { JACKETT_RESPONSE_TIMEOUT } from 'src/config';
+import { JACKETT_CONFIG } from 'src/config';
 
 @Injectable()
 export class JackettService {
@@ -42,7 +42,7 @@ export class JackettService {
     );
 
     const client = axios.create({
-      baseURL: 'http://jackett:9117/api/v2.0/indexers/all',
+      baseURL: `http://{JACKETT_CONFIG.host}:{JACKETT_CONFIG.port}/api/v2.0/indexers/all`,
       params: { apikey: jackettApiKey },
     });
 
@@ -176,8 +176,8 @@ export class JackettService {
       const resolvedIndexers = await PromiseRaceAll(
         allIndexers,
         opts.withoutFilter
-          ? JACKETT_RESPONSE_TIMEOUT.manual
-          : JACKETT_RESPONSE_TIMEOUT.automatic
+          ? JACKETT_CONFIG.timeoutManual
+          : JACKETT_CONFIG.timeoutAutomatic
       );
       const flattenIndexers = resolvedIndexers
         .filter((item) => Boolean(item))
