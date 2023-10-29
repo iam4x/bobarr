@@ -16,10 +16,22 @@ cat << "EOF"
 
 EOF
 
+if docker compose > /dev/null 2>&1; then
+    if docker compose version --short | grep "^2." > /dev/null 2>&1; then
+      COMPOSE_VERSION='docker compose'
+    fi
+elif docker-compose > /dev/null 2>&1; then
+  if ! [[ $(alias docker-compose 2> /dev/null) ]] ; then
+    if docker-compose version --short | grep "^2." > /dev/null 2>&1; then
+      COMPOSE_VERSION='docker-compose'
+    fi
+  fi
+fi
+
 args=$1
 
 stop_bobarr() {
-  docker-compose down --remove-orphans || true
+  $COMPOSE_VERSION down --remove-orphans || true
 }
 
 after_start() {
@@ -27,27 +39,27 @@ after_start() {
   echo "bobarr started correctly, printing bobarr api logs"
   echo "you can close this and bobarr will continue to run in backgound"
   echo ""
-  docker-compose logs -f api
+  $COMPOSE_VERSION logs -f api
 }
 
 if [[ $args == 'start' ]]; then
   stop_bobarr
-  docker-compose up --force-recreate -d
+  $COMPOSE_VERSION up --force-recreate -d
   after_start
 elif [[ $args == 'start:vpn' ]]; then
   stop_bobarr
-  docker-compose -f docker-compose.yml -f docker-compose.vpn.yml up --force-recreate -d
+  $COMPOSE_VERSION -f docker-compose.yml -f docker-compose.vpn.yml up --force-recreate -d
   after_start
 elif [[ $args == 'start:wireguard' ]]; then
   stop_bobarr
-  docker-compose -f docker-compose.yml -f docker-compose.wireguard.yml up --force-recreate -d
+  $COMPOSE_VERSION -f docker-compose.yml -f docker-compose.wireguard.yml up --force-recreate -d
   after_start
 elif [[ $args == 'stop' ]]; then
   stop_bobarr
   echo ""
   echo "bobarr correctly stopped"
 elif [[ $args == 'update' ]]; then
-  docker-compose pull
+  $COMPOSE_VERSION pull
   echo ""
   echo "bobarr docker images correctly updated, you can now re-start bobarr"
 else
