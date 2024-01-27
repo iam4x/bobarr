@@ -49,7 +49,7 @@ chmod +x ./bobarr.sh
 
 echo "downloading docker images"
 
-docker-compose pull
+docker compose pull
 
 echo ""
 echo "bobarr installation is now complete!"
