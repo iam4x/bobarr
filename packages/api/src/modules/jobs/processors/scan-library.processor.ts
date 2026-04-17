@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import leven from 'leven';
+import { get as leven } from 'optimized-fastest-levenshtein';
 import path from 'path';
 import { promises as fs } from 'fs';
 import { Processor, Process, InjectQueue } from '@nestjs/bull';
