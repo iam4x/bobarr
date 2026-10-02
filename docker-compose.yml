@@ -42,7 +42,7 @@ services:
 
   redis:
     container_name: bobarr-redis
-    image: bitnami/redis:5.0.6
+    image: bitnami/redis:latest
     env_file: .env
     restart: unless-stopped
     volumes:
